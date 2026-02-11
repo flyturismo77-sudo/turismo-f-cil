@@ -14,6 +14,179 @@ export type Database = {
   }
   public: {
     Tables: {
+      assentos: {
+        Row: {
+          andar: string | null
+          created_at: string
+          id: string
+          id_viagem: string | null
+          numero_poltrona: number
+          posicao: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          andar?: string | null
+          created_at?: string
+          id?: string
+          id_viagem?: string | null
+          numero_poltrona: number
+          posicao?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          andar?: string | null
+          created_at?: string
+          id?: string
+          id_viagem?: string | null
+          numero_poltrona?: number
+          posicao?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assentos_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clientes: {
+        Row: {
+          andar_onibus: string | null
+          arquivado: boolean | null
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          cor_grupo: string | null
+          cpf: string | null
+          created_at: string
+          data_nascimento: string | null
+          e_crianca_colo: boolean | null
+          email: string | null
+          estado: string | null
+          forma_pagamento: string | null
+          id: string
+          id_cliente_principal: string | null
+          id_viagem: string | null
+          idade: number | null
+          idade_crianca_colo: number | null
+          local_embarque: string | null
+          nome_completo: string
+          nome_crianca_colo: string | null
+          numero: string | null
+          numero_grupo: number | null
+          numero_parcelas: number | null
+          observacoes: string | null
+          poltrona: number | null
+          possui_crianca_colo: boolean | null
+          rua: string | null
+          sexo: string | null
+          status_pagamento: string | null
+          telefone: string | null
+          updated_at: string
+          valor_pago: number | null
+          valor_personalizado: number | null
+          valor_selecionado: string | null
+          valor_total_pacote: number | null
+        }
+        Insert: {
+          andar_onibus?: string | null
+          arquivado?: boolean | null
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cor_grupo?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          e_crianca_colo?: boolean | null
+          email?: string | null
+          estado?: string | null
+          forma_pagamento?: string | null
+          id?: string
+          id_cliente_principal?: string | null
+          id_viagem?: string | null
+          idade?: number | null
+          idade_crianca_colo?: number | null
+          local_embarque?: string | null
+          nome_completo: string
+          nome_crianca_colo?: string | null
+          numero?: string | null
+          numero_grupo?: number | null
+          numero_parcelas?: number | null
+          observacoes?: string | null
+          poltrona?: number | null
+          possui_crianca_colo?: boolean | null
+          rua?: string | null
+          sexo?: string | null
+          status_pagamento?: string | null
+          telefone?: string | null
+          updated_at?: string
+          valor_pago?: number | null
+          valor_personalizado?: number | null
+          valor_selecionado?: string | null
+          valor_total_pacote?: number | null
+        }
+        Update: {
+          andar_onibus?: string | null
+          arquivado?: boolean | null
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cor_grupo?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          e_crianca_colo?: boolean | null
+          email?: string | null
+          estado?: string | null
+          forma_pagamento?: string | null
+          id?: string
+          id_cliente_principal?: string | null
+          id_viagem?: string | null
+          idade?: number | null
+          idade_crianca_colo?: number | null
+          local_embarque?: string | null
+          nome_completo?: string
+          nome_crianca_colo?: string | null
+          numero?: string | null
+          numero_grupo?: number | null
+          numero_parcelas?: number | null
+          observacoes?: string | null
+          poltrona?: number | null
+          possui_crianca_colo?: boolean | null
+          rua?: string | null
+          sexo?: string | null
+          status_pagamento?: string | null
+          telefone?: string | null
+          updated_at?: string
+          valor_pago?: number | null
+          valor_personalizado?: number | null
+          valor_selecionado?: string | null
+          valor_total_pacote?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clientes_id_cliente_principal_fkey"
+            columns: ["id_cliente_principal"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clientes_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuracao_empresa: {
         Row: {
           cor_primaria: string | null
@@ -68,6 +241,405 @@ export type Database = {
         }
         Relationships: []
       }
+      contatos: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          lida: boolean | null
+          mensagem: string | null
+          nome: string
+          telefone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          lida?: boolean | null
+          mensagem?: string | null
+          nome: string
+          telefone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          lida?: boolean | null
+          mensagem?: string | null
+          nome?: string
+          telefone?: string | null
+        }
+        Relationships: []
+      }
+      documentos_viagem: {
+        Row: {
+          conteudo: string | null
+          created_at: string
+          id: string
+          id_viagem: string | null
+          nome: string | null
+          tipo: string | null
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          conteudo?: string | null
+          created_at?: string
+          id?: string
+          id_viagem?: string | null
+          nome?: string | null
+          tipo?: string | null
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          conteudo?: string | null
+          created_at?: string
+          id?: string
+          id_viagem?: string | null
+          nome?: string | null
+          tipo?: string | null
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_viagem_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      equipe: {
+        Row: {
+          ativo: boolean | null
+          cargo: string | null
+          created_at: string
+          email: string | null
+          foto_url: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          cargo?: string | null
+          created_at?: string
+          email?: string | null
+          foto_url?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          cargo?: string | null
+          created_at?: string
+          email?: string | null
+          foto_url?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      formularios: {
+        Row: {
+          ativo: boolean | null
+          campos: Json | null
+          created_at: string
+          descricao: string | null
+          id: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          campos?: Json | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          campos?: Json | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fornecedores: {
+        Row: {
+          ativo: boolean | null
+          contato: string | null
+          created_at: string
+          email: string | null
+          endereco: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          telefone: string | null
+          tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          telefone?: string | null
+          tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          telefone?: string | null
+          tipo?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      logs_auditoria: {
+        Row: {
+          acao: string
+          created_at: string
+          detalhes: Json | null
+          entidade: string | null
+          entidade_id: string | null
+          id: string
+          usuario_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          detalhes?: Json | null
+          entidade?: string | null
+          entidade_id?: string | null
+          id?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          detalhes?: Json | null
+          entidade?: string | null
+          entidade_id?: string | null
+          id?: string
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
+      mensagens: {
+        Row: {
+          conteudo: string | null
+          created_at: string
+          destinatario_id: string | null
+          id: string
+          lida: boolean | null
+          remetente_id: string | null
+        }
+        Insert: {
+          conteudo?: string | null
+          created_at?: string
+          destinatario_id?: string | null
+          id?: string
+          lida?: boolean | null
+          remetente_id?: string | null
+        }
+        Update: {
+          conteudo?: string | null
+          created_at?: string
+          destinatario_id?: string | null
+          id?: string
+          lida?: boolean | null
+          remetente_id?: string | null
+        }
+        Relationships: []
+      }
+      pagamentos: {
+        Row: {
+          comprovante_url: string | null
+          created_at: string
+          data_pagamento: string | null
+          forma_pagamento: string | null
+          id: string
+          id_cliente: string | null
+          numero_parcela: number | null
+          observacoes: string | null
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          comprovante_url?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          forma_pagamento?: string | null
+          id?: string
+          id_cliente?: string | null
+          numero_parcela?: number | null
+          observacoes?: string | null
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          comprovante_url?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          forma_pagamento?: string | null
+          id?: string
+          id_cliente?: string | null
+          numero_parcela?: number | null
+          observacoes?: string | null
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_id_cliente_fkey"
+            columns: ["id_cliente"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pagamentos_empresa: {
+        Row: {
+          categoria: string | null
+          comprovante_url: string | null
+          created_at: string
+          data_pagamento: string | null
+          descricao: string
+          fornecedor: string | null
+          id: string
+          id_viagem: string | null
+          observacoes: string | null
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          categoria?: string | null
+          comprovante_url?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          descricao: string
+          fornecedor?: string | null
+          id?: string
+          id_viagem?: string | null
+          observacoes?: string | null
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          categoria?: string | null
+          comprovante_url?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          descricao?: string
+          fornecedor?: string | null
+          id?: string
+          id_viagem?: string | null
+          observacoes?: string | null
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_empresa_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parcelas: {
+        Row: {
+          comprovante_url: string | null
+          created_at: string
+          data_pagamento: string | null
+          data_vencimento: string | null
+          forma_pagamento: string | null
+          id: string
+          id_cliente: string | null
+          id_viagem: string | null
+          numero_parcela: number
+          observacoes: string | null
+          status: string | null
+          total_parcelas: number
+          updated_at: string
+          valor_parcela: number | null
+        }
+        Insert: {
+          comprovante_url?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          forma_pagamento?: string | null
+          id?: string
+          id_cliente?: string | null
+          id_viagem?: string | null
+          numero_parcela: number
+          observacoes?: string | null
+          status?: string | null
+          total_parcelas: number
+          updated_at?: string
+          valor_parcela?: number | null
+        }
+        Update: {
+          comprovante_url?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          forma_pagamento?: string | null
+          id?: string
+          id_cliente?: string | null
+          id_viagem?: string | null
+          numero_parcela?: number
+          observacoes?: string | null
+          status?: string | null
+          total_parcelas?: number
+          updated_at?: string
+          valor_parcela?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcelas_id_cliente_fkey"
+            columns: ["id_cliente"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parcelas_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -101,6 +673,44 @@ export type Database = {
         }
         Relationships: []
       }
+      quartos: {
+        Row: {
+          capacidade: number | null
+          created_at: string
+          id: string
+          id_viagem: string | null
+          numero_quarto: string
+          ocupados: number | null
+          updated_at: string
+        }
+        Insert: {
+          capacidade?: number | null
+          created_at?: string
+          id?: string
+          id_viagem?: string | null
+          numero_quarto: string
+          ocupados?: number | null
+          updated_at?: string
+        }
+        Update: {
+          capacidade?: number | null
+          created_at?: string
+          id?: string
+          id_viagem?: string | null
+          numero_quarto?: string
+          ocupados?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quartos_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -116,6 +726,69 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      viagens: {
+        Row: {
+          arquivada: boolean | null
+          created_at: string
+          data_retorno: string | null
+          data_saida: string | null
+          destino: string
+          id: string
+          imagem_url: string | null
+          imagens_urls: string[] | null
+          modelo_onibus: string | null
+          modo_pirapark: boolean | null
+          nome: string
+          status: string | null
+          updated_at: string
+          vagas_ocupadas: number | null
+          vagas_totais: number | null
+          valor_1: number | null
+          valor_2: number | null
+          valor_3: number | null
+        }
+        Insert: {
+          arquivada?: boolean | null
+          created_at?: string
+          data_retorno?: string | null
+          data_saida?: string | null
+          destino: string
+          id?: string
+          imagem_url?: string | null
+          imagens_urls?: string[] | null
+          modelo_onibus?: string | null
+          modo_pirapark?: boolean | null
+          nome: string
+          status?: string | null
+          updated_at?: string
+          vagas_ocupadas?: number | null
+          vagas_totais?: number | null
+          valor_1?: number | null
+          valor_2?: number | null
+          valor_3?: number | null
+        }
+        Update: {
+          arquivada?: boolean | null
+          created_at?: string
+          data_retorno?: string | null
+          data_saida?: string | null
+          destino?: string
+          id?: string
+          imagem_url?: string | null
+          imagens_urls?: string[] | null
+          modelo_onibus?: string | null
+          modo_pirapark?: boolean | null
+          nome?: string
+          status?: string | null
+          updated_at?: string
+          vagas_ocupadas?: number | null
+          vagas_totais?: number | null
+          valor_1?: number | null
+          valor_2?: number | null
+          valor_3?: number | null
         }
         Relationships: []
       }

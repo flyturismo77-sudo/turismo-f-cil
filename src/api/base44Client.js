@@ -103,6 +103,7 @@ const entityTableMap = {
   Mensagem: 'mensagens',
   Usuario: 'profiles',
   LogAuditoria: 'logs_auditoria',
+  Parcela: 'parcelas',
 };
 
 // Create entity proxies
