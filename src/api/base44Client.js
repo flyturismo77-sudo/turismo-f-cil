@@ -197,11 +197,24 @@ const integrations = {
     },
 
     async SendEmail({ to, subject, body }) {
-      // Email sending is not available without an edge function
-      // Log it for now and show a toast-friendly message
-      console.log(`[SendEmail] To: ${to}, Subject: ${subject}`);
-      console.warn('SendEmail: funcionalidade de email não configurada. Configure um serviço de email via Edge Function.');
-      return { success: false, message: 'Email service not configured' };
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/functions/v1/send-email`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1emZkd2tqcXFzYXlpc2ZsbHd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzI4ODksImV4cCI6MjA4NjQwODg4OX0.DKdBuaeaPunvxh_gawqaDHva3nOI0Qcbvby6zMV_8PA',
+            },
+            body: JSON.stringify({ to, subject, body }),
+          }
+        );
+        const data = await response.json();
+        return data;
+      } catch (err) {
+        console.warn('SendEmail falhou:', err);
+        return { success: false, message: err.message };
+      }
     },
   },
 };
