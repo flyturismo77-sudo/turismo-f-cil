@@ -45,7 +45,7 @@ export default function Usuarios() {
 
   const { data: users = [] } = useQuery({
     queryKey: ['users'],
-    queryFn: () => base44.entities.User.list('-created_date'),
+    queryFn: () => base44.entities.Usuario.list('-created_at'),
   });
 
   const { data: currentUser } = useQuery({
@@ -54,7 +54,7 @@ export default function Usuarios() {
   });
 
   const updateUserMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.User.update(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Usuario.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
       setShowForm(false);
@@ -69,7 +69,7 @@ export default function Usuarios() {
   });
 
   const deleteUserMutation = useMutation({
-    mutationFn: (id) => base44.entities.User.delete(id),
+    mutationFn: (id) => base44.entities.Usuario.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
       setShowDeleteDialog(false);
@@ -230,7 +230,7 @@ export default function Usuarios() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {format(new Date(user.created_date), 'dd/MM/yyyy', { locale: ptBR })}
+                      {format(new Date(user.created_at), 'dd/MM/yyyy', { locale: ptBR })}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

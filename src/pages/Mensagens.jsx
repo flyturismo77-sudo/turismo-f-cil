@@ -53,7 +53,7 @@ export default function Mensagens() {
                   <div>
                     <h3 className="font-bold text-lg text-gray-900">{contato.nome}</h3>
                     <p className="text-sm text-gray-500">
-                      {format(new Date(contato.created_date), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                      {format(new Date(contato.created_at), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
                     </p>
                   </div>
                 </div>

@@ -102,6 +102,7 @@ const entityTableMap = {
   Formulario: 'formularios',
   Mensagem: 'mensagens',
   Usuario: 'profiles',
+  User: 'profiles',
   LogAuditoria: 'logs_auditoria',
   Parcela: 'parcelas',
 };
@@ -157,8 +158,42 @@ const appLogs = {
   logUserInApp: async () => {},
 };
 
+// Integrations compatibility layer (replaces Base44 Core integrations)
+const SUPABASE_URL = "https://duzfdwkjqqsayisfllww.supabase.co";
+
+const integrations = {
+  Core: {
+    async UploadFile({ file }) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `public/${fileName}`;
+
+      const { error } = await supabase.storage
+        .from('uploads')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(filePath);
+
+      return { file_url: publicUrl };
+    },
+
+    async SendEmail({ to, subject, body }) {
+      // Email sending is not available without an edge function
+      // Log it for now and show a toast-friendly message
+      console.log(`[SendEmail] To: ${to}, Subject: ${subject}`);
+      console.warn('SendEmail: funcionalidade de email não configurada. Configure um serviço de email via Edge Function.');
+      return { success: false, message: 'Email service not configured' };
+    },
+  },
+};
+
 export const base44 = {
   entities,
   auth,
   appLogs,
+  integrations,
 };

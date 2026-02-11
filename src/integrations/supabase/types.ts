@@ -72,6 +72,7 @@ export type Database = {
           forma_pagamento: string | null
           id: string
           id_cliente_principal: string | null
+          id_quarto: string | null
           id_viagem: string | null
           idade: number | null
           idade_crianca_colo: number | null
@@ -110,6 +111,7 @@ export type Database = {
           forma_pagamento?: string | null
           id?: string
           id_cliente_principal?: string | null
+          id_quarto?: string | null
           id_viagem?: string | null
           idade?: number | null
           idade_crianca_colo?: number | null
@@ -148,6 +150,7 @@ export type Database = {
           forma_pagamento?: string | null
           id?: string
           id_cliente_principal?: string | null
+          id_quarto?: string | null
           id_viagem?: string | null
           idade?: number | null
           idade_crianca_colo?: number | null
@@ -179,6 +182,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "clientes_id_quarto_fkey"
+            columns: ["id_quarto"]
+            isOneToOne: false
+            referencedRelation: "quartos"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "clientes_id_viagem_fkey"
             columns: ["id_viagem"]
             isOneToOne: false
@@ -201,6 +211,8 @@ export type Database = {
           logo_url: string | null
           nome_empresa: string | null
           site: string | null
+          slogan: string | null
+          sobre_nos: string | null
           telefone: string | null
           updated_at: string
           whatsapp: string | null
@@ -218,6 +230,8 @@ export type Database = {
           logo_url?: string | null
           nome_empresa?: string | null
           site?: string | null
+          slogan?: string | null
+          sobre_nos?: string | null
           telefone?: string | null
           updated_at?: string
           whatsapp?: string | null
@@ -235,6 +249,8 @@ export type Database = {
           logo_url?: string | null
           nome_empresa?: string | null
           site?: string | null
+          slogan?: string | null
+          sobre_nos?: string | null
           telefone?: string | null
           updated_at?: string
           whatsapp?: string | null
@@ -249,6 +265,7 @@ export type Database = {
           lida: boolean | null
           mensagem: string | null
           nome: string
+          status: string | null
           telefone: string | null
         }
         Insert: {
@@ -258,6 +275,7 @@ export type Database = {
           lida?: boolean | null
           mensagem?: string | null
           nome: string
+          status?: string | null
           telefone?: string | null
         }
         Update: {
@@ -267,6 +285,7 @@ export type Database = {
           lida?: boolean | null
           mensagem?: string | null
           nome?: string
+          status?: string | null
           telefone?: string | null
         }
         Relationships: []
@@ -316,37 +335,60 @@ export type Database = {
         Row: {
           ativo: boolean | null
           cargo: string | null
+          cpf: string | null
           created_at: string
           email: string | null
           foto_url: string | null
+          funcao: string | null
           id: string
+          id_viagem: string | null
           nome: string
+          nome_completo: string | null
+          status: string | null
           telefone: string | null
           updated_at: string
         }
         Insert: {
           ativo?: boolean | null
           cargo?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
           foto_url?: string | null
+          funcao?: string | null
           id?: string
+          id_viagem?: string | null
           nome: string
+          nome_completo?: string | null
+          status?: string | null
           telefone?: string | null
           updated_at?: string
         }
         Update: {
           ativo?: boolean | null
           cargo?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
           foto_url?: string | null
+          funcao?: string | null
           id?: string
+          id_viagem?: string | null
           nome?: string
+          nome_completo?: string | null
+          status?: string | null
           telefone?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "equipe_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       formularios: {
         Row: {
@@ -381,6 +423,7 @@ export type Database = {
       fornecedores: {
         Row: {
           ativo: boolean | null
+          cnpj: string | null
           contato: string | null
           created_at: string
           email: string | null
@@ -390,10 +433,12 @@ export type Database = {
           observacoes: string | null
           telefone: string | null
           tipo: string | null
+          tipo_servico: string | null
           updated_at: string
         }
         Insert: {
           ativo?: boolean | null
+          cnpj?: string | null
           contato?: string | null
           created_at?: string
           email?: string | null
@@ -403,10 +448,12 @@ export type Database = {
           observacoes?: string | null
           telefone?: string | null
           tipo?: string | null
+          tipo_servico?: string | null
           updated_at?: string
         }
         Update: {
           ativo?: boolean | null
+          cnpj?: string | null
           contato?: string | null
           created_at?: string
           email?: string | null
@@ -416,6 +463,7 @@ export type Database = {
           observacoes?: string | null
           telefone?: string | null
           tipo?: string | null
+          tipo_servico?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -675,30 +723,45 @@ export type Database = {
       }
       quartos: {
         Row: {
+          camas_beliche: number | null
+          camas_casal: number | null
+          camas_extra: number | null
+          camas_solteiro: number | null
           capacidade: number | null
           created_at: string
           id: string
           id_viagem: string | null
           numero_quarto: string
           ocupados: number | null
+          tipo: string | null
           updated_at: string
         }
         Insert: {
+          camas_beliche?: number | null
+          camas_casal?: number | null
+          camas_extra?: number | null
+          camas_solteiro?: number | null
           capacidade?: number | null
           created_at?: string
           id?: string
           id_viagem?: string | null
           numero_quarto: string
           ocupados?: number | null
+          tipo?: string | null
           updated_at?: string
         }
         Update: {
+          camas_beliche?: number | null
+          camas_casal?: number | null
+          camas_extra?: number | null
+          camas_solteiro?: number | null
           capacidade?: number | null
           created_at?: string
           id?: string
           id_viagem?: string | null
           numero_quarto?: string
           ocupados?: number | null
+          tipo?: string | null
           updated_at?: string
         }
         Relationships: [
