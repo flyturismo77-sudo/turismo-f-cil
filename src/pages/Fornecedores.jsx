@@ -46,7 +46,7 @@ export default function Fornecedores() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Fornecedor.create(data),
+    mutationFn: (data) => base44.entities.Fornecedor.create({ ...data, tipo: data.tipo_servico || data.tipo }),
     onSuccess: () => {
       queryClient.invalidateQueries(['fornecedores']);
       setShowForm(false);
@@ -55,7 +55,7 @@ export default function Fornecedores() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Fornecedor.update(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Fornecedor.update(id, { ...data, tipo: data.tipo_servico || data.tipo }),
     onSuccess: () => {
       queryClient.invalidateQueries(['fornecedores']);
       setShowForm(false);

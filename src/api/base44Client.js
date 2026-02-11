@@ -1,6 +1,17 @@
 // Compatibility layer: replaces Base44 SDK with Supabase calls
 import { supabase } from '@/lib/supabaseClient';
 
+// Add created_date alias for backward compatibility with Base44 field names
+const addFieldAliases = (record) => {
+  if (!record) return record;
+  if (Array.isArray(record)) return record.map(addFieldAliases);
+  return {
+    ...record,
+    created_date: record.created_at,
+    updated_date: record.updated_at,
+  };
+};
+
 // Generic entity wrapper that maps Base44 entity operations to Supabase
 const createEntityProxy = (tableName) => ({
   async list(orderBy) {
@@ -14,10 +25,10 @@ const createEntityProxy = (tableName) => ({
     }
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+    return addFieldAliases(data || []);
   },
 
-  async filter(filters, orderBy) {
+  async filter(filters, orderBy, limit) {
     let query = supabase.from(tableName).select('*');
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
@@ -30,9 +41,12 @@ const createEntityProxy = (tableName) => ({
       const col = column === 'created_date' ? 'created_at' : column;
       query = query.order(col, { ascending: !desc });
     }
+    if (limit) {
+      query = query.limit(limit);
+    }
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+    return addFieldAliases(data || []);
   },
 
   async get(id) {
@@ -42,7 +56,7 @@ const createEntityProxy = (tableName) => ({
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;
-    return data;
+    return addFieldAliases(data);
   },
 
   async create(record) {
@@ -52,7 +66,7 @@ const createEntityProxy = (tableName) => ({
       .select()
       .single();
     if (error) throw error;
-    return data;
+    return addFieldAliases(data);
   },
 
   async update(id, record) {
@@ -65,7 +79,7 @@ const createEntityProxy = (tableName) => ({
       .select()
       .single();
     if (error) throw error;
-    return data;
+    return addFieldAliases(data);
   },
 
   async delete(id) {
@@ -82,7 +96,7 @@ const createEntityProxy = (tableName) => ({
       .insert(records)
       .select();
     if (error) throw error;
-    return data || [];
+    return addFieldAliases(data || []);
   },
 });
 
@@ -100,6 +114,7 @@ const entityTableMap = {
   PagamentoEmpresa: 'pagamentos_empresa',
   Fornecedor: 'fornecedores',
   Formulario: 'formularios',
+  FormularioContrato: 'formularios_contrato',
   Mensagem: 'mensagens',
   Usuario: 'profiles',
   User: 'profiles',

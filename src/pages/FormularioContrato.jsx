@@ -48,23 +48,16 @@ export default function FormularioContrato() {
     mutationFn: async (data) => {
       const formulario = await base44.entities.FormularioContrato.create(data);
       
-      // Enviar email de confirmação
-      const viagemSelecionada = viagens.find(v => v.id === data.id_viagem);
-      await base44.integrations.Core.SendEmail({
-        to: data.email,
-        subject: `Confirmação de envio do formulário – Fly Turismo ✈️`,
-        body: `Olá, ${data.nome_completo}!
-
-Recebemos com sucesso o seu formulário de cadastro para a viagem com a Fly Turismo.
-
-Nossa equipe está analisando as informações e em breve entraremos em contato pelo e-mail ou WhatsApp informados no seu cadastro para confirmar os próximos passos.
-
-Caso tenha dúvidas, entre em contato conosco pelo telefone (38) 9755-2155 ou pelo e-mail flyturismo77@gmail.com.
-
-Agradecemos pela confiança e desejamos uma excelente viagem! 🌍✨
-
-Equipe Fly Turismo`
-      });
+      // Enviar email de confirmação (funcionalidade futura)
+      try {
+        await base44.integrations.Core.SendEmail({
+          to: data.email,
+          subject: `Confirmação de envio do formulário – Fly Turismo ✈️`,
+          body: `Olá, ${data.nome_completo}!\n\nRecebemos com sucesso o seu formulário de cadastro para a viagem com a Fly Turismo.\n\nEquipe Fly Turismo`
+        });
+      } catch (emailErr) {
+        console.warn('Email não enviado:', emailErr);
+      }
 
       return formulario;
     },
