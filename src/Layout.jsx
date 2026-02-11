@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useAuth } from "@/lib/AuthContext";
 import { 
   LayoutDashboard, 
   Plane, 
@@ -39,7 +40,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -48,71 +49,28 @@ const publicPages = ["Home", "Sobre", "ViagensPublico", "Contato", "FormularioCo
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
-  const [currentUser, setCurrentUser] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const [connectionError, setConnectionError] = React.useState(false);
-  const [migrationNeeded, setMigrationNeeded] = React.useState(false);
+  const { user, profile, isAdmin, logout } = useAuth();
   const isAdminPage = adminPages.includes(currentPageName);
   const isPublicPage = publicPages.includes(currentPageName);
 
   const { data: config } = useQuery({
     queryKey: ['config'],
     queryFn: async () => {
-      try {
-        const configs = await base44.entities.ConfiguracaoEmpresa.list();
-        setConnectionError(false);
-        return configs[0];
-      } catch (error) {
-        console.error("Erro ao carregar configurações:", error);
-        setConnectionError(true);
-        return null;
-      }
+      const { data, error } = await supabase
+        .from('configuracao_empresa')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
     },
     retry: 3,
     retryDelay: 1000,
     staleTime: 5 * 60 * 1000,
   });
 
-  // Verificar se há viagens DD que precisam de migração
-  useEffect(() => {
-    const checkMigration = async () => {
-      try {
-        const viagens = await base44.entities.Viagem.list();
-        const viagensDD = viagens.filter(v => v.modelo_onibus === 'DD' && v.vagas_totais !== 57);
-        setMigrationNeeded(viagensDD.length > 0);
-      } catch (error) {
-        console.error("Erro ao verificar migração:", error);
-      }
-    };
-
-    if (isAdminPage && currentUser) {
-      checkMigration();
-    }
-  }, [isAdminPage, currentUser]);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (isAdminPage) {
-        try {
-          const user = await base44.auth.me();
-          setCurrentUser(user);
-          setLoading(false);
-          setConnectionError(false);
-        } catch (error) {
-          console.error("Erro de autenticação:", error);
-          setConnectionError(true);
-          base44.auth.redirectToLogin(window.location.pathname);
-        }
-      } else {
-        setLoading(false);
-      }
-    };
-    
-    checkAuth();
-  }, [isAdminPage, currentPageName]);
-
-  const handleLogout = () => {
-    base44.auth.logout(createPageUrl('Home'));
+  const handleLogout = async () => {
+    await logout();
   };
 
   if (isPublicPage) {
@@ -123,47 +81,8 @@ export default function Layout({ children, currentPageName }) {
     );
   }
 
-  if (isAdminPage && loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando sistema...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (connectionError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 p-6">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Conexão Perdida</h2>
-          <p className="text-gray-600 mb-6">
-            Não foi possível conectar ao servidor. Verifique sua conexão com a internet e tente novamente.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all"
-          >
-            Tentar Novamente
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isAdminPage && !currentUser) {
-    return null;
-  }
-
-  const isAdminByEmail = currentUser?.email?.toLowerCase().includes('flyturadm');
-  const isAdmin = isAdminByEmail || currentUser?.cargo === 'Administrador' || currentUser?.role === 'admin';
+  const currentUser = profile || {};
+  const userIsAdmin = isAdmin;
 
   const navigationItems = [
     {
@@ -171,7 +90,7 @@ export default function Layout({ children, currentPageName }) {
       url: createPageUrl("Dashboard"),
       icon: LayoutDashboard,
     },
-    ...(isAdmin ? [{
+    ...(userIsAdmin ? [{
       title: "Viagens",
       url: createPageUrl("Viagens"),
       icon: Plane,
@@ -196,7 +115,7 @@ export default function Layout({ children, currentPageName }) {
       url: createPageUrl("WhatsApp"),
       icon: MessageSquare,
     },
-    ...(isAdmin ? [
+    ...(userIsAdmin ? [
       {
         title: "Financeiro",
         url: createPageUrl("Financeiro"),
@@ -233,7 +152,7 @@ export default function Layout({ children, currentPageName }) {
       url: createPageUrl("Mensagens"),
       icon: MessageSquare,
     },
-    ...(isAdmin ? [
+    ...(userIsAdmin ? [
       {
         title: "Usuários",
         url: createPageUrl("Usuarios"),
@@ -259,12 +178,6 @@ export default function Layout({ children, currentPageName }) {
         url: createPageUrl("Documentacao"),
         icon: BookOpen,
       },
-      ...(migrationNeeded ? [{
-        title: "⚠️ Migração DD",
-        url: createPageUrl("MigracaoDD"),
-        icon: RefreshCw,
-        highlight: true
-      }] : [])
     ] : []),
     {
       title: "Configurações",
@@ -358,8 +271,8 @@ export default function Layout({ children, currentPageName }) {
                   <p className="font-medium text-gray-900 text-sm truncate">
                     {currentUser?.full_name || 'Usuário'}
                   </p>
-                  <Badge className={`text-xs mt-1 ${isAdmin ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                    {isAdmin ? 'Administrador' : 'Funcionário'}
+                  <Badge className={`text-xs mt-1 ${userIsAdmin ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {userIsAdmin ? 'Administrador' : 'Funcionário'}
                   </Badge>
                 </div>
               </div>
