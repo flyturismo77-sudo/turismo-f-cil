@@ -113,24 +113,18 @@ export default function Financeiro() {
           status_pagamento: novoStatus
         });
 
-        // Enviar recibo por email
+        // Enviar recibo por email (funcionalidade futura)
         if (cliente.email) {
-          const viagem = viagens.find(v => v.id === cliente.id_viagem);
-          await base44.integrations.Core.SendEmail({
-            to: cliente.email,
-            subject: 'Recibo de pagamento – Fly Turismo',
-            body: `Olá ${cliente.nome_completo},
-
-Confirmamos o recebimento do seu pagamento referente à viagem ${viagem?.nome || 'N/A'}.
-
-Valor: R$ ${data.valor.toFixed(2)}
-Data: ${format(new Date(data.data_pagamento), "dd/MM/yyyy", { locale: ptBR })}
-Forma de pagamento: ${data.forma_pagamento}
-
-Obrigado por viajar com a Fly Turismo! ✈️
-
-Equipe Fly Turismo`
-          });
+          try {
+            const viagem = viagens.find(v => v.id === cliente.id_viagem);
+            await base44.integrations.Core.SendEmail({
+              to: cliente.email,
+              subject: 'Recibo de pagamento – Fly Turismo',
+              body: `Olá ${cliente.nome_completo},\n\nConfirmamos o recebimento do seu pagamento referente à viagem ${viagem?.nome || 'N/A'}.\n\nValor: R$ ${data.valor.toFixed(2)}\nData: ${format(new Date(data.data_pagamento), "dd/MM/yyyy", { locale: ptBR })}\nForma de pagamento: ${data.forma_pagamento}\n\nObrigado por viajar com a Fly Turismo! ✈️\n\nEquipe Fly Turismo`
+            });
+          } catch (emailErr) {
+            console.warn('Email não enviado:', emailErr);
+          }
         }
       }
       

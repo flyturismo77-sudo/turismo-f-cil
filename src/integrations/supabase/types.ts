@@ -420,6 +420,92 @@ export type Database = {
         }
         Relationships: []
       }
+      formularios_contrato: {
+        Row: {
+          bairro: string | null
+          cidade: string | null
+          cpf: string | null
+          created_at: string
+          data_nascimento: string | null
+          desconto: number | null
+          email: string | null
+          forma_pagamento: string | null
+          id: string
+          id_viagem: string | null
+          idade_crianca_colo: number | null
+          nome_completo: string
+          nome_crianca_colo: string | null
+          numero: string | null
+          numero_parcelas: number | null
+          passageiros: Json | null
+          possui_crianca_colo: boolean | null
+          rg: string | null
+          rua: string | null
+          sexo: string | null
+          status: string | null
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          bairro?: string | null
+          cidade?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          desconto?: number | null
+          email?: string | null
+          forma_pagamento?: string | null
+          id?: string
+          id_viagem?: string | null
+          idade_crianca_colo?: number | null
+          nome_completo: string
+          nome_crianca_colo?: string | null
+          numero?: string | null
+          numero_parcelas?: number | null
+          passageiros?: Json | null
+          possui_crianca_colo?: boolean | null
+          rg?: string | null
+          rua?: string | null
+          sexo?: string | null
+          status?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bairro?: string | null
+          cidade?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          desconto?: number | null
+          email?: string | null
+          forma_pagamento?: string | null
+          id?: string
+          id_viagem?: string | null
+          idade_crianca_colo?: number | null
+          nome_completo?: string
+          nome_crianca_colo?: string | null
+          numero?: string | null
+          numero_parcelas?: number | null
+          passageiros?: Json | null
+          possui_crianca_colo?: boolean | null
+          rg?: string | null
+          rua?: string | null
+          sexo?: string | null
+          status?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "formularios_contrato_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fornecedores: {
         Row: {
           ativo: boolean | null

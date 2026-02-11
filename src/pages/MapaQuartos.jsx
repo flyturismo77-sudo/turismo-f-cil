@@ -255,6 +255,24 @@ export default function MapaQuartos() {
           marrom: '#92400e',
           cinza: '#6b7280'
         };
+
+        const getCorHex = (cor, grupo) => {
+          if (!cor) return null;
+          const numGrupo = grupo || 1;
+          const coresMap = {
+            vermelho: ['#fca5a5', '#ef4444', '#b91c1c', '#7f1d1d'],
+            azul: ['#93c5fd', '#3b82f6', '#1d4ed8', '#1e3a8a'],
+            verde: ['#6ee7b7', '#10b981', '#047857', '#064e3b'],
+            amarelo: ['#fde047', '#eab308', '#a16207', '#713f12'],
+            roxo: ['#d8b4fe', '#a855f7', '#7e22ce', '#581c87'],
+            rosa: ['#f9a8d4', '#ec4899', '#be185d', '#831843'],
+            laranja: ['#fdba74', '#f97316', '#c2410c', '#7c2d12'],
+            marrom: ['#d97706', '#b45309', '#92400e', '#78350f'],
+            cinza: ['#d1d5db', '#6b7280', '#374151', '#1f2937']
+          };
+          const grupoIndex = (numGrupo - 1) % 4;
+          return coresMap[cor]?.[grupoIndex] || coresMap[cor]?.[0];
+        };
         
         let hospedesHtml = '';
         if (hospedes && hospedes.length > 0) {

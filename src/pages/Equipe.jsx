@@ -50,7 +50,7 @@ export default function Equipe() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Equipe.create(data),
+    mutationFn: (data) => base44.entities.Equipe.create({ ...data, nome: data.nome_completo || data.nome }),
     onSuccess: () => {
       queryClient.invalidateQueries(['equipe']);
       setShowForm(false);
@@ -59,7 +59,7 @@ export default function Equipe() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Equipe.update(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Equipe.update(id, { ...data, nome: data.nome_completo || data.nome }),
     onSuccess: () => {
       queryClient.invalidateQueries(['equipe']);
       setShowForm(false);
