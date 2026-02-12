@@ -4,8 +4,7 @@ import { queryClientInstance } from '@/lib/query-client'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
-import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import Login from '@/pages/Login';
+import { AuthProvider } from '@/lib/AuthContext';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -15,50 +14,26 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
   : <>{children}</>;
 
-const AuthenticatedApp = () => {
-  const { isLoadingAuth, isAuthenticated } = useAuth();
-
-  if (isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  // Public pages that don't require auth
-  const publicPageNames = ["Home", "Sobre", "ViagensPublico", "Contato", "FormularioContrato", "Login"];
-
+const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/Login" element={
-        isAuthenticated ? <Navigate to="/Dashboard" /> : <Login />
-      } />
-      
       <Route path="/" element={
-        isAuthenticated ? (
-          <LayoutWrapper currentPageName={mainPageKey}>
-            <MainPage />
-          </LayoutWrapper>
-        ) : <Navigate to="/Login" />
+        <LayoutWrapper currentPageName={mainPageKey}>
+          <MainPage />
+        </LayoutWrapper>
       } />
       
-      {Object.entries(Pages).map(([path, Page]) => {
-        const isPublic = publicPageNames.includes(path);
-        return (
-          <Route
-            key={path}
-            path={`/${path}`}
-            element={
-              isPublic || isAuthenticated ? (
-                <LayoutWrapper currentPageName={path}>
-                  <Page />
-                </LayoutWrapper>
-              ) : <Navigate to="/Login" />
-            }
-          />
-        );
-      })}
+      {Object.entries(Pages).map(([path, Page]) => (
+        <Route
+          key={path}
+          path={`/${path}`}
+          element={
+            <LayoutWrapper currentPageName={path}>
+              <Page />
+            </LayoutWrapper>
+          }
+        />
+      ))}
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -70,7 +45,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <AuthenticatedApp />
+          <AppRoutes />
         </Router>
         <Toaster />
       </QueryClientProvider>
