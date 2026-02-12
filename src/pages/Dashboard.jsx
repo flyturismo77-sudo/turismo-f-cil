@@ -1,9 +1,8 @@
 import React from "react";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import { Plane, Users, DollarSign, TrendingUp, Calendar, Bell, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { differenceInDays } from "date-fns";
@@ -14,17 +13,41 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 export default function Dashboard() {
   const { data: viagens = [] } = useQuery({
     queryKey: ['viagens'],
-    queryFn: () => base44.entities.Viagem.list("-created_date"),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('viagens')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    retry: 2,
   });
 
   const { data: clientes = [] } = useQuery({
     queryKey: ['clientes'],
-    queryFn: () => base44.entities.Cliente.list("-created_date"),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    retry: 2,
   });
 
   const { data: pagamentos = [] } = useQuery({
     queryKey: ['pagamentos'],
-    queryFn: () => base44.entities.Pagamento.list("-data_pagamento"),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pagamentos')
+        .select('*')
+        .order('data_pagamento', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    retry: 2,
   });
 
   const viagensAtivas = viagens.filter(v => !v.arquivada);
@@ -41,9 +64,8 @@ export default function Dashboard() {
     { name: 'Pendente', value: clientes.filter(c => c.status_pagamento === 'Pendente' || !c.status_pagamento).length },
   ].filter(item => item.value > 0);
 
-  const COLORS = ['#10b981', '#f59e0b', '#ef4444'];
+  const COLORS = ['hsl(160, 84%, 39%)', 'hsl(38, 92%, 50%)', 'hsl(0, 84%, 60%)'];
 
-  // Receita mensal chart data
   const receitaMensal = pagamentos.reduce((acc, p) => {
     if (!p.data_pagamento) return acc;
     const date = new Date(p.data_pagamento);
@@ -56,7 +78,6 @@ export default function Dashboard() {
   }, {});
   const receitaData = Object.values(receitaMensal).slice(-6);
 
-  // Alertas
   const alertas = [];
   viagensAtivas.forEach(viagem => {
     const vagasRestantes = (viagem.vagas_totais || 0) - (viagem.vagas_ocupadas || 0);
@@ -74,17 +95,12 @@ export default function Dashboard() {
   const sistemaNovo = viagens.length === 0 && clientes.length === 0;
 
   return (
-    <div className="p-6 md:p-8 space-y-8 min-h-screen">
-      <div>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600 text-lg">Bem-vindo ao painel de controle da Fly Turismo</p>
-      </div>
-
+    <div className="space-y-8">
       {sistemaNovo && (
-        <Alert className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-lg">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <AlertTitle className="text-green-900 font-bold text-lg">✅ Sistema Pronto!</AlertTitle>
-          <AlertDescription className="text-green-700 mt-2">
+        <Alert className="bg-success/10 border-success/30">
+          <CheckCircle className="h-5 w-5 text-success" />
+          <AlertTitle className="text-foreground font-bold text-lg">✅ Sistema Pronto!</AlertTitle>
+          <AlertDescription className="text-muted-foreground mt-2">
             Comece criando sua primeira viagem na aba <strong>Viagens</strong>.
           </AlertDescription>
         </Alert>
@@ -93,7 +109,7 @@ export default function Dashboard() {
       {alertas.length > 0 && (
         <div className="space-y-3">
           {alertas.map((alerta, index) => (
-            <Alert key={index} className={`${alerta.tipo === 'warning' ? 'bg-yellow-50 border-yellow-200' : 'bg-blue-50 border-blue-200'}`}>
+            <Alert key={index} className={`${alerta.tipo === 'warning' ? 'bg-warning/10 border-warning/30' : 'bg-primary/10 border-primary/30'}`}>
               <Bell className="h-4 w-4" />
               <AlertTitle>{alerta.titulo}</AlertTitle>
               <AlertDescription>{alerta.mensagem}</AlertDescription>
@@ -102,8 +118,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* 4 Cards de Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           title="Receita Total"
           value={`R$ ${totalReceita.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
@@ -140,12 +155,11 @@ export default function Dashboard() {
 
       {!sistemaNovo && (
         <>
-          {/* Gráficos */}
-          <div className="grid lg:grid-cols-2 gap-6">
-            <Card className="shadow-xl border-none">
-              <CardHeader className="border-b border-gray-100">
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-green-600" />
+          <div className="grid lg:grid-cols-2 gap-5">
+            <Card className="shadow-elevated border-border">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="text-lg font-display font-bold flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-success" />
                   Receita Mensal
                 </CardTitle>
               </CardHeader>
@@ -153,23 +167,23 @@ export default function Dashboard() {
                 {receitaData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={receitaData}>
-                      <CartesianGrid strokeDasharray="3 3" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 32%, 91%)" />
                       <XAxis dataKey="name" />
                       <YAxis />
                       <Tooltip formatter={(v) => `R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`} />
-                      <Bar dataKey="valor" fill="#10b981" name="Receita" radius={[4,4,0,0]} />
+                      <Bar dataKey="valor" fill="hsl(160, 84%, 39%)" name="Receita" radius={[6,6,0,0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-64 flex items-center justify-center text-gray-500">Nenhum pagamento registrado</div>
+                  <div className="h-64 flex items-center justify-center text-muted-foreground">Nenhum pagamento registrado</div>
                 )}
               </CardContent>
             </Card>
 
-            <Card className="shadow-xl border-none">
-              <CardHeader className="border-b border-gray-100">
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-sky-600" />
+            <Card className="shadow-elevated border-border">
+              <CardHeader className="border-b border-border">
+                <CardTitle className="text-lg font-display font-bold flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
                   Status de Pagamentos
                 </CardTitle>
               </CardHeader>
@@ -194,13 +208,12 @@ export default function Dashboard() {
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-64 flex items-center justify-center text-gray-500">Nenhum dado disponível</div>
+                  <div className="h-64 flex items-center justify-center text-muted-foreground">Nenhum dado disponível</div>
                 )}
               </CardContent>
             </Card>
           </div>
 
-          {/* Atividades Recentes */}
           <RecentActivity 
             viagens={viagensAtivas}
             clientes={clientes}
