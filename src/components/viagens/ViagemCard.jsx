@@ -11,8 +11,15 @@ import { createPageUrl } from "@/utils";
 import placeholder1 from "@/assets/placeholder-travel-1.jpg";
 import placeholder2 from "@/assets/placeholder-travel-2.jpg";
 import placeholder3 from "@/assets/placeholder-travel-3.jpg";
+import placeholder4 from "@/assets/placeholder-travel-4.jpg";
+import placeholder5 from "@/assets/placeholder-travel-5.jpg";
+import placeholder6 from "@/assets/placeholder-travel-6.jpg";
+import placeholder7 from "@/assets/placeholder-travel-7.jpg";
+import placeholder8 from "@/assets/placeholder-travel-8.jpg";
+import placeholder9 from "@/assets/placeholder-travel-9.jpg";
+import placeholder10 from "@/assets/placeholder-travel-10.jpg";
 
-const placeholders = [placeholder1, placeholder2, placeholder3];
+const placeholders = [placeholder1, placeholder2, placeholder3, placeholder4, placeholder5, placeholder6, placeholder7, placeholder8, placeholder9, placeholder10];
 
 const getPlaceholder = (id) => {
   if (!id) return placeholders[0];
