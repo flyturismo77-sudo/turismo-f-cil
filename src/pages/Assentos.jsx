@@ -17,6 +17,7 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DoubleDeckLayout from "../components/assentos/DoubleDeckLayout";
+import DDDSTurLayout from "../components/assentos/DDDSTurLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Assentos() {
@@ -103,7 +104,9 @@ export default function Assentos() {
 
     let andar = 'Primeiro Andar';
     if (viagemSelecionada?.modelo_onibus === 'DD') {
-      andar = poltrona <= 47 ? 'Piso Superior' : 'Piso Inferior';
+      andar = poltrona <= 48 ? 'Piso Superior' : 'Piso Inferior';
+    } else if (viagemSelecionada?.modelo_onibus === 'DD_DS_TUR') {
+      andar = poltrona <= 44 ? 'Piso Superior' : 'Piso Inferior';
     }
 
     await updateClienteMutation.mutateAsync({
@@ -414,14 +417,15 @@ export default function Assentos() {
     let currentIndex = 0;
     
     while (currentIndex < assentos.length) {
+      // Correct: Left = 1(janela), 2(corredor) | corridor | 4(corredor), 3(janela)
       const leftSeats = [
-        assentos[currentIndex + 1],
-        assentos[currentIndex + 3]
+        assentos[currentIndex],     // ímpar - janela
+        assentos[currentIndex + 1]  // par - corredor
       ].filter(Boolean);
       
       const rightSeats = [
-        assentos[currentIndex],
-        assentos[currentIndex + 2]
+        assentos[currentIndex + 3], // par - corredor
+        assentos[currentIndex + 2]  // ímpar - janela
       ].filter(Boolean);
       
       rows.push({ left: leftSeats, right: rightSeats });
@@ -433,6 +437,7 @@ export default function Assentos() {
 
   const seatRows = renderSeatsLayout();
   const isDoubleDeck = viagemSelecionada?.modelo_onibus === 'DD';
+  const isDDDSTur = viagemSelecionada?.modelo_onibus === 'DD_DS_TUR';
 
   const enviarWhatsApp = (cliente) => {
     if (!cliente.telefone) {
@@ -591,7 +596,17 @@ Qualquer dúvida, estamos à disposição!`;
               </div>
             </div>
 
-            {isDoubleDeck ? (
+            {isDDDSTur ? (
+              <DDDSTurLayout
+                clientePorPoltrona={clientePorPoltrona}
+                searchTerm={searchTerm}
+                onSeatClick={(seatNumber) => {
+                  setSelectedSeat(seatNumber);
+                  setShowDialog(true);
+                }}
+                renderSeatInfo={renderSeatInfo}
+              />
+            ) : isDoubleDeck ? (
               <DoubleDeckLayout
                 clientePorPoltrona={clientePorPoltrona}
                 searchTerm={searchTerm}
@@ -647,7 +662,7 @@ Qualquer dúvida, estamos à disposição!`;
                               >
                                 <Armchair className={`w-5 h-5 mb-1 ${isOccupied ? 'text-green-700' : 'text-gray-400'}`} />
                                 <span className="text-xs font-bold text-gray-700">{seatNumber}</span>
-                                <span className="text-[8px] text-gray-500">PAR</span>
+                                <span className="text-[8px] text-gray-500">{seatNumber % 2 === 1 ? 'JANELA' : 'CORRED.'}</span>
                               </button>
                               {isOccupied && (
                                 <div className="hidden group-hover:block">
@@ -695,7 +710,7 @@ Qualquer dúvida, estamos à disposição!`;
                               >
                                 <Armchair className={`w-5 h-5 mb-1 ${isOccupied ? 'text-green-700' : 'text-gray-400'}`} />
                                 <span className="text-xs font-bold text-gray-700">{seatNumber}</span>
-                                <span className="text-[8px] text-gray-500">ÍMPAR</span>
+                                <span className="text-[8px] text-gray-500">{seatNumber % 2 === 1 ? 'JANELA' : 'CORRED.'}</span>
                               </button>
                               {isOccupied && (
                                 <div className="hidden group-hover:block">

@@ -45,39 +45,47 @@ export default function Viagens() {
         const assentos = [];
         
         if (modelo === 'VAN') {
-          // VAN: todos no primeiro andar
           for (let i = 1; i <= totalAssentos; i++) {
             assentos.push({
               numero_poltrona: i,
               id_viagem: viagem.id,
               andar: 'Primeiro Andar',
-              posicao: i % 2 === 1 ? 'Janela' : 'Corredor', // ÍMPARES = JANELA, PARES = CORREDOR
+              posicao: i % 2 === 1 ? 'Janela' : 'Corredor',
               status: 'Disponível'
             });
           }
         } else if (modelo === 'DD') {
-          // DD: 57 assentos divididos em 2 andares
-          const assentosPorAndar = Math.ceil(totalAssentos / 2); // 29 no primeiro, 28 no segundo
-          
+          // DD 57: piso superior 1-48, piso inferior 49-57
           for (let i = 1; i <= totalAssentos; i++) {
-            const andar = i <= assentosPorAndar ? 'Primeiro Andar' : 'Segundo Andar';
-            
+            const andar = i <= 48 ? 'Piso Superior' : 'Piso Inferior';
             assentos.push({
               numero_poltrona: i,
               id_viagem: viagem.id,
               andar,
-              posicao: i % 2 === 1 ? 'Janela' : 'Corredor', // ÍMPARES = JANELA, PARES = CORREDOR
+              posicao: i % 2 === 1 ? 'Janela' : 'Corredor',
+              status: 'Disponível'
+            });
+          }
+        } else if (modelo === 'DD_DS_TUR') {
+          // DD DS TUR 56: piso superior 1-44, piso inferior 45-56
+          for (let i = 1; i <= totalAssentos; i++) {
+            const andar = i <= 44 ? 'Piso Superior' : 'Piso Inferior';
+            assentos.push({
+              numero_poltrona: i,
+              id_viagem: viagem.id,
+              andar,
+              posicao: i % 2 === 1 ? 'Janela' : 'Corredor',
               status: 'Disponível'
             });
           }
         } else {
-          // LD: todos no primeiro andar
+          // LD (46 ou 48): todos no primeiro andar
           for (let i = 1; i <= totalAssentos; i++) {
             assentos.push({
               numero_poltrona: i,
               id_viagem: viagem.id,
               andar: 'Primeiro Andar',
-              posicao: i % 2 === 1 ? 'Janela' : 'Corredor', // ÍMPARES = JANELA, PARES = CORREDOR
+              posicao: i % 2 === 1 ? 'Janela' : 'Corredor',
               status: 'Disponível'
             });
           }

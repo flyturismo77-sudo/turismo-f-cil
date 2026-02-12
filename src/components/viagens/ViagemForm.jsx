@@ -8,8 +8,10 @@ import { Loader2, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const busModels = [
-  { value: 'LD', label: 'Low Driver (LD)', capacity: 46 },
-  { value: 'DD', label: 'Double Deck (DD)', capacity: 57 }, // ATUALIZADO PARA 57
+  { value: 'LD', label: 'Low Driver (LD) 46', capacity: 46 },
+  { value: 'LD48', label: 'Low Driver (LD) 48', capacity: 48 },
+  { value: 'DD', label: 'Double Deck (DD) 57', capacity: 57 },
+  { value: 'DD_DS_TUR', label: 'DD DS TUR 56', capacity: 56 },
   { value: 'VAN', label: 'VAN', capacity: 20 }
 ];
 
