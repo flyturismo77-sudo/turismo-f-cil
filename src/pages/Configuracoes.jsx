@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Settings, Loader2, CheckCircle, Upload } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -409,28 +408,12 @@ export default function Configuracoes() {
   );
 }
 
-const TABLE_OPTIONS = [
-  { value: 'clientes', label: 'Clientes' },
-  { value: 'assentos', label: 'Assentos' },
-  { value: 'quartos', label: 'Quartos' },
-  { value: 'pagamentos', label: 'Pagamentos' },
-  { value: 'parcelas', label: 'Parcelas' },
-  { value: 'equipe', label: 'Equipe' },
-  { value: 'fornecedores', label: 'Fornecedores' },
-  { value: 'documentos_viagem', label: 'Documentos de Viagem' },
-  { value: 'pagamentos_empresa', label: 'Pagamentos Empresa' },
-  { value: 'formularios', label: 'Formulários' },
-  { value: 'formularios_contrato', label: 'Formulários Contrato' },
-  { value: 'contatos', label: 'Contatos' },
-];
-
 function ImportClientes() {
   const queryClient = useQueryClient();
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
-  const [selectedTable, setSelectedTable] = useState('clientes');
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
@@ -452,31 +435,27 @@ function ImportClientes() {
   };
 
   const handleImport = async () => {
-    if (!selectedFile || !selectedTable) return;
+    if (!selectedFile) return;
     setImporting(true);
     setResult(null);
     try {
       const text = await selectedFile.text();
-      const records = JSON.parse(text);
+      const clientes = JSON.parse(text);
 
       const edgeResp = await fetch(
-        'https://duzfdwkjqqsayisfllww.supabase.co/functions/v1/import-generic',
+        'https://duzfdwkjqqsayisfllww.supabase.co/functions/v1/import-clientes',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1emZkd2tqcXFzYXlpc2ZsbHd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzI4ODksImV4cCI6MjA4NjQwODg4OX0.DKdBuaeaPunvxh_gawqaDHva3nOI0Qcbvby6zMV_8PA',
           },
-          body: JSON.stringify({
-            table: selectedTable,
-            records: Array.isArray(records) ? records : [records],
-          }),
+          body: JSON.stringify({ clientes: Array.isArray(clientes) ? clientes : [clientes] }),
         }
       );
       const data = await edgeResp.json();
       setResult(data);
       // Invalidar cache para os dados aparecerem em tempo real
-      queryClient.invalidateQueries({ queryKey: [selectedTable] });
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
       queryClient.invalidateQueries({ queryKey: ['viagens'] });
       queryClient.invalidateQueries({ queryKey: ['parcelas'] });
@@ -490,36 +469,18 @@ function ImportClientes() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-600">
-        Selecione a tabela de destino e o arquivo JSON exportado do sistema antigo (Base44).
+        Selecione o arquivo JSON exportado do sistema antigo (Base44) para importar para o Supabase.
       </p>
       <div className="space-y-3">
-        <div className="space-y-2">
-          <Label>Tabela de destino</Label>
-          <Select value={selectedTable} onValueChange={setSelectedTable}>
-            <SelectTrigger className="w-full md:w-72">
-              <SelectValue placeholder="Selecione a tabela" />
-            </SelectTrigger>
-            <SelectContent>
-              {TABLE_OPTIONS.map((t) => (
-                <SelectItem key={t.value} value={t.value}>
-                  {t.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label>Arquivo JSON</Label>
-          <Input
-            type="file"
-            accept=".json"
-            onChange={handleFileSelect}
-            disabled={importing}
-          />
-        </div>
+        <Input
+          type="file"
+          accept=".json"
+          onChange={handleFileSelect}
+          disabled={importing}
+        />
         {filePreview && !filePreview.error && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-            📄 <strong>{filePreview.name}</strong> — {filePreview.count} registros → <strong>{TABLE_OPTIONS.find(t => t.value === selectedTable)?.label}</strong>
+            📄 <strong>{filePreview.name}</strong> — {filePreview.count} registros encontrados
           </div>
         )}
         {filePreview?.error && (
@@ -527,9 +488,9 @@ function ImportClientes() {
             ❌ {filePreview.error}
           </div>
         )}
-        <Button onClick={handleImport} disabled={importing || !selectedFile || !selectedTable || filePreview?.error}>
+        <Button onClick={handleImport} disabled={importing || !selectedFile || filePreview?.error}>
           {importing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-          {importing ? 'Importando...' : `Importar para ${TABLE_OPTIONS.find(t => t.value === selectedTable)?.label}`}
+          {importing ? 'Importando...' : 'Importar Dados'}
         </Button>
       </div>
       {result && (
