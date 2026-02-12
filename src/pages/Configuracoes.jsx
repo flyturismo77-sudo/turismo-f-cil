@@ -411,14 +411,36 @@ export default function Configuracoes() {
 function ImportClientes() {
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedFile(file);
+    setResult(null);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        const count = Array.isArray(data) ? data.length : 0;
+        setFilePreview({ name: file.name, count });
+      } catch {
+        setFilePreview({ name: file.name, error: 'Arquivo JSON inválido' });
+      }
+    };
+    reader.readAsText(file);
+  };
 
   const handleImport = async () => {
+    if (!selectedFile) return;
     setImporting(true);
     setResult(null);
     try {
-      const resp = await fetch('/data/clientes-import.json');
-      const clientes = await resp.json();
-      
+      const text = await selectedFile.text();
+      const clientes = JSON.parse(text);
+
       const edgeResp = await fetch(
         'https://duzfdwkjqqsayisfllww.supabase.co/functions/v1/import-clientes',
         {
@@ -427,7 +449,7 @@ function ImportClientes() {
             'Content-Type': 'application/json',
             'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1emZkd2tqcXFzYXlpc2ZsbHd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzI4ODksImV4cCI6MjA4NjQwODg4OX0.DKdBuaeaPunvxh_gawqaDHva3nOI0Qcbvby6zMV_8PA',
           },
-          body: JSON.stringify({ clientes }),
+          body: JSON.stringify({ clientes: Array.isArray(clientes) ? clientes : [clientes] }),
         }
       );
       const data = await edgeResp.json();
@@ -441,12 +463,30 @@ function ImportClientes() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-600">
-        Clique para importar os clientes do arquivo JSON (Base44 → Supabase).
+        Selecione o arquivo JSON exportado do sistema antigo (Base44) para importar para o Supabase.
       </p>
-      <Button onClick={handleImport} disabled={importing}>
-        {importing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-        {importing ? 'Importando...' : 'Importar Clientes'}
-      </Button>
+      <div className="space-y-3">
+        <Input
+          type="file"
+          accept=".json"
+          onChange={handleFileSelect}
+          disabled={importing}
+        />
+        {filePreview && !filePreview.error && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+            📄 <strong>{filePreview.name}</strong> — {filePreview.count} registros encontrados
+          </div>
+        )}
+        {filePreview?.error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-800">
+            ❌ {filePreview.error}
+          </div>
+        )}
+        <Button onClick={handleImport} disabled={importing || !selectedFile || filePreview?.error}>
+          {importing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+          {importing ? 'Importando...' : 'Importar Dados'}
+        </Button>
+      </div>
       {result && (
         <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto max-h-60">
           {JSON.stringify(result, null, 2)}
