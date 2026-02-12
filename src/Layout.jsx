@@ -16,6 +16,9 @@ import {
   UserCheck,
   Building2,
   UsersRound,
+  ChevronRight,
+  Wallet,
+  LogOut,
 } from "lucide-react";
 import {
   Sidebar,
@@ -34,6 +37,43 @@ import {
 import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { Separator } from "@/components/ui/separator";
+
+const navSections = [
+  {
+    label: "Principal",
+    items: [
+      { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
+      { title: "Viagens", url: createPageUrl("Viagens"), icon: Plane },
+      { title: "Clientes", url: createPageUrl("Clientes"), icon: Users },
+    ]
+  },
+  {
+    label: "Operacional",
+    items: [
+      { title: "Assentos", url: createPageUrl("Assentos"), icon: Armchair },
+      { title: "Quartos", url: createPageUrl("MapaQuartos"), icon: Hotel },
+      { title: "Equipe", url: createPageUrl("Equipe"), icon: UsersRound },
+    ]
+  },
+  {
+    label: "Financeiro",
+    items: [
+      { title: "Recebimentos", url: createPageUrl("Recebimentos"), icon: Receipt },
+      { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck },
+      { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2 },
+    ]
+  },
+  {
+    label: "Sistema",
+    items: [
+      { title: "Usuários", url: createPageUrl("Usuarios"), icon: UserCog },
+      { title: "Backup", url: createPageUrl("GerenciamentoArquivos"), icon: HardDrive },
+      { title: "Migração DD", url: createPageUrl("MigracaoDD"), icon: RefreshCw },
+      { title: "Configurações", url: createPageUrl("Configuracoes"), icon: Settings },
+    ]
+  },
+];
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -53,101 +93,103 @@ export default function Layout({ children, currentPageName }) {
     staleTime: 5 * 60 * 1000,
   });
 
-  const navigationItems = [
-    { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
-    { title: "Viagens", url: createPageUrl("Viagens"), icon: Plane },
-    { title: "Clientes", url: createPageUrl("Clientes"), icon: Users },
-    { title: "Assentos", url: createPageUrl("Assentos"), icon: Armchair },
-    { title: "Quartos", url: createPageUrl("MapaQuartos"), icon: Hotel },
-    { title: "Recebimentos", url: createPageUrl("Recebimentos"), icon: Receipt },
-    { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck },
-    { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2 },
-    { title: "Equipe", url: createPageUrl("Equipe"), icon: UsersRound },
-    { title: "Usuários", url: createPageUrl("Usuarios"), icon: UserCog },
-    { title: "Backup", url: createPageUrl("GerenciamentoArquivos"), icon: HardDrive },
-    { title: "Migração DD", url: createPageUrl("MigracaoDD"), icon: RefreshCw },
-    { title: "Configurações", url: createPageUrl("Configuracoes"), icon: Settings },
-  ];
+  const currentTitle = navSections
+    .flatMap(s => s.items)
+    .find(i => location.pathname === i.url)?.title || currentPageName || "Dashboard";
 
   return (
     <ErrorBoundary>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 to-blue-50">
-          <Sidebar className="border-r border-gray-200 bg-white">
-            <SidebarHeader className="border-b border-gray-100 p-6">
+        <div className="min-h-screen flex w-full bg-background">
+          <Sidebar className="gradient-sidebar border-r-0">
+            {/* Logo */}
+            <SidebarHeader className="px-5 py-6">
               <div className="flex items-center gap-3">
                 {config?.logo_url ? (
-                  <img src={config.logo_url} alt="Logo" className="w-10 h-10 object-contain" />
+                  <img src={config.logo_url} alt="Logo" className="w-10 h-10 object-contain rounded-xl" />
                 ) : (
-                  <div className="w-10 h-10 bg-gradient-to-br from-sky-400 via-blue-600 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <Plane className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-glow-primary">
+                    <Plane className="w-5 h-5 text-primary-foreground" />
                   </div>
                 )}
                 <div>
-                  <h2 className="font-bold text-lg text-gray-900">
+                  <h2 className="font-display font-bold text-base text-sidebar-primary-foreground tracking-tight">
                     {config?.nome_empresa || "Fly Turismo"}
                   </h2>
-                  <p className="text-xs text-gray-500">Sistema de Gestão</p>
+                  <p className="text-[11px] text-sidebar-foreground/50 font-medium">
+                    Sistema de Gestão
+                  </p>
                 </div>
               </div>
             </SidebarHeader>
             
-            <SidebarContent className="p-3">
-              <SidebarGroup>
-                <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
-                  Menu Principal
-                </SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {navigationItems.map((item) => (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton 
-                          asChild 
-                          className={`hover:bg-sky-50 hover:text-sky-700 transition-all duration-200 rounded-xl mb-1 ${
-                            location.pathname === item.url ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg' : ''
-                          }`}
-                        >
-                          <Link to={item.url} className="flex items-center gap-3 px-4 py-3">
-                            <item.icon className="w-5 h-5" />
-                            <span className="font-medium">{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-
-
-
+            <SidebarContent className="px-3 py-1 overflow-y-auto">
+              {navSections.map((section, idx) => (
+                <SidebarGroup key={section.label}>
+                  <SidebarGroupLabel className="text-[10px] font-semibold text-sidebar-foreground/40 uppercase tracking-[0.12em] px-3 mb-1">
+                    {section.label}
+                  </SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {section.items.map((item) => {
+                        const isActive = location.pathname === item.url;
+                        return (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton 
+                              asChild 
+                              className={`group transition-all duration-200 rounded-lg mb-0.5 ${
+                                isActive 
+                                  ? 'gradient-primary text-primary-foreground shadow-glow-primary' 
+                                  : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
+                              }`}
+                            >
+                              <Link to={item.url} className="flex items-center gap-3 px-3 py-2.5">
+                                <item.icon className={`w-[18px] h-[18px] ${isActive ? '' : 'opacity-70 group-hover:opacity-100'}`} />
+                                <span className="text-sm font-medium">{item.title}</span>
+                                {isActive && (
+                                  <ChevronRight className="w-3.5 h-3.5 ml-auto opacity-70" />
+                                )}
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                  {idx < navSections.length - 1 && (
+                    <Separator className="my-2 bg-sidebar-border/50" />
+                  )}
+                </SidebarGroup>
+              ))}
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-gray-100 p-4">
+            <SidebarFooter className="px-4 py-4 border-t border-sidebar-border/50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold text-sm">A</span>
+                <div className="w-9 h-9 rounded-full gradient-primary flex items-center justify-center shadow-glow-primary">
+                  <span className="text-primary-foreground font-semibold text-sm">A</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 text-sm truncate">Administrador</p>
-                  <p className="text-xs text-green-600 font-medium">Admin</p>
+                  <p className="font-medium text-sidebar-foreground text-sm truncate">Admin</p>
+                  <p className="text-[11px] text-sidebar-foreground/50">Administrador</p>
                 </div>
               </div>
             </SidebarFooter>
           </Sidebar>
 
           <main className="flex-1 flex flex-col overflow-hidden">
-            <header className="bg-white border-b border-gray-200 px-6 py-4 md:hidden">
-              <div className="flex items-center gap-4">
-                <SidebarTrigger className="hover:bg-gray-100 p-2 rounded-lg transition-colors duration-200">
-                  <Menu className="w-5 h-5" />
-                </SidebarTrigger>
-                <h1 className="text-xl font-semibold text-gray-900">
-                  {config?.nome_empresa || "Fly Turismo"}
+            {/* Top Header Bar */}
+            <header className="bg-card border-b border-border px-6 py-3 flex items-center gap-4 shadow-soft">
+              <SidebarTrigger className="hover:bg-secondary p-2 rounded-lg transition-colors duration-200 md:hidden">
+                <Menu className="w-5 h-5 text-foreground" />
+              </SidebarTrigger>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-display font-semibold text-foreground">
+                  {currentTitle}
                 </h1>
               </div>
             </header>
 
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-auto p-4 md:p-6 animate-fade-in">
               {children}
             </div>
           </main>
