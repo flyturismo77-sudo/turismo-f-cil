@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Settings, Loader2, CheckCircle } from 'lucide-react';
+import { Settings, Loader2, CheckCircle, Upload } from 'lucide-react';
 
 export default function Configuracoes() {
   const [formData, setFormData] = useState({
@@ -391,6 +391,67 @@ export default function Configuracoes() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Temporary Import Section */}
+      <Card className="shadow-lg border-none mt-6">
+        <CardHeader className="border-b border-gray-100">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Upload className="w-5 h-5" />
+            Importar Dados (Base44)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <ImportClientes />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function ImportClientes() {
+  const [importing, setImporting] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleImport = async () => {
+    setImporting(true);
+    setResult(null);
+    try {
+      const resp = await fetch('/data/clientes-import.json');
+      const clientes = await resp.json();
+      
+      const edgeResp = await fetch(
+        'https://duzfdwkjqqsayisfllww.supabase.co/functions/v1/import-clientes',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1emZkd2tqcXFzYXlpc2ZsbHd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzI4ODksImV4cCI6MjA4NjQwODg4OX0.DKdBuaeaPunvxh_gawqaDHva3nOI0Qcbvby6zMV_8PA',
+          },
+          body: JSON.stringify({ clientes }),
+        }
+      );
+      const data = await edgeResp.json();
+      setResult(data);
+    } catch (err) {
+      setResult({ error: err.message });
+    }
+    setImporting(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-600">
+        Clique para importar os clientes do arquivo JSON (Base44 → Supabase).
+      </p>
+      <Button onClick={handleImport} disabled={importing}>
+        {importing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+        {importing ? 'Importando...' : 'Importar Clientes'}
+      </Button>
+      {result && (
+        <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto max-h-60">
+          {JSON.stringify(result, null, 2)}
+        </pre>
+      )}
     </div>
   );
 }
