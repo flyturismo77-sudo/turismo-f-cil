@@ -987,9 +987,27 @@ export default function MapaQuartos() {
               </p>
             </div>
 
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Buscar cliente por nome, CPF ou telefone..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 h-9 text-sm"
+              />
+            </div>
+
             {clientesSemQuarto.length > 0 ? (
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {clientesSemQuarto.map(cliente => (
+                {clientesSemQuarto
+                  .filter(c => {
+                    if (!searchTerm) return true;
+                    const term = searchTerm.toLowerCase();
+                    return c.nome_completo?.toLowerCase().includes(term) ||
+                      c.cpf?.includes(term) ||
+                      c.telefone?.includes(term);
+                  })
+                  .map(cliente => (
                   <button
                     key={cliente.id}
                     onClick={() => handleAdicionarHospede(cliente.id, selectedQuarto)}
