@@ -912,8 +912,25 @@ Qualquer dúvida, estamos à disposição!`;
                 <p className="text-sm text-gray-600 mb-3">
                   Selecione um cliente para ocupar a poltrona #{selectedSeat}:
                 </p>
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    placeholder="Buscar cliente por nome, CPF ou telefone..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9 h-9 text-sm"
+                  />
+                </div>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {clientesSemAssento.map(cliente => (
+                  {clientesSemAssento
+                    .filter(c => {
+                      if (!searchTerm) return true;
+                      const term = searchTerm.toLowerCase();
+                      return c.nome_completo?.toLowerCase().includes(term) ||
+                        c.cpf?.includes(term) ||
+                        c.telefone?.includes(term);
+                    })
+                    .map(cliente => (
                     <button
                       key={cliente.id}
                       onClick={() => handleAtribuirAssento(cliente.id, selectedSeat)}
