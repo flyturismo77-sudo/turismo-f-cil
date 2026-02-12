@@ -18,6 +18,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DoubleDeckLayout from "../components/assentos/DoubleDeckLayout";
 import DDDSTurLayout from "../components/assentos/DDDSTurLayout";
+import JGTurismo44Layout from "../components/assentos/JGTurismo44Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Assentos() {
@@ -103,7 +104,7 @@ export default function Assentos() {
     }
 
     let andar = 'Primeiro Andar';
-    if (viagemSelecionada?.modelo_onibus === 'DD') {
+    if (viagemSelecionada?.modelo_onibus === 'VA_TUR') {
       andar = poltrona <= 48 ? 'Piso Superior' : 'Piso Inferior';
     } else if (viagemSelecionada?.modelo_onibus === 'DD_DS_TUR') {
       andar = poltrona <= 44 ? 'Piso Superior' : 'Piso Inferior';
@@ -436,8 +437,9 @@ export default function Assentos() {
   };
 
   const seatRows = renderSeatsLayout();
-  const isDoubleDeck = viagemSelecionada?.modelo_onibus === 'DD';
+  const isDoubleDeck = viagemSelecionada?.modelo_onibus === 'VA_TUR';
   const isDDDSTur = viagemSelecionada?.modelo_onibus === 'DD_DS_TUR';
+  const isJGTurismo = viagemSelecionada?.modelo_onibus === 'JG_TURISMO_44';
 
   const enviarWhatsApp = (cliente) => {
     if (!cliente.telefone) {
@@ -596,7 +598,17 @@ Qualquer dúvida, estamos à disposição!`;
               </div>
             </div>
 
-            {isDDDSTur ? (
+            {isJGTurismo ? (
+              <JGTurismo44Layout
+                clientePorPoltrona={clientePorPoltrona}
+                searchTerm={searchTerm}
+                onSeatClick={(seatNumber) => {
+                  setSelectedSeat(seatNumber);
+                  setShowDialog(true);
+                }}
+                renderSeatInfo={renderSeatInfo}
+              />
+            ) : isDDDSTur ? (
               <DDDSTurLayout
                 clientePorPoltrona={clientePorPoltrona}
                 searchTerm={searchTerm}
