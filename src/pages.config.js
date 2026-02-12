@@ -1,10 +1,5 @@
 /**
  * pages.config.js - Page routing configuration
- * 
- * This file is AUTO-GENERATED. Do not add imports or modify PAGES manually.
- * Pages are auto-registered when you create files in the ./pages/ folder.
- * 
- * THE ONLY EDITABLE VALUE: mainPage
  */
 import Assentos from './pages/Assentos';
 import Clientes from './pages/Clientes';
@@ -13,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import DespesasEmpresa from './pages/DespesasEmpresa';
 import DespesasPessoal from './pages/DespesasPessoal';
 import DetalhesViagem from './pages/DetalhesViagem';
+import Equipe from './pages/Equipe';
 import GerenciamentoArquivos from './pages/GerenciamentoArquivos';
 import MapaQuartos from './pages/MapaQuartos';
 import MigracaoDD from './pages/MigracaoDD';
@@ -30,6 +26,7 @@ export const PAGES = {
     "DespesasEmpresa": DespesasEmpresa,
     "DespesasPessoal": DespesasPessoal,
     "DetalhesViagem": DetalhesViagem,
+    "Equipe": Equipe,
     "GerenciamentoArquivos": GerenciamentoArquivos,
     "MapaQuartos": MapaQuartos,
     "MigracaoDD": MigracaoDD,
