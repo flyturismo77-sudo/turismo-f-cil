@@ -290,6 +290,75 @@ export type Database = {
         }
         Relationships: []
       }
+      despesas_pessoal: {
+        Row: {
+          categoria: string
+          comprovante_url: string | null
+          created_at: string
+          data_pagamento: string | null
+          data_vencimento: string | null
+          descricao: string
+          forma_pagamento: string | null
+          id: string
+          id_membro_equipe: string | null
+          id_viagem: string | null
+          observacoes: string | null
+          recorrente: boolean | null
+          status: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          categoria?: string
+          comprovante_url?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          descricao: string
+          forma_pagamento?: string | null
+          id?: string
+          id_membro_equipe?: string | null
+          id_viagem?: string | null
+          observacoes?: string | null
+          recorrente?: boolean | null
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          categoria?: string
+          comprovante_url?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          descricao?: string
+          forma_pagamento?: string | null
+          id?: string
+          id_membro_equipe?: string | null
+          id_viagem?: string | null
+          observacoes?: string | null
+          recorrente?: boolean | null
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "despesas_pessoal_id_membro_equipe_fkey"
+            columns: ["id_membro_equipe"]
+            isOneToOne: false
+            referencedRelation: "equipe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "despesas_pessoal_id_viagem_fkey"
+            columns: ["id_viagem"]
+            isOneToOne: false
+            referencedRelation: "viagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos_viagem: {
         Row: {
           conteudo: string | null
@@ -718,6 +787,7 @@ export type Database = {
           id: string
           id_cliente: string | null
           id_viagem: string | null
+          intervalo_dias: number | null
           numero_parcela: number
           observacoes: string | null
           status: string | null
@@ -734,6 +804,7 @@ export type Database = {
           id?: string
           id_cliente?: string | null
           id_viagem?: string | null
+          intervalo_dias?: number | null
           numero_parcela: number
           observacoes?: string | null
           status?: string | null
@@ -750,6 +821,7 @@ export type Database = {
           id?: string
           id_cliente?: string | null
           id_viagem?: string | null
+          intervalo_dias?: number | null
           numero_parcela?: number
           observacoes?: string | null
           status?: string | null
