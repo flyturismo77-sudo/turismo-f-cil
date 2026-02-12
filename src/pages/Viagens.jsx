@@ -54,8 +54,8 @@ export default function Viagens() {
               status: 'Disponível'
             });
           }
-        } else if (modelo === 'DD') {
-          // DD 57: piso superior 1-48, piso inferior 49-57
+        } else if (modelo === 'VA_TUR') {
+          // VA TUR 57: piso superior 1-48, piso inferior 49-57
           for (let i = 1; i <= totalAssentos; i++) {
             const andar = i <= 48 ? 'Piso Superior' : 'Piso Inferior';
             assentos.push({
@@ -74,6 +74,17 @@ export default function Viagens() {
               numero_poltrona: i,
               id_viagem: viagem.id,
               andar,
+              posicao: i % 2 === 1 ? 'Janela' : 'Corredor',
+              status: 'Disponível'
+            });
+          }
+        } else if (modelo === 'JG_TURISMO_44') {
+          // JG Turismo 44: todos no primeiro andar
+          for (let i = 1; i <= totalAssentos; i++) {
+            assentos.push({
+              numero_poltrona: i,
+              id_viagem: viagem.id,
+              andar: 'Primeiro Andar',
               posicao: i % 2 === 1 ? 'Janela' : 'Corredor',
               status: 'Disponível'
             });
