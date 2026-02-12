@@ -70,8 +70,8 @@ const createEntityProxy = (tableName) => ({
   },
 
   async update(id, record) {
-    // Remove id from update payload
-    const { id: _, ...updateData } = record;
+    // Remove id and alias fields from update payload
+    const { id: _, created_date, updated_date, ...updateData } = record;
     const { data, error } = await supabase
       .from(tableName)
       .update(updateData)
