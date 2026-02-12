@@ -118,28 +118,8 @@ export default function DDDSTurLayout({
             {/* 41, 42 | 36, 35 */}
             {renderRow(41, 42, 36, 35)}
 
-            {/* 44, 43 | 40, 39 — last row (3 left + 1 right window) */}
-            <div className="flex gap-3 justify-center">
-              <div className="flex gap-1">
-                {renderSeat(44)}
-                {renderSeat(43)}
-              </div>
-              <div className="w-8 border-x-2 border-dashed border-sky-300" />
-              <div className="flex gap-1">
-                {renderSeat(40)}
-                <div className="w-16" />
-              </div>
-            </div>
-
-            {/* Último: 39 sozinho na direita (janela) */}
-            <div className="flex gap-3 justify-center">
-              <div className="w-[136px]" />
-              <div className="w-8" />
-              <div className="flex gap-1">
-                <div className="w-16" />
-                {renderSeat(39)}
-              </div>
-            </div>
+            {/* 44, 43 | 40, 39 */}
+            {renderRow(44, 43, 40, 39)}
 
             {/* BEBEDOURO / GELADEIRA */}
             <div className="bg-cyan-100 border-2 border-cyan-400 rounded-lg py-2 text-center mt-2">
@@ -195,8 +175,8 @@ export default function DDDSTurLayout({
               </div>
             </div>
 
-            {/* 51, 52 | 54, 53 */}
-            <div className="flex gap-3 justify-center">
+            {/* 51, 52 | 54 */}
+            <div className="flex gap-3 justify-center items-center">
               <div className="flex gap-1">
                 {renderSeat(51)}
                 {renderSeat(52)}
@@ -204,18 +184,21 @@ export default function DDDSTurLayout({
               <div className="w-8 border-x-2 border-dashed border-orange-300" />
               <div className="flex gap-1">
                 {renderSeat(54)}
-                {renderSeat(53)}
+                <div className="w-16" />
               </div>
             </div>
 
-            {/* 55, 56 */}
+            {/* 55, 56 | 53 */}
             <div className="flex gap-3 justify-center">
               <div className="flex gap-1">
                 {renderSeat(55)}
                 {renderSeat(56)}
               </div>
-              <div className="w-8" />
-              <div className="w-[136px]" />
+              <div className="w-8 border-x-2 border-dashed border-orange-300" />
+              <div className="flex gap-1">
+                <div className="w-16" />
+                {renderSeat(53)}
+              </div>
             </div>
 
             {/* GELADEIRA */}
