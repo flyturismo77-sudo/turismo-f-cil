@@ -7,10 +7,8 @@ import {
   Users, 
   Armchair, 
   DollarSign, 
-  FileText,
   Menu,
   Settings,
-  Globe,
   MessageSquare,
   Hotel,
   CreditCard,
@@ -18,10 +16,7 @@ import {
   Building2,
   UsersRound,
   HardDrive,
-  Activity,
   RefreshCw,
-  Database,
-  BookOpen
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,11 +36,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-const publicPages = ["Home", "Sobre", "ViagensPublico", "Contato", "FormularioContrato"];
-
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
-  const isPublicPage = publicPages.includes(currentPageName);
 
   const { data: config } = useQuery({
     queryKey: ['config'],
@@ -62,10 +54,6 @@ export default function Layout({ children, currentPageName }) {
     staleTime: 5 * 60 * 1000,
   });
 
-  if (isPublicPage) {
-    return <ErrorBoundary>{children}</ErrorBoundary>;
-  }
-
   const navigationItems = [
     { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
     { title: "Viagens", url: createPageUrl("Viagens"), icon: Plane },
@@ -77,15 +65,9 @@ export default function Layout({ children, currentPageName }) {
     { title: "Despesas", url: createPageUrl("PagamentosEmpresa"), icon: CreditCard },
     { title: "Fornecedores", url: createPageUrl("Fornecedores"), icon: Building2 },
     { title: "Equipe", url: createPageUrl("Equipe"), icon: UsersRound },
-    { title: "Relatórios", url: createPageUrl("Relatorios"), icon: FileText },
-    { title: "Formulários", url: createPageUrl("Formularios"), icon: FileText },
-    { title: "Mensagens", url: createPageUrl("Mensagens"), icon: MessageSquare },
     { title: "Usuários", url: createPageUrl("Usuarios"), icon: UserCog },
     { title: "Backup", url: createPageUrl("GerenciamentoArquivos"), icon: HardDrive },
-    { title: "Logs", url: createPageUrl("LogsAuditoria"), icon: Activity },
     { title: "Migração DD", url: createPageUrl("MigracaoDD"), icon: RefreshCw },
-    { title: "Exportação", url: createPageUrl("Exportacao"), icon: Database },
-    { title: "Documentação", url: createPageUrl("Documentacao"), icon: BookOpen },
     { title: "Configurações", url: createPageUrl("Configuracoes"), icon: Settings },
   ];
 
@@ -138,20 +120,8 @@ export default function Layout({ children, currentPageName }) {
                 </SidebarGroupContent>
               </SidebarGroup>
 
-              <SidebarGroup>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild className="hover:bg-amber-50 hover:text-amber-700 transition-all duration-200 rounded-xl">
-                        <Link to={createPageUrl("Home")} className="flex items-center gap-3 px-4 py-3">
-                          <Globe className="w-5 h-5" />
-                          <span className="font-medium">Ver Site</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
+
+
             </SidebarContent>
 
             <SidebarFooter className="border-t border-gray-100 p-4">
