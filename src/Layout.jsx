@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { useAuth } from "@/lib/AuthContext";
 import { 
   LayoutDashboard, 
   Plane, 
@@ -9,7 +8,6 @@ import {
   Armchair, 
   DollarSign, 
   FileText,
-  LogOut,
   Menu,
   Settings,
   Globe,
@@ -39,18 +37,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-const adminPages = ["Dashboard", "Viagens", "Clientes", "Assentos", "MapaQuartos", "Financeiro", "PagamentosEmpresa", "Fornecedores", "Equipe", "Relatorios", "Formularios", "Configuracoes", "Mensagens", "Usuarios", "GerenciamentoArquivos", "LogsAuditoria", "MigracaoDD", "Exportacao", "WhatsApp", "Documentacao"];
 const publicPages = ["Home", "Sobre", "ViagensPublico", "Contato", "FormularioContrato"];
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
-  const { user, profile, isAdmin, logout } = useAuth();
-  const isAdminPage = adminPages.includes(currentPageName);
   const isPublicPage = publicPages.includes(currentPageName);
 
   const { data: config } = useQuery({
@@ -65,140 +59,40 @@ export default function Layout({ children, currentPageName }) {
       return data;
     },
     retry: 3,
-    retryDelay: 1000,
     staleTime: 5 * 60 * 1000,
   });
 
-  const handleLogout = async () => {
-    await logout();
-  };
-
   if (isPublicPage) {
-    return (
-      <ErrorBoundary>
-        {children}
-      </ErrorBoundary>
-    );
+    return <ErrorBoundary>{children}</ErrorBoundary>;
   }
 
-  const currentUser = profile || {};
-  const userIsAdmin = isAdmin;
-
   const navigationItems = [
-    {
-      title: "Dashboard",
-      url: createPageUrl("Dashboard"),
-      icon: LayoutDashboard,
-    },
-    ...(userIsAdmin ? [{
-      title: "Viagens",
-      url: createPageUrl("Viagens"),
-      icon: Plane,
-    }] : []),
-    {
-      title: "Clientes",
-      url: createPageUrl("Clientes"),
-      icon: Users,
-    },
-    {
-      title: "Assentos",
-      url: createPageUrl("Assentos"),
-      icon: Armchair,
-    },
-    {
-      title: "Quartos",
-      url: createPageUrl("MapaQuartos"),
-      icon: Hotel,
-    },
-    {
-      title: "WhatsApp",
-      url: createPageUrl("WhatsApp"),
-      icon: MessageSquare,
-    },
-    ...(userIsAdmin ? [
-      {
-        title: "Financeiro",
-        url: createPageUrl("Financeiro"),
-        icon: DollarSign,
-      },
-      {
-        title: "Despesas",
-        url: createPageUrl("PagamentosEmpresa"),
-        icon: CreditCard,
-      },
-      {
-        title: "Fornecedores",
-        url: createPageUrl("Fornecedores"),
-        icon: Building2,
-      },
-      {
-        title: "Equipe",
-        url: createPageUrl("Equipe"),
-        icon: UsersRound,
-      },
-      {
-        title: "Relatórios",
-        url: createPageUrl("Relatorios"),
-        icon: FileText,
-      },
-    ] : []),
-    {
-      title: "Formulários",
-      url: createPageUrl("Formularios"),
-      icon: FileText,
-    },
-    {
-      title: "Mensagens",
-      url: createPageUrl("Mensagens"),
-      icon: MessageSquare,
-    },
-    ...(userIsAdmin ? [
-      {
-        title: "Usuários",
-        url: createPageUrl("Usuarios"),
-        icon: UserCog,
-      },
-      {
-        title: "Backup",
-        url: createPageUrl("GerenciamentoArquivos"),
-        icon: HardDrive,
-      },
-      {
-        title: "Logs",
-        url: createPageUrl("LogsAuditoria"),
-        icon: Activity,
-      },
-      {
-        title: "Exportação",
-        url: createPageUrl("Exportacao"),
-        icon: Database,
-      },
-      {
-        title: "Documentação",
-        url: createPageUrl("Documentacao"),
-        icon: BookOpen,
-      },
-    ] : []),
-    {
-      title: "Configurações",
-      url: createPageUrl("Configuracoes"),
-      icon: Settings,
-    },
+    { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
+    { title: "Viagens", url: createPageUrl("Viagens"), icon: Plane },
+    { title: "Clientes", url: createPageUrl("Clientes"), icon: Users },
+    { title: "Assentos", url: createPageUrl("Assentos"), icon: Armchair },
+    { title: "Quartos", url: createPageUrl("MapaQuartos"), icon: Hotel },
+    { title: "WhatsApp", url: createPageUrl("WhatsApp"), icon: MessageSquare },
+    { title: "Financeiro", url: createPageUrl("Financeiro"), icon: DollarSign },
+    { title: "Despesas", url: createPageUrl("PagamentosEmpresa"), icon: CreditCard },
+    { title: "Fornecedores", url: createPageUrl("Fornecedores"), icon: Building2 },
+    { title: "Equipe", url: createPageUrl("Equipe"), icon: UsersRound },
+    { title: "Relatórios", url: createPageUrl("Relatorios"), icon: FileText },
+    { title: "Formulários", url: createPageUrl("Formularios"), icon: FileText },
+    { title: "Mensagens", url: createPageUrl("Mensagens"), icon: MessageSquare },
+    { title: "Usuários", url: createPageUrl("Usuarios"), icon: UserCog },
+    { title: "Backup", url: createPageUrl("GerenciamentoArquivos"), icon: HardDrive },
+    { title: "Logs", url: createPageUrl("LogsAuditoria"), icon: Activity },
+    { title: "Migração DD", url: createPageUrl("MigracaoDD"), icon: RefreshCw },
+    { title: "Exportação", url: createPageUrl("Exportacao"), icon: Database },
+    { title: "Documentação", url: createPageUrl("Documentacao"), icon: BookOpen },
+    { title: "Configurações", url: createPageUrl("Configuracoes"), icon: Settings },
   ];
 
   return (
     <ErrorBoundary>
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 to-blue-50">
-          <style>{`
-            :root {
-              --primary: 214 88% 48%;
-              --primary-foreground: 0 0% 100%;
-              --secondary: 38 92% 50%;
-              --secondary-foreground: 0 0% 100%;
-            }
-          `}</style>
-          
           <Sidebar className="border-r border-gray-200 bg-white">
             <SidebarHeader className="border-b border-gray-100 p-6">
               <div className="flex items-center gap-3">
@@ -213,7 +107,7 @@ export default function Layout({ children, currentPageName }) {
                   <h2 className="font-bold text-lg text-gray-900">
                     {config?.nome_empresa || "Fly Turismo"}
                   </h2>
-                  <p className="text-xs text-gray-500">Sistema Corporativo</p>
+                  <p className="text-xs text-gray-500">Sistema de Gestão</p>
                 </div>
               </div>
             </SidebarHeader>
@@ -231,7 +125,7 @@ export default function Layout({ children, currentPageName }) {
                           asChild 
                           className={`hover:bg-sky-50 hover:text-sky-700 transition-all duration-200 rounded-xl mb-1 ${
                             location.pathname === item.url ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg' : ''
-                          } ${item.highlight ? 'bg-amber-50 border-2 border-amber-300 animate-pulse' : ''}`}
+                          }`}
                         >
                           <Link to={item.url} className="flex items-center gap-3 px-4 py-3">
                             <item.icon className="w-5 h-5" />
@@ -261,28 +155,15 @@ export default function Layout({ children, currentPageName }) {
             </SidebarContent>
 
             <SidebarFooter className="border-t border-gray-100 p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold text-sm">
-                    {currentUser?.full_name?.[0]?.toUpperCase() || 'U'}
-                  </span>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">A</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 text-sm truncate">
-                    {currentUser?.full_name || 'Usuário'}
-                  </p>
-                  <Badge className={`text-xs mt-1 ${userIsAdmin ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                    {userIsAdmin ? 'Administrador' : 'Funcionário'}
-                  </Badge>
+                  <p className="font-medium text-gray-900 text-sm truncate">Administrador</p>
+                  <p className="text-xs text-green-600 font-medium">Admin</p>
                 </div>
               </div>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-              >
-                <LogOut className="w-4 h-4" />
-                Sair
-              </button>
             </SidebarFooter>
           </Sidebar>
 
