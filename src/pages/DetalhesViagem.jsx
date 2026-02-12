@@ -85,7 +85,7 @@ export default function DetalhesViagem() {
     queryKey: ['config'],
     queryFn: async () => {
       const configs = await base44.entities.ConfiguracaoEmpresa.list();
-      return configs[0];
+      return configs[0] || null;
     },
   });
 
@@ -518,6 +518,35 @@ export default function DetalhesViagem() {
     }
   };
 
+  const getCoresOrdem = React.useCallback((cor) => {
+    const ordem = { vermelho: 1, azul: 2, verde: 3, amarelo: 4, roxo: 5, rosa: 6, laranja: 7, marrom: 8, cinza: 9, '': 10 };
+    return ordem[cor] || 10;
+  }, []);
+
+  const filteredAndSortedClientes = React.useMemo(() => {
+    const filtered = clientes.filter(cliente => {
+      if (!searchTerm) return true;
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        cliente.nome_completo?.toLowerCase().includes(searchLower) ||
+        cliente.cpf?.includes(searchLower) ||
+        cliente.telefone?.includes(searchLower) ||
+        cliente.nome_crianca_colo?.toLowerCase().includes(searchLower) ||
+        (cliente.poltrona && cliente.poltrona.toString().includes(searchLower))
+      );
+    });
+
+    return filtered.sort((a, b) => {
+      const corCompare = getCoresOrdem(a?.cor_grupo || '') - getCoresOrdem(b?.cor_grupo || '');
+      if (corCompare !== 0) return corCompare;
+      
+      const grupoCompare = (a?.numero_grupo || 1) - (b?.numero_grupo || 1);
+      if (grupoCompare !== 0) return grupoCompare;
+      
+      return (a?.nome_completo || '').localeCompare(b?.nome_completo || '');
+    });
+  }, [clientes, searchTerm, getCoresOrdem]);
+
   if (!viagemId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -554,35 +583,6 @@ export default function DetalhesViagem() {
   const semAssento = clientes.filter(c => !c.poltrona).length;
   const criancasColo = clientes.filter(c => c.e_crianca_colo).length;
   const acompanhantesCount = clientes.filter(c => c.id_cliente_principal).length;
-
-  const getCoresOrdem = React.useCallback((cor) => {
-    const ordem = { vermelho: 1, azul: 2, verde: 3, amarelo: 4, roxo: 5, rosa: 6, laranja: 7, marrom: 8, cinza: 9, '': 10 };
-    return ordem[cor] || 10;
-  }, []);
-
-  const filteredAndSortedClientes = React.useMemo(() => {
-    const filtered = clientes.filter(cliente => {
-      if (!searchTerm) return true;
-      const searchLower = searchTerm.toLowerCase();
-      return (
-        cliente.nome_completo?.toLowerCase().includes(searchLower) ||
-        cliente.cpf?.includes(searchLower) ||
-        cliente.telefone?.includes(searchLower) ||
-        cliente.nome_crianca_colo?.toLowerCase().includes(searchLower) ||
-        (cliente.poltrona && cliente.poltrona.toString().includes(searchLower))
-      );
-    });
-
-    return filtered.sort((a, b) => {
-      const corCompare = getCoresOrdem(a?.cor_grupo || '') - getCoresOrdem(b?.cor_grupo || '');
-      if (corCompare !== 0) return corCompare;
-      
-      const grupoCompare = (a?.numero_grupo || 1) - (b?.numero_grupo || 1);
-      if (grupoCompare !== 0) return grupoCompare;
-      
-      return (a?.nome_completo || '').localeCompare(b?.nome_completo || '');
-    });
-  }, [clientes, searchTerm, getCoresOrdem]);
 
   const modeloNome = viagem.modelo_onibus === 'DD' ? 'Double Deck' : viagem.modelo_onibus === 'VAN' ? 'VAN' : 'Low Driver';
 
