@@ -25,6 +25,7 @@ export default function DespesasPessoal() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("all");
   const [filtroStatus, setFiltroStatus] = useState("all");
+  const [usarOutraCategoria, setUsarOutraCategoria] = useState(false);
 
   const [formData, setFormData] = useState({
     descricao: '', categoria: 'Salário', id_membro_equipe: '',
@@ -105,6 +106,8 @@ export default function DespesasPessoal() {
 
   const handleEdit = (d) => {
     setEditing(d);
+    const isCustom = !CATEGORIAS.includes(d.categoria);
+    setUsarOutraCategoria(isCustom);
     setFormData({
       descricao: d.descricao, categoria: d.categoria, id_membro_equipe: d.id_membro_equipe || '',
       valor: d.valor, data_pagamento: d.data_pagamento || '', data_vencimento: d.data_vencimento || '',
@@ -119,6 +122,8 @@ export default function DespesasPessoal() {
       valor: 0, data_pagamento: '', data_vencimento: '',
       status: 'Pendente', forma_pagamento: 'PIX', observacoes: ''
     });
+    setEditing(null);
+    setUsarOutraCategoria(false);
     setEditing(null);
   };
 
@@ -263,12 +268,25 @@ export default function DespesasPessoal() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Categoria *</Label>
-                <Select value={formData.categoria} onValueChange={v => setFormData({ ...formData, categoria: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIAS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                {usarOutraCategoria ? (
+                  <div className="flex gap-2">
+                    <Input value={formData.categoria} onChange={e => setFormData({ ...formData, categoria: e.target.value })} placeholder="Digite a categoria..." required />
+                    <Button type="button" variant="outline" size="sm" onClick={() => { setUsarOutraCategoria(false); setFormData({ ...formData, categoria: 'Salário' }); }}>
+                      Voltar
+                    </Button>
+                  </div>
+                ) : (
+                  <Select value={formData.categoria} onValueChange={v => {
+                    if (v === '__outros__') { setUsarOutraCategoria(true); setFormData({ ...formData, categoria: '' }); }
+                    else setFormData({ ...formData, categoria: v });
+                  }}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIAS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      <SelectItem value="__outros__">✏️ Outros (digitar)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
               <div>
                 <Label>Membro da Equipe</Label>

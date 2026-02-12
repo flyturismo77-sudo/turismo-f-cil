@@ -15,6 +15,7 @@ import {
   Receipt,
   UserCheck,
   Building2,
+  UsersRound,
 } from "lucide-react";
 import {
   Sidebar,
@@ -61,6 +62,7 @@ export default function Layout({ children, currentPageName }) {
     { title: "Recebimentos", url: createPageUrl("Recebimentos"), icon: Receipt },
     { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck },
     { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2 },
+    { title: "Equipe", url: createPageUrl("Equipe"), icon: UsersRound },
     { title: "Usuários", url: createPageUrl("Usuarios"), icon: UserCog },
     { title: "Backup", url: createPageUrl("GerenciamentoArquivos"), icon: HardDrive },
     { title: "Migração DD", url: createPageUrl("MigracaoDD"), icon: RefreshCw },
