@@ -9,7 +9,7 @@ import { base44 } from "@/api/base44Client";
 
 const busModels = [
   { value: 'LD', label: 'Low Driver (LD) 46', capacity: 46 },
-  { value: 'LD48', label: 'Low Driver (LD) 48', capacity: 48 },
+  { value: 'LD48', label: 'LD DECA TURISMO', capacity: 48 },
   { value: 'VA_TUR', label: 'VA TUR 57', capacity: 57 },
   { value: 'DD_DS_TUR', label: 'DD DS TUR 56', capacity: 56 },
   { value: 'JG_TURISMO_44', label: 'JG Turismo 44', capacity: 44 },
