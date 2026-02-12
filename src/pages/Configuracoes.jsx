@@ -409,6 +409,7 @@ export default function Configuracoes() {
 }
 
 function ImportClientes() {
+  const queryClient = useQueryClient();
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -454,6 +455,11 @@ function ImportClientes() {
       );
       const data = await edgeResp.json();
       setResult(data);
+      // Invalidar cache para os dados aparecerem em tempo real
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+      queryClient.invalidateQueries({ queryKey: ['viagens'] });
+      queryClient.invalidateQueries({ queryKey: ['parcelas'] });
+      queryClient.invalidateQueries({ queryKey: ['pagamentos'] });
     } catch (err) {
       setResult({ error: err.message });
     }
