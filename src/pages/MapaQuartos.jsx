@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Hotel, Plus, Bed, Edit, Trash2, UserPlus, UserMinus, Printer, Save } from "lucide-react";
+import { Hotel, Plus, Bed, Edit, Trash2, UserPlus, UserMinus, Printer, Save, Search } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -41,6 +41,7 @@ const getNomeTipoQuarto = (capacidade) => {
 
 export default function MapaQuartos() {
   const [selectedViagem, setSelectedViagem] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showQuartoForm, setShowQuartoForm] = useState(false);
   const [showOcupacaoDialog, setShowOcupacaoDialog] = useState(false);
   const [selectedQuarto, setSelectedQuarto] = useState(null);
@@ -716,8 +717,31 @@ export default function MapaQuartos() {
                 </Button>
               </div>
 
+              {/* Search */}
+              <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
+                  placeholder="Buscar cliente por nome, CPF ou número do quarto..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {quartos.map((quarto) => {
+                {quartos.filter((quarto) => {
+                  if (!searchTerm) return true;
+                  const term = searchTerm.toLowerCase();
+                  // Match by room number
+                  if (quarto.numero_quarto?.toLowerCase().includes(term)) return true;
+                  // Match by guest name or CPF
+                  const hospedes = clientesDoQuarto(quarto.id);
+                  return hospedes.some(h => 
+                    h.nome_completo?.toLowerCase().includes(term) ||
+                    h.cpf?.includes(term) ||
+                    h.telefone?.includes(term)
+                  );
+                }).map((quarto) => {
                   const hospedes = clientesDoQuarto(quarto.id);
                   const ocupacaoReal = hospedes.length;
                   const percentOcupacao = quarto.capacidade > 0 ? (ocupacaoReal / quarto.capacidade) * 100 : 0;
