@@ -9,7 +9,7 @@ import {
   DollarSign, 
   Menu,
   Settings,
-  MessageSquare,
+  
   Hotel,
   CreditCard,
   UserCog,
@@ -60,7 +60,7 @@ export default function Layout({ children, currentPageName }) {
     { title: "Clientes", url: createPageUrl("Clientes"), icon: Users },
     { title: "Assentos", url: createPageUrl("Assentos"), icon: Armchair },
     { title: "Quartos", url: createPageUrl("MapaQuartos"), icon: Hotel },
-    { title: "WhatsApp", url: createPageUrl("WhatsApp"), icon: MessageSquare },
+    
     { title: "Financeiro", url: createPageUrl("Financeiro"), icon: DollarSign },
     { title: "Despesas", url: createPageUrl("PagamentosEmpresa"), icon: CreditCard },
     { title: "Fornecedores", url: createPageUrl("Fornecedores"), icon: Building2 },

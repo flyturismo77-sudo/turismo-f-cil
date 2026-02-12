@@ -61,7 +61,6 @@ import MigracaoDD from './pages/MigracaoDD';
 import PagamentosEmpresa from './pages/PagamentosEmpresa';
 import Usuarios from './pages/Usuarios';
 import Viagens from './pages/Viagens';
-import WhatsApp from './pages/WhatsApp';
 import __Layout from './Layout.jsx';
 
 
@@ -80,7 +79,6 @@ export const PAGES = {
     "PagamentosEmpresa": PagamentosEmpresa,
     "Usuarios": Usuarios,
     "Viagens": Viagens,
-    "WhatsApp": WhatsApp,
 }
 
 export const pagesConfig = {
