@@ -26,6 +26,7 @@ export default function Contratos() {
   const [selectedViagem, setSelectedViagem] = useState('');
   const [selectedCliente, setSelectedCliente] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [clienteSearch, setClienteSearch] = useState('');
   const [formData, setFormData] = useState({
     nome_completo: '',
     estado_civil: '',
@@ -495,18 +496,47 @@ export default function Contratos() {
                     <h3 className="font-semibold text-foreground flex items-center gap-2">
                       <User className="w-4 h-4" /> 2. Selecione o Cliente (preenche automaticamente)
                     </h3>
-                    <Select value={selectedCliente} onValueChange={handleSelectCliente}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Escolha um cliente" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {clientes.map(c => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.nome_completo} {c.cpf ? `- ${c.cpf}` : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Buscar por nome, CPF ou telefone..."
+                        value={clienteSearch}
+                        onChange={(e) => setClienteSearch(e.target.value)}
+                        className="pl-10 mb-2"
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto border rounded-lg divide-y">
+                      {clientes
+                        .filter(c => {
+                          if (!clienteSearch) return true;
+                          const term = clienteSearch.toLowerCase();
+                          return (
+                            c.nome_completo?.toLowerCase().includes(term) ||
+                            c.cpf?.includes(term) ||
+                            c.telefone?.includes(term)
+                          );
+                        })
+                        .map(c => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => handleSelectCliente(c.id)}
+                            className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-accent ${
+                              selectedCliente === c.id ? 'bg-primary/10 font-semibold text-primary' : 'text-foreground'
+                            }`}
+                          >
+                            {c.nome_completo} {c.cpf ? `- ${c.cpf}` : ''} {c.telefone ? `- ${c.telefone}` : ''}
+                          </button>
+                        ))
+                      }
+                      {clientes.filter(c => {
+                        if (!clienteSearch) return true;
+                        const term = clienteSearch.toLowerCase();
+                        return c.nome_completo?.toLowerCase().includes(term) || c.cpf?.includes(term) || c.telefone?.includes(term);
+                      }).length === 0 && (
+                        <p className="px-3 py-4 text-sm text-muted-foreground text-center">Nenhum cliente encontrado</p>
+                      )}
+                    </div>
                   </>
                 )}
                 <Separator />
