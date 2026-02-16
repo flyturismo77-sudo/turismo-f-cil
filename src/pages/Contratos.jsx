@@ -372,89 +372,121 @@ export default function Contratos() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-display font-bold text-foreground">Contratos</h2>
-          <p className="text-muted-foreground text-sm">Gerencie contratos de viagem</p>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-sky-400/80 to-blue-400/70 p-6 md:p-8">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-60" />
+        <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-white">Contratos</h2>
+            <p className="text-white/80 text-sm mt-1">Gerencie e gere contratos de viagem</p>
+          </div>
+          <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="gap-2 bg-white text-sky-600 hover:bg-white/90 shadow-lg font-semibold">
+            <Plus className="w-4 h-4" /> Novo Contrato
+          </Button>
         </div>
-        <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="gap-2">
-          <Plus className="w-4 h-4" /> Novo Contrato
-        </Button>
+        {/* Stats */}
+        <div className="relative grid grid-cols-3 gap-4 mt-6">
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-white">{contratos.length}</p>
+            <p className="text-xs text-white/70">Total</p>
+          </div>
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-white">{contratos.filter(c => c.status === 'Assinado').length}</p>
+            <p className="text-xs text-white/70">Assinados</p>
+          </div>
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-white">{contratos.filter(c => c.status === 'Pendente' || !c.status).length}</p>
+            <p className="text-xs text-white/70">Pendentes</p>
+          </div>
+        </div>
       </div>
 
       {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar por nome ou CPF..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+      <Card className="border-none shadow-sm">
+        <CardContent className="p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nome ou CPF..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 border-muted bg-secondary/50"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* List */}
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <Loader2 className="w-8 h-8 animate-spin text-sky-400" />
         </div>
       ) : filteredContratos.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <FileText className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
-            <p className="text-muted-foreground">Nenhum contrato encontrado</p>
-            <Button onClick={() => { resetForm(); setDialogOpen(true); }} variant="outline" className="mt-4 gap-2">
+        <Card className="border-dashed border-2 border-sky-200 bg-sky-50/50">
+          <CardContent className="py-16 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-sky-100 flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-8 h-8 text-sky-400" />
+            </div>
+            <p className="text-muted-foreground font-medium">Nenhum contrato encontrado</p>
+            <p className="text-muted-foreground/70 text-sm mt-1">Crie seu primeiro contrato para começar</p>
+            <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="mt-5 gap-2 bg-sky-400 hover:bg-sky-500 text-white">
               <Plus className="w-4 h-4" /> Criar primeiro contrato
             </Button>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-3">
-          {filteredContratos.map((contrato) => (
-            <Card key={contrato.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
+          {filteredContratos.map((contrato, index) => (
+            <Card key={contrato.id} className="group hover:shadow-lg hover:border-sky-200 transition-all duration-300 border">
+              <CardContent className="p-5">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <FileText className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-100 to-blue-100 flex items-center justify-center shrink-0 group-hover:from-sky-200 group-hover:to-blue-200 transition-colors">
+                      <FileText className="w-5 h-5 text-sky-500" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-foreground truncate">{contrato.nome_completo}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <p className="font-semibold text-foreground truncate text-base">{contrato.nome_completo}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                         <span>{contrato.cpf || 'Sem CPF'}</span>
                         {contrato.viagens && (
                           <>
-                            <span>•</span>
-                            <span className="truncate">{contrato.viagens.nome || contrato.viagens.destino}</span>
+                            <span className="text-sky-300">•</span>
+                            <span className="truncate text-sky-600/70">{contrato.viagens.nome || contrato.viagens.destino}</span>
                           </>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge variant={contrato.status === 'Assinado' ? 'default' : contrato.status === 'Cancelado' ? 'destructive' : 'secondary'}>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <Badge className={
+                      contrato.status === 'Assinado' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 
+                      contrato.status === 'Cancelado' ? 'bg-red-100 text-red-700 hover:bg-red-100' : 
+                      'bg-amber-100 text-amber-700 hover:bg-amber-100'
+                    }>
                       {contrato.status || 'Pendente'}
                     </Badge>
                     {contrato.valor_total > 0 && (
-                      <span className="text-sm font-semibold text-foreground">
+                      <span className="text-sm font-bold text-foreground bg-secondary px-3 py-1 rounded-lg">
                         R$ {Number(contrato.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     )}
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(contrato)} title="Editar">
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => gerarPDF(contrato)} title="Gerar PDF">
-                      <Download className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost" size="icon"
-                      onClick={() => {
-                        if (confirm('Excluir este contrato?')) deleteMutation.mutate(contrato.id);
-                      }}
-                      title="Excluir"
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(contrato)} title="Editar" className="hover:bg-sky-50 hover:text-sky-600">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => gerarPDF(contrato)} title="Gerar PDF" className="hover:bg-sky-50 hover:text-sky-600">
+                        <Download className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost" size="icon"
+                        onClick={() => {
+                          if (confirm('Excluir este contrato?')) deleteMutation.mutate(contrato.id);
+                        }}
+                        title="Excluir"
+                        className="hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
