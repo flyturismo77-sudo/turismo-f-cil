@@ -106,7 +106,7 @@ export default function Layout({ children, currentPageName }) {
     <ErrorBoundary>
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-slate-50">
-          <Sidebar className="border-r-0" style={{ background: 'linear-gradient(180deg, #0f172a 0%, #0c1322 100%)' }}>
+          <Sidebar className="border-r-0" style={{ background: 'linear-gradient(180deg, #1e3a5f 0%, #162d4a 100%)' }}>
             {/* Logo */}
             <SidebarHeader className="px-5 py-6">
               <div className="flex items-center gap-3">
