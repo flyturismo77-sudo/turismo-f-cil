@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { 
   FileText, Plus, Download, Eye, Search, Trash2, Edit, 
-  Loader2, User, Plane, Calendar, DollarSign 
+  Loader2, User, Plane, Calendar, DollarSign, MessageCircle 
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -364,6 +364,34 @@ export default function Contratos() {
     toast({ title: 'PDF gerado com sucesso!' });
   };
 
+  const enviarWhatsApp = (contrato) => {
+    const viagem = viagens.find(v => v.id === contrato.id_viagem) || contrato.viagens || {};
+    const empresa = config || {};
+    const dataSaida = viagem.data_saida ? format(new Date(viagem.data_saida + 'T12:00:00'), 'dd/MM/yyyy') : 'A definir';
+    const dataRetorno = viagem.data_retorno ? format(new Date(viagem.data_retorno + 'T12:00:00'), 'dd/MM/yyyy') : 'A definir';
+    const valorStr = contrato.valor_total 
+      ? `R$ ${Number(contrato.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+      : 'A combinar';
+
+    const mensagem = `📄 *CONTRATO DE VIAGEM*\n\n` +
+      `🏢 *${empresa.nome_empresa || 'FLY TURISMO'}*\n\n` +
+      `👤 *Contratante:* ${contrato.nome_completo}\n` +
+      `📝 CPF: ${contrato.cpf || 'Não informado'}\n` +
+      `📞 Tel: ${contrato.telefone || 'Não informado'}\n\n` +
+      `✈️ *Viagem:* ${viagem.destino || viagem.nome || 'Não definida'}\n` +
+      `📅 Saída: ${dataSaida}\n` +
+      `📅 Retorno: ${dataRetorno}\n\n` +
+      `💰 *Valor:* ${valorStr}\n` +
+      `💳 Pagamento: ${contrato.forma_pagamento || 'À Vista'}\n` +
+      `📊 Parcelas: ${contrato.numero_parcelas || 1}x\n\n` +
+      `📌 Status: ${contrato.status || 'Pendente'}\n\n` +
+      `_Contrato gerado pelo sistema ${empresa.nome_empresa || 'Fly Turismo'}_`;
+
+    const telefone = contrato.telefone?.replace(/\D/g, '') || '';
+    const url = `https://wa.me/${telefone.startsWith('55') ? telefone : '55' + telefone}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+  };
+
   const filteredContratos = contratos.filter(c =>
     c.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.cpf?.includes(searchTerm)
@@ -475,6 +503,9 @@ export default function Contratos() {
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => gerarPDF(contrato)} title="Gerar PDF" className="hover:bg-sky-50 hover:text-sky-600">
                         <Download className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => enviarWhatsApp(contrato)} title="Enviar via WhatsApp" className="hover:bg-emerald-50 hover:text-emerald-600">
+                        <MessageCircle className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="ghost" size="icon"
