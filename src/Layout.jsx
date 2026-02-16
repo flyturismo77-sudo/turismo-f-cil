@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Wallet,
   LogOut,
+  FileText,
 } from "lucide-react";
 import {
   Sidebar,
@@ -60,6 +61,7 @@ const navSections = [
     label: "Financeiro",
     items: [
       { title: "Recebimentos", url: createPageUrl("Recebimentos"), icon: Receipt },
+      { title: "Contratos", url: createPageUrl("Contratos"), icon: FileText },
       { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck },
       { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2 },
     ]

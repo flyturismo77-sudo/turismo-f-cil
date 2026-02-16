@@ -497,7 +497,9 @@ export type Database = {
           created_at: string
           data_nascimento: string | null
           desconto: number | null
+          dia_vencimento: number | null
           email: string | null
+          estado_civil: string | null
           forma_pagamento: string | null
           id: string
           id_viagem: string | null
@@ -514,6 +516,7 @@ export type Database = {
           status: string | null
           telefone: string | null
           updated_at: string
+          valor_total: number | null
         }
         Insert: {
           bairro?: string | null
@@ -522,7 +525,9 @@ export type Database = {
           created_at?: string
           data_nascimento?: string | null
           desconto?: number | null
+          dia_vencimento?: number | null
           email?: string | null
+          estado_civil?: string | null
           forma_pagamento?: string | null
           id?: string
           id_viagem?: string | null
@@ -539,6 +544,7 @@ export type Database = {
           status?: string | null
           telefone?: string | null
           updated_at?: string
+          valor_total?: number | null
         }
         Update: {
           bairro?: string | null
@@ -547,7 +553,9 @@ export type Database = {
           created_at?: string
           data_nascimento?: string | null
           desconto?: number | null
+          dia_vencimento?: number | null
           email?: string | null
+          estado_civil?: string | null
           forma_pagamento?: string | null
           id?: string
           id_viagem?: string | null
@@ -564,6 +572,7 @@ export type Database = {
           status?: string | null
           telefone?: string | null
           updated_at?: string
+          valor_total?: number | null
         }
         Relationships: [
           {
