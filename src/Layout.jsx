@@ -37,6 +37,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/lib/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const navSections = [
   {
@@ -82,6 +84,13 @@ const navSections = [
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
+  const { profile, logout, isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/Login');
+  };
 
   const { data: config } = useQuery({
     queryKey: ['config'],
@@ -168,12 +177,17 @@ export default function Layout({ children, currentPageName }) {
             <SidebarFooter className="px-4 py-4 border-t border-slate-800">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center shadow-sm">
-                  <span className="text-white font-semibold text-sm">A</span>
+                  <span className="text-white font-semibold text-sm">
+                    {(profile?.full_name || 'U').charAt(0).toUpperCase()}
+                  </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-200 text-sm truncate">Admin</p>
-                  <p className="text-[11px] text-slate-500">Administrador</p>
+                  <p className="font-medium text-slate-200 text-sm truncate">{profile?.full_name || 'Usuário'}</p>
+                  <p className="text-[11px] text-slate-500">{profile?.cargo || (isAdmin ? 'Gerente' : 'Funcionário')}</p>
                 </div>
+                <button onClick={handleLogout} className="p-2 rounded-lg hover:bg-slate-800 text-slate-500 hover:text-red-400 transition-colors" title="Sair">
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
             </SidebarFooter>
           </Sidebar>
