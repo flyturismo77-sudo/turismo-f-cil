@@ -18,7 +18,6 @@ import {
   UsersRound,
   LogOut,
   FileText,
-  ChevronDown,
 } from "lucide-react";
 import {
   Sidebar,
@@ -60,9 +59,14 @@ const navSections = [
     label: "Financeiro",
     items: [
       { title: "Recebimentos", url: createPageUrl("Recebimentos"), icon: Receipt },
-      { title: "Contratos", url: createPageUrl("Contratos"), icon: FileText },
       { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck },
       { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2 },
+    ]
+  },
+  {
+    label: "Contratos",
+    items: [
+      { title: "Contratos", url: createPageUrl("Contratos"), icon: FileText },
     ]
   },
   {
@@ -102,22 +106,22 @@ export default function Layout({ children, currentPageName }) {
     <ErrorBoundary>
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-slate-50">
-          <Sidebar className="border-r-0 bg-white">
+          <Sidebar className="border-r-0" style={{ background: 'linear-gradient(180deg, #0f172a 0%, #0c1322 100%)' }}>
             {/* Logo */}
-            <SidebarHeader className="px-5 py-5">
+            <SidebarHeader className="px-5 py-6">
               <div className="flex items-center gap-3">
                 {config?.logo_url ? (
                   <img src={config.logo_url} alt="Logo" className="w-10 h-10 object-contain rounded-xl" />
                 ) : (
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-md shadow-sky-200">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
                     <Plane className="w-5 h-5 text-white" />
                   </div>
                 )}
                 <div>
-                  <h2 className="font-display font-bold text-base text-slate-800 tracking-tight">
+                  <h2 className="font-display font-bold text-base text-white tracking-tight">
                     {config?.nome_empresa || "Fly Turismo"}
                   </h2>
-                  <p className="text-[11px] text-slate-400 font-medium">
+                  <p className="text-[11px] text-slate-500 font-medium">
                     Sistema de Gestão
                   </p>
                 </div>
@@ -127,7 +131,7 @@ export default function Layout({ children, currentPageName }) {
             <SidebarContent className="px-3 py-1 overflow-y-auto">
               {navSections.map((section, idx) => (
                 <SidebarGroup key={section.label}>
-                  <SidebarGroupLabel className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.12em] px-3 mb-1">
+                  <SidebarGroupLabel className="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em] px-3 mb-1">
                     {section.label}
                   </SidebarGroupLabel>
                   <SidebarGroupContent>
@@ -140,8 +144,8 @@ export default function Layout({ children, currentPageName }) {
                               asChild 
                               className={`group transition-all duration-200 rounded-xl mb-0.5 ${
                                 isActive 
-                                  ? 'bg-gradient-to-r from-sky-400 to-blue-400 text-white shadow-md shadow-sky-200/50' 
-                                  : 'text-slate-500 hover:bg-sky-50 hover:text-sky-600'
+                                  ? 'bg-gradient-to-r from-sky-400 to-sky-500 text-white shadow-lg shadow-sky-500/25' 
+                                  : 'text-slate-400 hover:bg-slate-800 hover:text-sky-300'
                               }`}
                             >
                               <Link to={item.url} className="flex items-center gap-3 px-3 py-2.5">
@@ -155,20 +159,20 @@ export default function Layout({ children, currentPageName }) {
                     </SidebarMenu>
                   </SidebarGroupContent>
                   {idx < navSections.length - 1 && (
-                    <Separator className="my-2 bg-slate-100" />
+                    <Separator className="my-2 bg-slate-800" />
                   )}
                 </SidebarGroup>
               ))}
             </SidebarContent>
 
-            <SidebarFooter className="px-4 py-4 border-t border-slate-100">
+            <SidebarFooter className="px-4 py-4 border-t border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-sm">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center shadow-sm">
                   <span className="text-white font-semibold text-sm">A</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-700 text-sm truncate">Admin</p>
-                  <p className="text-[11px] text-slate-400">Administrador</p>
+                  <p className="font-medium text-slate-200 text-sm truncate">Admin</p>
+                  <p className="text-[11px] text-slate-500">Administrador</p>
                 </div>
               </div>
             </SidebarFooter>
