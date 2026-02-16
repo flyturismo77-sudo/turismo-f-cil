@@ -4,6 +4,7 @@
 import Assentos from './pages/Assentos';
 import Clientes from './pages/Clientes';
 import Configuracoes from './pages/Configuracoes';
+import Contratos from './pages/Contratos';
 import Dashboard from './pages/Dashboard';
 import DespesasEmpresa from './pages/DespesasEmpresa';
 import DespesasPessoal from './pages/DespesasPessoal';
@@ -22,6 +23,7 @@ export const PAGES = {
     "Assentos": Assentos,
     "Clientes": Clientes,
     "Configuracoes": Configuracoes,
+    "Contratos": Contratos,
     "Dashboard": Dashboard,
     "DespesasEmpresa": DespesasEmpresa,
     "DespesasPessoal": DespesasPessoal,
