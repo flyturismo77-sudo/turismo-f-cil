@@ -1,0 +1,1 @@
+UPDATE public.profiles SET cargo = 'Gerente' WHERE id IN ('f850d5dc-45dc-43c3-b50e-ec0219c3a351', 'ff57e35b-de67-404f-8e14-1d17a741eb75');
