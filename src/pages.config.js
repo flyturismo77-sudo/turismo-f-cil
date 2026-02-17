@@ -10,6 +10,7 @@ import DespesasEmpresa from './pages/DespesasEmpresa';
 import DespesasPessoal from './pages/DespesasPessoal';
 import DetalhesViagem from './pages/DetalhesViagem';
 import Equipe from './pages/Equipe';
+import Formularios from './pages/Formularios';
 import GerenciamentoArquivos from './pages/GerenciamentoArquivos';
 import MapaQuartos from './pages/MapaQuartos';
 import MigracaoDD from './pages/MigracaoDD';
@@ -29,6 +30,7 @@ export const PAGES = {
     "DespesasPessoal": DespesasPessoal,
     "DetalhesViagem": DetalhesViagem,
     "Equipe": Equipe,
+    "Formularios": Formularios,
     "GerenciamentoArquivos": GerenciamentoArquivos,
     "MapaQuartos": MapaQuartos,
     "MigracaoDD": MigracaoDD,

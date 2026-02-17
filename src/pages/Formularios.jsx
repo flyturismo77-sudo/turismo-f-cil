@@ -111,11 +111,11 @@ export default function Formularios() {
     return viagem ? viagem.nome : 'N/A';
   };
 
-  const linkFormulario = `${window.location.origin}${createPageUrl('FormularioContrato')}`;
+  const linkFormulario = `${window.location.origin}/InscricaoViagem`;
 
   const copiarLink = () => {
     navigator.clipboard.writeText(linkFormulario);
-    alert('Link copiado para a área de transferência!');
+    alert('✅ Link copiado para a área de transferência!');
   };
 
   return (

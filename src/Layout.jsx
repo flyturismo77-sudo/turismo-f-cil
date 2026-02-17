@@ -19,6 +19,7 @@ import {
   UsersRound,
   LogOut,
   FileText,
+  ClipboardList,
 } from "lucide-react";
 import {
   Sidebar,
@@ -70,6 +71,7 @@ const navSections = [
     label: "Contratos",
     items: [
       { title: "Contratos", url: createPageUrl("Contratos"), icon: FileText },
+      { title: "Formulários", url: createPageUrl("Formularios"), icon: ClipboardList },
     ]
   },
   {

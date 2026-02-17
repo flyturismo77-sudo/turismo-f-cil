@@ -6,6 +6,12 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import Login from '@/pages/Login';
+import InscricaoViagem from '@/pages/InscricaoViagem';
+import FormularioContrato from '@/pages/FormularioContrato';
+import Home from '@/pages/Home';
+import ViagensPublico from '@/pages/ViagensPublico';
+import Sobre from '@/pages/Sobre';
+import Contato from '@/pages/Contato';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -39,7 +45,14 @@ const ProtectedRoute = ({ children }) => {
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Rotas públicas (sem autenticação) */}
       <Route path="/Login" element={<Login />} />
+      <Route path="/InscricaoViagem" element={<InscricaoViagem />} />
+      <Route path="/FormularioContrato" element={<FormularioContrato />} />
+      <Route path="/Home" element={<Home />} />
+      <Route path="/ViagensPublico" element={<ViagensPublico />} />
+      <Route path="/Sobre" element={<Sobre />} />
+      <Route path="/Contato" element={<Contato />} />
       
       <Route path="/" element={
         <ProtectedRoute>
