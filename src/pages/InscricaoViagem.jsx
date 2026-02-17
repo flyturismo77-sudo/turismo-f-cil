@@ -1,110 +1,91 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import {
   Plane, MapPin, Calendar, Users, Plus, Minus, CheckCircle,
   Loader2, XCircle, ChevronRight, ChevronLeft, User, Home,
-  CreditCard, Baby, Phone, Mail, FileText, Star, Clock
+  CreditCard, Baby, Phone, Mail, FileText, Clock, Star,
+  ArrowRight, Shield, Heart
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-import Navbar from '../components/public/Navbar';
-import Footer from '../components/public/Footer';
 import logoFly from '@/assets/logo-fly-turismo.jpg';
 
 const SUPABASE_URL = "https://duzfdwkjqqsayisfllww.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1emZkd2tqcXFzYXlpc2ZsbHd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzI4ODksImV4cCI6MjA4NjQwODg4OX0.DKdBuaeaPunvxh_gawqaDHva3nOI0Qcbvby6zMV_8PA";
 
 const STEPS = [
-  { id: 1, title: 'Escolha a Viagem', icon: Plane },
-  { id: 2, title: 'Dados Pessoais', icon: User },
-  { id: 3, title: 'Endereço', icon: Home },
+  { id: 1, title: 'Viagem',    icon: Plane },
+  { id: 2, title: 'Pessoais',  icon: User },
+  { id: 3, title: 'Endereço',  icon: Home },
   { id: 4, title: 'Pagamento', icon: CreditCard },
-  { id: 5, title: 'Passageiros', icon: Users },
-  { id: 6, title: 'Confirmação', icon: CheckCircle },
+  { id: 5, title: 'Grupo',     icon: Users },
+  { id: 6, title: 'Resumo',    icon: CheckCircle },
 ];
 
-const formatCPF = (value) => {
-  const digits = value.replace(/\D/g, '').slice(0, 11);
-  return digits
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-};
-
-const formatPhone = (value) => {
-  const digits = value.replace(/\D/g, '').slice(0, 11);
-  if (digits.length <= 10) {
-    return digits.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '');
-  }
-  return digits.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '');
-};
-
-const formatCEP = (value) => {
-  const digits = value.replace(/\D/g, '').slice(0, 8);
-  return digits.replace(/(\d{5})(\d{0,3})/, '$1-$2').replace(/-$/, '');
-};
+const formatCPF = (v) => v.replace(/\D/g,'').slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+const formatPhone = (v) => { const d=v.replace(/\D/g,'').slice(0,11); return d.length<=10?d.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3').replace(/-$/,''):d.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3').replace(/-$/,''); };
+const formatCEP = (v) => v.replace(/\D/g,'').slice(0,8).replace(/(\d{5})(\d{0,3})/,'$1-$2').replace(/-$/,'');
 
 const buscarCEP = async (cep) => {
-  const digits = cep.replace(/\D/g, '');
-  if (digits.length !== 8) return null;
-  try {
-    const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
-    const data = await res.json();
-    if (data.erro) return null;
-    return data;
-  } catch {
-    return null;
-  }
+  const d = cep.replace(/\D/g,'');
+  if (d.length !== 8) return null;
+  try { const r = await fetch(`https://viacep.com.br/ws/${d}/json/`); const data = await r.json(); return data.erro ? null : data; } catch { return null; }
 };
+
+// ── Field component ──────────────────────────────────────────────
+const Field = ({ label, required, children, className = '' }) => (
+  <div className={`space-y-1.5 ${className}`}>
+    <Label className="text-sm font-semibold text-foreground/80">
+      {label}{required && <span className="text-destructive ml-0.5">*</span>}
+    </Label>
+    {children}
+  </div>
+);
+
+// ── Section Header ───────────────────────────────────────────────
+const SectionHeader = ({ icon: Icon, title, subtitle }) => (
+  <div className="mb-8">
+    <div className="flex items-center gap-3 mb-1">
+      <div className="w-10 h-10 rounded-2xl gradient-primary flex items-center justify-center shadow-glow-primary">
+        <Icon className="w-5 h-5 text-white" />
+      </div>
+      <h2 className="text-2xl font-display font-bold text-foreground">{title}</h2>
+    </div>
+    {subtitle && <p className="text-muted-foreground text-sm ml-13 pl-[52px]">{subtitle}</p>}
+  </div>
+);
+
+// ── Card Section ─────────────────────────────────────────────────
+const FormSection = ({ children, className = '' }) => (
+  <div className={`bg-card rounded-2xl border border-border shadow-elevated p-6 ${className}`}>
+    {children}
+  </div>
+);
 
 export default function InscricaoViagem() {
   const [step, setStep] = useState(1);
-  const [status, setStatus] = useState('idle'); // idle | success | error
+  const [status, setStatus] = useState('idle');
   const [loadingCep, setLoadingCep] = useState(false);
   const [passageiros, setPassageiros] = useState([]);
   const [formData, setFormData] = useState({
-    id_viagem: '',
-    nome_completo: '',
-    rg: '',
-    cpf: '',
-    sexo: '',
-    estado_civil: '',
-    data_nascimento: '',
-    email: '',
-    telefone: '',
-    cep: '',
-    rua: '',
-    numero: '',
-    bairro: '',
-    cidade: '',
-    estado: '',
-    forma_pagamento: 'À Vista',
-    numero_parcelas: 1,
-    dia_vencimento: 10,
-    possui_crianca_colo: false,
-    nome_crianca_colo: '',
-    idade_crianca_colo: 0,
+    id_viagem: '', nome_completo: '', rg: '', cpf: '',
+    sexo: '', estado_civil: '', data_nascimento: '',
+    email: '', telefone: '',
+    cep: '', rua: '', numero: '', complemento: '', bairro: '', cidade: '', estado: '',
+    forma_pagamento: 'À Vista', numero_parcelas: 1, dia_vencimento: 10,
+    possui_crianca_colo: false, nome_crianca_colo: '', idade_crianca_colo: 0,
     desconto: 0,
   });
 
   const { data: viagens = [], isLoading: loadingViagens } = useQuery({
     queryKey: ['viagens-publicas'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('viagens')
-        .select('*')
-        .eq('status', 'Aberta')
-        .order('data_saida', { ascending: true });
+      const { data, error } = await supabase.from('viagens').select('*').eq('status', 'Aberta').order('data_saida', { ascending: true });
       if (error) throw error;
       return data || [];
     },
@@ -112,274 +93,277 @@ export default function InscricaoViagem() {
 
   const submitMutation = useMutation({
     mutationFn: async (payload) => {
-      // 1. Salvar formulário no banco
-      const { data: formulario, error } = await supabase
-        .from('formularios_contrato')
-        .insert(payload)
-        .select()
-        .single();
-
+      const { data: formulario, error } = await supabase.from('formularios_contrato').insert(payload).select().single();
       if (error) throw error;
-
-      // 2. Enviar e-mail de confirmação ao cliente
       try {
         await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
-          body: JSON.stringify({
-            to: payload.email,
-            subject: '✈️ Fly Turismo – Formulário recebido com sucesso!',
-            body: `Olá, ${payload.nome_completo}!\n\nRecebemos seu formulário de inscrição para a viagem. Nossa equipe entrará em contato em breve para confirmar os detalhes e formas de pagamento.\n\nQualquer dúvida, entre em contato:\n📞 (38) 9755-2155\n📧 flyturismo77@gmail.com\n\nEquipe Fly Turismo ✈️`,
-          }),
+          body: JSON.stringify({ to: payload.email, subject: '✈️ Fly Turismo – Formulário recebido!', body: `Olá, ${payload.nome_completo}!\n\nRecebemos seu formulário. Nossa equipe entrará em contato em breve.\n\nFly Turismo ✈️` }),
         });
-      } catch (_) { /* silencioso */ }
-
-      // 3. Notificar admin
+      } catch (_) {}
       try {
-        const viagemSel = viagens.find(v => v.id === payload.id_viagem);
+        const v = viagens.find(x => x.id === payload.id_viagem);
         await fetch(`${SUPABASE_URL}/functions/v1/notificar-inscricao`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
-          body: JSON.stringify({
-            nome_cliente: payload.nome_completo,
-            telefone: payload.telefone,
-            email: payload.email,
-            viagem_nome: viagemSel?.nome || 'N/A',
-            viagem_destino: viagemSel?.destino || 'N/A',
-            forma_pagamento: payload.forma_pagamento,
-            numero_parcelas: payload.numero_parcelas,
-            total_passageiros: (payload.passageiros?.length || 0) + 1,
-          }),
+          body: JSON.stringify({ nome_cliente: payload.nome_completo, telefone: payload.telefone, email: payload.email, viagem_nome: v?.nome || '', viagem_destino: v?.destino || '', forma_pagamento: payload.forma_pagamento, numero_parcelas: payload.numero_parcelas, total_passageiros: (payload.passageiros?.length || 0) + 1 }),
         });
-      } catch (_) { /* silencioso */ }
-
+      } catch (_) {}
       return formulario;
     },
-    onSuccess: () => {
-      setStatus('success');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    onError: () => {
-      setStatus('error');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
+    onSuccess: () => { setStatus('success'); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+    onError: () => { setStatus('error'); window.scrollTo({ top: 0, behavior: 'smooth' }); },
   });
 
   const viagemSelecionada = viagens.find(v => v.id === formData.id_viagem);
-
   const update = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
 
   const handleCepBlur = async (cep) => {
     setLoadingCep(true);
     const addr = await buscarCEP(cep);
-    if (addr) {
-      setFormData(prev => ({
-        ...prev,
-        rua: addr.logradouro || prev.rua,
-        bairro: addr.bairro || prev.bairro,
-        cidade: addr.localidade || prev.cidade,
-        estado: addr.uf || prev.estado,
-      }));
-    }
+    if (addr) setFormData(prev => ({ ...prev, rua: addr.logradouro || prev.rua, bairro: addr.bairro || prev.bairro, cidade: addr.localidade || prev.cidade, estado: addr.uf || prev.estado }));
     setLoadingCep(false);
   };
 
-  const adicionarPassageiro = () => {
-    setPassageiros(prev => [...prev, { nome_completo: '', cpf: '', telefone: '', data_nascimento: '', sexo: '' }]);
-  };
-
-  const removerPassageiro = (i) => {
-    setPassageiros(prev => prev.filter((_, idx) => idx !== i));
-  };
-
-  const updatePassageiro = (i, field, value) => {
-    setPassageiros(prev => {
-      const novo = [...prev];
-      novo[i] = { ...novo[i], [field]: value };
-      return novo;
-    });
-  };
+  const adicionarPassageiro = () => setPassageiros(prev => [...prev, { nome_completo: '', cpf: '', telefone: '', data_nascimento: '', sexo: '' }]);
+  const removerPassageiro = (i) => setPassageiros(prev => prev.filter((_, idx) => idx !== i));
+  const updatePassageiro = (i, field, value) => setPassageiros(prev => { const n = [...prev]; n[i] = { ...n[i], [field]: value }; return n; });
 
   const canProceed = () => {
     if (step === 1) return !!formData.id_viagem;
     if (step === 2) return !!(formData.nome_completo && formData.cpf && formData.rg && formData.sexo && formData.data_nascimento && formData.telefone && formData.email);
     if (step === 3) return !!(formData.rua && formData.numero && formData.bairro && formData.cidade);
-    if (step === 4) return !!(formData.forma_pagamento);
+    if (step === 4) return !!formData.forma_pagamento;
     return true;
   };
 
-  const handleSubmit = () => {
-    const payload = {
-      ...formData,
-      passageiros: passageiros.filter(p => p.nome_completo),
-      status: 'Pendente',
-    };
-    submitMutation.mutate(payload);
-  };
+  const handleSubmit = () => submitMutation.mutate({ ...formData, passageiros: passageiros.filter(p => p.nome_completo), status: 'Pendente' });
 
-  // ─── SUCCESS ───────────────────────────────────────────────
+  // ── SUCCESS ──────────────────────────────────────────────────
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50">
-        <Navbar />
-        <section className="py-16 px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-12 h-12 text-green-500" />
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-16">
+        <div className="max-w-lg w-full text-center">
+          <div className="w-24 h-24 gradient-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow-primary">
+            <CheckCircle className="w-12 h-12 text-white" />
+          </div>
+          <h1 className="text-3xl font-display font-bold text-foreground mb-2">Inscrição Enviada!</h1>
+          <p className="text-muted-foreground mb-8">
+            Obrigado, <strong className="text-foreground">{formData.nome_completo}</strong>! Sua inscrição para <strong className="text-primary">{viagemSelecionada?.nome}</strong> foi recebida com sucesso.
+          </p>
+          <div className="bg-card rounded-2xl border border-border shadow-elevated p-6 mb-8 text-left space-y-3">
+            <div className="flex items-center gap-2 mb-4">
+              <img src={logoFly} alt="Fly Turismo" className="w-8 h-8 rounded-full object-cover" />
+              <span className="font-display font-bold text-foreground">Fly Turismo</span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">Inscrição enviada!</h1>
-            <p className="text-lg text-gray-600 mb-2">Obrigado, <strong>{formData.nome_completo}</strong>!</p>
-            <p className="text-gray-600 mb-6">
-              Recebemos seu formulário para a viagem <strong>{viagemSelecionada?.nome}</strong>.
-              Nossa equipe entrará em contato em breve pelo WhatsApp ou e-mail informado.
-            </p>
-            <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 text-left space-y-3">
-              <h3 className="font-bold text-gray-900 mb-4">📋 Resumo da sua inscrição</h3>
-              <div className="flex justify-between text-sm"><span className="text-gray-500">Viagem</span><span className="font-medium">{viagemSelecionada?.nome}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-gray-500">Destino</span><span className="font-medium">{viagemSelecionada?.destino}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-gray-500">Passageiros</span><span className="font-medium">{passageiros.length + 1}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-gray-500">Pagamento</span><span className="font-medium">{formData.forma_pagamento}{formData.forma_pagamento === 'Parcelado' ? ` em ${formData.numero_parcelas}x` : ''}</span></div>
-              <Separator />
-              <p className="text-xs text-gray-500 text-center">Um e-mail de confirmação foi enviado para <strong>{formData.email}</strong></p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to={createPageUrl('Home')}>
-                <Button variant="outline">Voltar ao site</Button>
-              </Link>
-              <Link to={createPageUrl('ViagensPublico')}>
-                <Button className="bg-gradient-to-r from-sky-500 to-blue-600">Ver mais viagens</Button>
-              </Link>
+            {[
+              ['Viagem', viagemSelecionada?.nome],
+              ['Destino', viagemSelecionada?.destino],
+              ['Passageiros', `${passageiros.length + 1} pessoa(s)`],
+              ['Pagamento', `${formData.forma_pagamento}${formData.forma_pagamento === 'Parcelado' ? ` em ${formData.numero_parcelas}x` : ''}`],
+            ].map(([k, v]) => (
+              <div key={k} className="flex justify-between text-sm">
+                <span className="text-muted-foreground">{k}</span>
+                <span className="font-semibold text-foreground">{v}</span>
+              </div>
+            ))}
+            <div className="pt-3 mt-3 border-t border-border text-xs text-muted-foreground text-center">
+              📧 Confirmação enviada para <strong>{formData.email}</strong>
             </div>
           </div>
-        </section>
-        <Footer />
+          <div className="bg-primary/10 rounded-xl p-4 text-sm text-primary/80 mb-6">
+            <Phone className="w-4 h-4 inline mr-1" /> Nossa equipe entrará em contato pelo WhatsApp em breve.
+          </div>
+          <button onClick={() => { setStatus('idle'); setStep(1); setFormData(f => ({ ...f, id_viagem: '', nome_completo: '', cpf: '' })); }} className="text-sm text-muted-foreground hover:text-primary underline">
+            Fazer nova inscrição
+          </button>
+        </div>
       </div>
     );
   }
 
-  // ─── ERROR ────────────────────────────────────────────────
+  // ── ERROR ────────────────────────────────────────────────────
   if (status === 'error') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-50">
-        <Navbar />
-        <section className="py-16 px-4">
-          <div className="max-w-md mx-auto text-center">
-            <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <XCircle className="w-12 h-12 text-red-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Algo deu errado</h2>
-            <p className="text-gray-600 mb-6">Não conseguimos enviar seu formulário. Por favor tente novamente ou entre em contato: <strong>(38) 9755-2155</strong></p>
-            <Button onClick={() => setStatus('idle')} className="bg-sky-600 hover:bg-sky-700">Tentar Novamente</Button>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-16">
+        <div className="max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <XCircle className="w-10 h-10 text-destructive" />
           </div>
-        </section>
-        <Footer />
+          <h2 className="text-2xl font-display font-bold text-foreground mb-3">Algo deu errado</h2>
+          <p className="text-muted-foreground mb-6">Não foi possível enviar. Tente novamente ou ligue: <strong>(38) 9755-2155</strong></p>
+          <Button onClick={() => setStatus('idle')} className="gradient-primary text-white">Tentar Novamente</Button>
+        </div>
       </div>
     );
   }
 
-  // ─── MAIN FORM ────────────────────────────────────────────
+  // ── MAIN ─────────────────────────────────────────────────────
+  const progress = ((step - 1) / (STEPS.length - 1)) * 100;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50">
-      <Navbar />
+    <div className="min-h-screen bg-background">
 
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-sky-600 to-blue-700 text-white py-10 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <img src={logoFly} alt="Fly Turismo" className="w-12 h-12 rounded-full object-cover shadow-lg border-2 border-white/30" />
-            <h1 className="text-3xl md:text-4xl font-bold">Inscrição para Viagem</h1>
+      {/* ── Top Bar ── */}
+      <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border">
+        <div className="max-w-3xl mx-auto px-4">
+          {/* Brand */}
+          <div className="flex items-center justify-between py-3 border-b border-border/50">
+            <div className="flex items-center gap-3">
+              <img src={logoFly} alt="Fly Turismo" className="w-9 h-9 rounded-xl object-cover shadow-sm" />
+              <div>
+                <p className="font-display font-bold text-sm text-foreground leading-tight">Fly Turismo</p>
+                <p className="text-[10px] text-muted-foreground leading-tight">Formulário de Inscrição</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
+              <Shield className="w-3 h-3 text-primary" />
+              Dados protegidos
+            </div>
           </div>
-          <p className="text-sky-100 text-lg">Preencha o formulário abaixo para garantir sua vaga</p>
+
+          {/* Stepper */}
+          <div className="py-3">
+            <div className="flex items-center gap-1 mb-2">
+              {STEPS.map((s, idx) => {
+                const Icon = s.icon;
+                const isActive = step === s.id;
+                const isDone = step > s.id;
+                return (
+                  <React.Fragment key={s.id}>
+                    <button
+                      type="button"
+                      onClick={() => isDone && setStep(s.id)}
+                      className={`flex flex-col items-center gap-0.5 min-w-[44px] transition-all ${isDone ? 'cursor-pointer' : 'cursor-default'}`}
+                    >
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                        isActive ? 'gradient-primary shadow-glow-primary scale-110' :
+                        isDone ? 'bg-primary/20 text-primary' :
+                        'bg-muted text-muted-foreground'
+                      }`}>
+                        {isDone ? <CheckCircle className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                      </div>
+                      <span className={`text-[9px] font-semibold hidden sm:block transition-colors ${isActive ? 'text-primary' : isDone ? 'text-primary/70' : 'text-muted-foreground'}`}>
+                        {s.title}
+                      </span>
+                    </button>
+                    {idx < STEPS.length - 1 && (
+                      <div className="flex-1 h-0.5 rounded-full overflow-hidden bg-border">
+                        <div className={`h-full rounded-full transition-all duration-500 gradient-primary ${isDone ? 'w-full' : 'w-0'}`} />
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+            {/* Progress bar */}
+            <div className="h-1 bg-border rounded-full overflow-hidden">
+              <div className="h-full gradient-primary rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Stepper */}
-      <div className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between overflow-x-auto gap-1">
-            {STEPS.map((s, idx) => {
-              const Icon = s.icon;
-              const isActive = step === s.id;
-              const isDone = step > s.id;
-              return (
-                <React.Fragment key={s.id}>
-                  <div className={`flex flex-col items-center gap-1 min-w-[60px] cursor-pointer transition-all ${isActive ? 'opacity-100' : isDone ? 'opacity-70' : 'opacity-40'}`}
-                    onClick={() => isDone && setStep(s.id)}>
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${isActive ? 'bg-sky-600 text-white shadow-lg scale-110' : isDone ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                      {isDone ? <CheckCircle className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
-                    </div>
-                    <span className={`text-[10px] font-medium text-center leading-tight hidden sm:block ${isActive ? 'text-sky-600' : isDone ? 'text-green-600' : 'text-gray-400'}`}>
-                      {s.title}
-                    </span>
-                  </div>
-                  {idx < STEPS.length - 1 && (
-                    <div className={`flex-1 h-0.5 transition-all ${step > s.id ? 'bg-green-400' : 'bg-gray-200'}`} />
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      {/* ── Content ── */}
+      <div className="max-w-3xl mx-auto px-4 py-8 pb-32">
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-
-        {/* ── STEP 1: Escolha a Viagem ── */}
+        {/* ── STEP 1: Viagem ── */}
         {step === 1 && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Plane className="w-6 h-6 text-sky-600" /> Escolha a Viagem
-            </h2>
+          <div>
+            <SectionHeader icon={Plane} title="Escolha sua Viagem" subtitle="Selecione a viagem para a qual deseja se inscrever" />
             {loadingViagens ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 text-sky-500 animate-spin" />
+              <div className="flex flex-col items-center justify-center py-24 gap-3">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <p className="text-muted-foreground text-sm">Buscando viagens disponíveis...</p>
               </div>
             ) : viagens.length === 0 ? (
-              <Card className="border-none shadow-lg">
-                <CardContent className="p-12 text-center text-gray-500">
-                  <Plane className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-lg font-medium">Nenhuma viagem disponível no momento</p>
-                  <p className="text-sm mt-2">Aguarde novas viagens serem abertas ou entre em contato conosco.</p>
-                </CardContent>
-              </Card>
+              <FormSection className="text-center py-16">
+                <Plane className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                <p className="font-display font-bold text-lg text-foreground mb-1">Nenhuma viagem disponível</p>
+                <p className="text-sm text-muted-foreground">Aguarde novas viagens ou entre em contato: <strong>(38) 9755-2155</strong></p>
+              </FormSection>
             ) : (
-              <div className="grid gap-4">
+              <div className="space-y-3">
                 {viagens.map(viagem => {
                   const selected = formData.id_viagem === viagem.id;
                   const vagas = (viagem.vagas_totais || 0) - (viagem.vagas_ocupadas || 0);
+                  const imgSrc = (viagem.imagens_urls?.length > 0 ? viagem.imagens_urls[0] : null) || viagem.imagem_url;
                   return (
                     <button
                       key={viagem.id}
                       type="button"
                       onClick={() => update('id_viagem', viagem.id)}
-                      className={`w-full text-left rounded-2xl border-2 overflow-hidden transition-all duration-200 shadow-sm hover:shadow-lg ${selected ? 'border-sky-500 ring-2 ring-sky-200 bg-white' : 'border-gray-200 bg-white hover:border-sky-300'}`}
+                      className={`w-full text-left rounded-2xl border-2 overflow-hidden transition-all duration-200 ${
+                        selected
+                          ? 'border-primary ring-4 ring-primary/10 shadow-glow-primary bg-card'
+                          : 'border-border bg-card hover:border-primary/40 hover:shadow-elevated'
+                      }`}
                     >
-                      <div className="flex flex-col md:flex-row">
-                        {viagem.imagem_url && (
-                          <div className="w-full md:w-48 h-36 md:h-auto flex-shrink-0">
-                            <img src={viagem.imagem_url} alt={viagem.nome} className="w-full h-full object-cover" />
-                          </div>
-                        )}
-                        <div className="p-5 flex-1">
-                          <div className="flex items-start justify-between flex-wrap gap-2 mb-2">
-                            <h3 className="text-xl font-bold text-gray-900">{viagem.nome}</h3>
-                            {selected && <Badge className="bg-sky-100 text-sky-700">✓ Selecionada</Badge>}
-                          </div>
-                          <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-3">
-                            <span className="flex items-center gap-1"><MapPin className="w-4 h-4 text-sky-500" />{viagem.destino}</span>
-                            {viagem.data_saida && (
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-4 h-4 text-sky-500" />
-                                {format(new Date(viagem.data_saida + 'T12:00:00'), "dd 'de' MMMM", { locale: ptBR })}
-                                {viagem.data_retorno && ` → ${format(new Date(viagem.data_retorno + 'T12:00:00'), "dd 'de' MMMM", { locale: ptBR })}`}
+                      <div className="flex flex-col sm:flex-row">
+                        {/* Image */}
+                        <div className="sm:w-44 h-40 sm:h-auto flex-shrink-0 relative overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5">
+                          {imgSrc ? (
+                            <img src={imgSrc} alt={viagem.nome} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Plane className="w-16 h-16 text-primary/20" />
+                            </div>
+                          )}
+                          {selected && (
+                            <div className="absolute top-2 right-2 w-7 h-7 gradient-primary rounded-full flex items-center justify-center shadow-lg">
+                              <CheckCircle className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Info */}
+                        <div className="p-5 flex-1 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-start justify-between gap-2 mb-3">
+                              <h3 className="font-display font-bold text-lg text-foreground leading-tight">{viagem.nome}</h3>
+                              {vagas < 10 && vagas > 0 && (
+                                <span className="text-[10px] bg-destructive/10 text-destructive font-bold px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
+                                  Últimas vagas!
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground mb-4">
+                              <span className="flex items-center gap-1.5">
+                                <MapPin className="w-3.5 h-3.5 text-primary" />
+                                {viagem.destino}
                               </span>
-                            )}
-                            <span className="flex items-center gap-1"><Users className="w-4 h-4 text-sky-500" />{vagas} vagas disponíveis</span>
+                              {viagem.data_saida && (
+                                <span className="flex items-center gap-1.5">
+                                  <Calendar className="w-3.5 h-3.5 text-primary" />
+                                  {format(new Date(viagem.data_saida + 'T12:00:00'), "dd 'de' MMMM", { locale: ptBR })}
+                                  {viagem.data_retorno && ` → ${format(new Date(viagem.data_retorno + 'T12:00:00'), "dd 'de' MMMM", { locale: ptBR })}`}
+                                </span>
+                              )}
+                              <span className="flex items-center gap-1.5">
+                                <Users className="w-3.5 h-3.5 text-primary" />
+                                {vagas} vagas disponíveis
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex flex-wrap gap-3 items-center">
-                            {viagem.valor_1 > 0 && <span className="text-2xl font-bold text-sky-600">R$ {Number(viagem.valor_1).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
-                            {viagem.valor_2 > 0 && <span className="text-sm text-gray-500">Valor 2: R$ {Number(viagem.valor_2).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
-                            {viagem.valor_3 > 0 && <span className="text-sm text-gray-500">Valor 3: R$ {Number(viagem.valor_3).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
+
+                          {/* Valores */}
+                          <div className="flex flex-wrap gap-2 items-center">
+                            {viagem.valor_1 > 0 && (
+                              <div className="bg-primary/10 text-primary font-bold text-sm px-3 py-1 rounded-full">
+                                A partir de R$ {Number(viagem.valor_1).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </div>
+                            )}
+                            {viagem.valor_2 > 0 && (
+                              <div className="text-xs text-muted-foreground">
+                                Lote 2: R$ {Number(viagem.valor_2).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </div>
+                            )}
+                            {viagem.valor_3 > 0 && (
+                              <div className="text-xs text-muted-foreground">
+                                Lote 3: R$ {Number(viagem.valor_3).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -394,25 +378,19 @@ export default function InscricaoViagem() {
         {/* ── STEP 2: Dados Pessoais ── */}
         {step === 2 && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <User className="w-6 h-6 text-sky-600" /> Dados Pessoais
-            </h2>
-            <Card className="border-none shadow-lg">
-              <CardContent className="p-6 grid md:grid-cols-2 gap-4">
-                <div className="md:col-span-2 space-y-1.5">
-                  <Label>Nome Completo *</Label>
-                  <Input value={formData.nome_completo} onChange={e => update('nome_completo', e.target.value)} placeholder="Como no RG" required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>RG *</Label>
-                  <Input value={formData.rg} onChange={e => update('rg', e.target.value)} placeholder="0000000" required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>CPF *</Label>
-                  <Input value={formData.cpf} onChange={e => update('cpf', formatCPF(e.target.value))} placeholder="000.000.000-00" required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Sexo *</Label>
+            <SectionHeader icon={User} title="Seus Dados Pessoais" subtitle="Preencha seus dados conforme o documento de identidade" />
+            <FormSection>
+              <div className="grid md:grid-cols-2 gap-5">
+                <Field label="Nome Completo" required className="md:col-span-2">
+                  <Input value={formData.nome_completo} onChange={e => update('nome_completo', e.target.value)} placeholder="Como consta no RG/CPF" />
+                </Field>
+                <Field label="RG" required>
+                  <Input value={formData.rg} onChange={e => update('rg', e.target.value)} placeholder="0000000" />
+                </Field>
+                <Field label="CPF" required>
+                  <Input value={formData.cpf} onChange={e => update('cpf', formatCPF(e.target.value))} placeholder="000.000.000-00" />
+                </Field>
+                <Field label="Sexo" required>
                   <Select value={formData.sexo} onValueChange={v => update('sexo', v)}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
@@ -421,77 +399,70 @@ export default function InscricaoViagem() {
                       <SelectItem value="Outro">Outro</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Estado Civil</Label>
+                </Field>
+                <Field label="Estado Civil">
                   <Select value={formData.estado_civil} onValueChange={v => update('estado_civil', v)}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Solteiro(a)">Solteiro(a)</SelectItem>
-                      <SelectItem value="Casado(a)">Casado(a)</SelectItem>
-                      <SelectItem value="Divorciado(a)">Divorciado(a)</SelectItem>
-                      <SelectItem value="Viúvo(a)">Viúvo(a)</SelectItem>
-                      <SelectItem value="União Estável">União Estável</SelectItem>
+                      {['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viúvo(a)', 'União Estável'].map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Data de Nascimento *</Label>
-                  <Input type="date" value={formData.data_nascimento} onChange={e => update('data_nascimento', e.target.value)} required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Telefone / WhatsApp *</Label>
-                  <Input value={formData.telefone} onChange={e => update('telefone', formatPhone(e.target.value))} placeholder="(38) 99999-9999" required />
-                </div>
-                <div className="md:col-span-2 space-y-1.5">
-                  <Label>E-mail *</Label>
-                  <Input type="email" value={formData.email} onChange={e => update('email', e.target.value)} placeholder="seuemail@exemplo.com" required />
-                </div>
-
-                {/* Criança de Colo */}
-                <div className="md:col-span-2 mt-2">
-                  <Separator className="mb-4" />
-                  <div className="flex items-center gap-3 mb-3">
-                    <Baby className="w-5 h-5 text-sky-500" />
-                    <h4 className="font-semibold text-gray-800">Criança de Colo</h4>
+                </Field>
+                <Field label="Data de Nascimento" required>
+                  <Input type="date" value={formData.data_nascimento} onChange={e => update('data_nascimento', e.target.value)} />
+                </Field>
+                <Field label="WhatsApp" required>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                    <Input className="pl-10" value={formData.telefone} onChange={e => update('telefone', formatPhone(e.target.value))} placeholder="(38) 99999-9999" />
                   </div>
-                  <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-200 hover:bg-sky-50 transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={formData.possui_crianca_colo}
-                      onChange={e => update('possui_crianca_colo', e.target.checked)}
-                      className="w-4 h-4 accent-sky-600"
-                    />
-                    <span className="text-gray-700">Vou levar uma criança de colo (até 2 anos)</span>
-                  </label>
-                  {formData.possui_crianca_colo && (
-                    <div className="grid md:grid-cols-2 gap-4 mt-3 pl-3 border-l-2 border-sky-200">
-                      <div className="space-y-1.5">
-                        <Label>Nome da Criança</Label>
-                        <Input value={formData.nome_crianca_colo} onChange={e => update('nome_crianca_colo', e.target.value)} />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label>Idade (meses ou anos)</Label>
-                        <Input type="number" min={0} max={24} value={formData.idade_crianca_colo} onChange={e => update('idade_crianca_colo', parseInt(e.target.value) || 0)} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                </Field>
+                <Field label="E-mail" required className="md:col-span-2">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                    <Input className="pl-10" type="email" value={formData.email} onChange={e => update('email', e.target.value)} placeholder="seuemail@exemplo.com" />
+                  </div>
+                </Field>
+              </div>
+
+              {/* Criança de colo */}
+              <div className="mt-6 pt-6 border-t border-border">
+                <label className={`flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 transition-all ${formData.possui_crianca_colo ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+                  <input
+                    type="checkbox"
+                    checked={formData.possui_crianca_colo}
+                    onChange={e => update('possui_crianca_colo', e.target.checked)}
+                    className="w-4 h-4 accent-[hsl(var(--primary))]"
+                  />
+                  <div className="flex items-center gap-2">
+                    <Baby className="w-5 h-5 text-primary" />
+                    <span className="font-semibold text-foreground">Vou levar uma criança de colo (0–2 anos)</span>
+                  </div>
+                </label>
+                {formData.possui_crianca_colo && (
+                  <div className="grid md:grid-cols-2 gap-4 mt-4 p-4 bg-primary/5 rounded-xl border border-primary/20">
+                    <Field label="Nome da Criança">
+                      <Input value={formData.nome_crianca_colo} onChange={e => update('nome_crianca_colo', e.target.value)} />
+                    </Field>
+                    <Field label="Idade (meses)">
+                      <Input type="number" min={0} max={24} value={formData.idade_crianca_colo} onChange={e => update('idade_crianca_colo', parseInt(e.target.value) || 0)} />
+                    </Field>
+                  </div>
+                )}
+              </div>
+            </FormSection>
           </div>
         )}
 
         {/* ── STEP 3: Endereço ── */}
         {step === 3 && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Home className="w-6 h-6 text-sky-600" /> Endereço
-            </h2>
-            <Card className="border-none shadow-lg">
-              <CardContent className="p-6 grid md:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <Label>CEP</Label>
+            <SectionHeader icon={Home} title="Endereço" subtitle="Digite o CEP para preencher automaticamente" />
+            <FormSection>
+              <div className="grid md:grid-cols-3 gap-5">
+                <Field label="CEP">
                   <div className="relative">
                     <Input
                       value={formData.cep}
@@ -499,342 +470,311 @@ export default function InscricaoViagem() {
                       onBlur={e => handleCepBlur(e.target.value)}
                       placeholder="00000-000"
                     />
-                    {loadingCep && <Loader2 className="absolute right-3 top-2.5 w-4 h-4 animate-spin text-sky-500" />}
+                    {loadingCep && <Loader2 className="absolute right-3 top-2.5 w-4 h-4 animate-spin text-primary" />}
                   </div>
-                  <p className="text-xs text-gray-400">Digite o CEP para preencher automaticamente</p>
-                </div>
-                <div className="md:col-span-2 space-y-1.5">
-                  <Label>Rua / Logradouro *</Label>
-                  <Input value={formData.rua} onChange={e => update('rua', e.target.value)} required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Número *</Label>
-                  <Input value={formData.numero} onChange={e => update('numero', e.target.value)} required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Complemento</Label>
-                  <Input value={formData.complemento || ''} onChange={e => update('complemento', e.target.value)} placeholder="Apto, Casa..." />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Bairro *</Label>
-                  <Input value={formData.bairro} onChange={e => update('bairro', e.target.value)} required />
-                </div>
-                <div className="md:col-span-2 space-y-1.5">
-                  <Label>Cidade *</Label>
-                  <Input value={formData.cidade} onChange={e => update('cidade', e.target.value)} required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Estado (UF)</Label>
+                </Field>
+                <Field label="Rua / Logradouro" required className="md:col-span-2">
+                  <Input value={formData.rua} onChange={e => update('rua', e.target.value)} />
+                </Field>
+                <Field label="Número" required>
+                  <Input value={formData.numero} onChange={e => update('numero', e.target.value)} />
+                </Field>
+                <Field label="Complemento" className="md:col-span-2">
+                  <Input value={formData.complemento || ''} onChange={e => update('complemento', e.target.value)} placeholder="Apto, Bloco..." />
+                </Field>
+                <Field label="Bairro" required>
+                  <Input value={formData.bairro} onChange={e => update('bairro', e.target.value)} />
+                </Field>
+                <Field label="Cidade" required>
+                  <Input value={formData.cidade} onChange={e => update('cidade', e.target.value)} />
+                </Field>
+                <Field label="UF">
                   <Input value={formData.estado} onChange={e => update('estado', e.target.value)} maxLength={2} placeholder="MG" className="uppercase" />
-                </div>
-              </CardContent>
-            </Card>
+                </Field>
+              </div>
+            </FormSection>
           </div>
         )}
 
         {/* ── STEP 4: Pagamento ── */}
         {step === 4 && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <CreditCard className="w-6 h-6 text-sky-600" /> Forma de Pagamento
-            </h2>
-            <Card className="border-none shadow-lg">
-              <CardContent className="p-6 space-y-5">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label>Forma de Pagamento *</Label>
-                    <Select value={formData.forma_pagamento} onValueChange={v => update('forma_pagamento', v)}>
+            <SectionHeader icon={CreditCard} title="Forma de Pagamento" subtitle="Como você prefere pagar a viagem?" />
+
+            {/* Opções visuais */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+              {[
+                { value: 'PIX', label: 'PIX', icon: '⚡' },
+                { value: 'À Vista', label: 'À Vista', icon: '💵' },
+                { value: 'Parcelado', label: 'Parcelado', icon: '📅' },
+                { value: 'Cartão de Crédito', label: 'Cartão Crédito', icon: '💳' },
+                { value: 'Transferência', label: 'Transferência', icon: '🏦' },
+                { value: 'Dinheiro', label: 'Dinheiro', icon: '💰' },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => update('forma_pagamento', opt.value)}
+                  className={`p-4 rounded-2xl border-2 text-center transition-all duration-200 ${
+                    formData.forma_pagamento === opt.value
+                      ? 'border-primary bg-primary/10 shadow-glow-primary'
+                      : 'border-border bg-card hover:border-primary/40'
+                  }`}
+                >
+                  <div className="text-2xl mb-1">{opt.icon}</div>
+                  <div className={`text-sm font-semibold ${formData.forma_pagamento === opt.value ? 'text-primary' : 'text-foreground'}`}>{opt.label}</div>
+                </button>
+              ))}
+            </div>
+
+            {formData.forma_pagamento === 'Parcelado' && (
+              <FormSection className="mb-6">
+                <div className="grid md:grid-cols-2 gap-5">
+                  <Field label="Número de Parcelas" required>
+                    <Select value={formData.numero_parcelas.toString()} onValueChange={v => update('numero_parcelas', parseInt(v))}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="À Vista">À Vista</SelectItem>
-                        <SelectItem value="Parcelado">Parcelado</SelectItem>
-                        <SelectItem value="PIX">PIX</SelectItem>
-                        <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                        <SelectItem value="Transferência">Transferência Bancária</SelectItem>
-                        <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                        {[2,3,4,5,6,7,8,9,10,11,12].map(n => <SelectItem key={n} value={n.toString()}>{n}x</SelectItem>)}
                       </SelectContent>
                     </Select>
-                  </div>
-                  {formData.forma_pagamento === 'Parcelado' && (
-                    <>
-                      <div className="space-y-1.5">
-                        <Label>Número de Parcelas *</Label>
-                        <Select value={formData.numero_parcelas.toString()} onValueChange={v => update('numero_parcelas', parseInt(v))}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            {[2,3,4,5,6,7,8,9,10,11,12].map(n => (
-                              <SelectItem key={n} value={n.toString()}>{n}x</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label>Dia de Vencimento</Label>
-                        <Select value={formData.dia_vencimento.toString()} onValueChange={v => update('dia_vencimento', parseInt(v))}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            {[1,5,10,15,20,25,28].map(d => (
-                              <SelectItem key={d} value={d.toString()}>Dia {d}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </>
-                  )}
+                  </Field>
+                  <Field label="Dia de Vencimento">
+                    <Select value={formData.dia_vencimento.toString()} onValueChange={v => update('dia_vencimento', parseInt(v))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {[1,5,10,15,20,25,28].map(d => <SelectItem key={d} value={d.toString()}>Todo dia {d}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </Field>
                 </div>
+              </FormSection>
+            )}
 
-                {viagemSelecionada && (
-                  <div className="bg-sky-50 rounded-xl p-4 border border-sky-100">
-                    <h4 className="font-semibold text-sky-900 mb-3 flex items-center gap-2">
-                      <Star className="w-4 h-4" /> Valores da viagem
-                    </h4>
-                    <div className="space-y-1.5 text-sm">
-                      {viagemSelecionada.valor_1 > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Valor 1</span>
-                          <span className="font-bold text-sky-700">R$ {Number(viagemSelecionada.valor_1).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      )}
-                      {viagemSelecionada.valor_2 > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Valor 2</span>
-                          <span className="font-medium">R$ {Number(viagemSelecionada.valor_2).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      )}
-                      {viagemSelecionada.valor_3 > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Valor 3</span>
-                          <span className="font-medium">R$ {Number(viagemSelecionada.valor_3).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      )}
+            {viagemSelecionada && (
+              <FormSection>
+                <div className="flex items-center gap-2 mb-4">
+                  <Star className="w-4 h-4 text-accent" />
+                  <h4 className="font-display font-bold text-foreground">Valores da Viagem</h4>
+                </div>
+                <div className="space-y-2">
+                  {[
+                    { label: '1º Lote', value: viagemSelecionada.valor_1 },
+                    { label: '2º Lote', value: viagemSelecionada.valor_2 },
+                    { label: '3º Lote', value: viagemSelecionada.valor_3 },
+                  ].filter(l => l.value > 0).map(l => (
+                    <div key={l.label} className="flex justify-between items-center py-2 border-b border-border last:border-0">
+                      <span className="text-sm text-muted-foreground">{l.label}</span>
+                      <span className="font-bold text-foreground">R$ {Number(l.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
-                    <p className="text-xs text-sky-600 mt-3">* Os valores finais serão confirmados pela equipe da Fly Turismo.</p>
-                  </div>
-                )}
-
-                <div className="space-y-1.5">
-                  <Label>Desconto (R$) — se aplicável</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    step="0.01"
-                    value={formData.desconto}
-                    onChange={e => update('desconto', parseFloat(e.target.value) || 0)}
-                    placeholder="0,00"
-                  />
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+                <p className="text-xs text-muted-foreground mt-3">* Valores finais confirmados pela equipe Fly Turismo</p>
+              </FormSection>
+            )}
           </div>
         )}
 
-        {/* ── STEP 5: Passageiros Adicionais ── */}
+        {/* ── STEP 5: Passageiros ── */}
         {step === 5 && (
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <Users className="w-6 h-6 text-sky-600" /> Passageiros Adicionais
-              </h2>
-              <Button type="button" onClick={adicionarPassageiro} variant="outline" className="border-sky-300 text-sky-700 hover:bg-sky-50">
-                <Plus className="w-4 h-4 mr-2" /> Adicionar
+            <SectionHeader icon={Users} title="Passageiros do Grupo" subtitle="Você já está incluído. Adicione acompanhantes (opcional)" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2 bg-primary/10 text-primary text-sm px-3 py-1.5 rounded-full">
+                <User className="w-4 h-4" />
+                <span className="font-medium">{formData.nome_completo} (você)</span>
+              </div>
+              <Button type="button" onClick={adicionarPassageiro} size="sm" className="gradient-primary text-white shadow-glow-primary gap-1.5">
+                <Plus className="w-4 h-4" /> Adicionar
               </Button>
             </div>
-            <p className="text-gray-500 mb-4">Você já está inscrito como passageiro principal. Adicione aqui as demais pessoas do grupo (opcional).</p>
+
             {passageiros.length === 0 ? (
-              <Card className="border-dashed border-2 border-gray-200 shadow-none">
-                <CardContent className="p-8 text-center text-gray-400">
-                  <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>Nenhum passageiro adicional</p>
-                  <p className="text-sm">Clique em "Adicionar" para incluir mais pessoas</p>
-                </CardContent>
-              </Card>
+              <FormSection className="text-center py-12">
+                <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
+                <p className="font-semibold text-foreground mb-1">Nenhum acompanhante</p>
+                <p className="text-sm text-muted-foreground">Clique em "Adicionar" para incluir mais pessoas no grupo</p>
+              </FormSection>
             ) : (
               <div className="space-y-4">
                 {passageiros.map((p, i) => (
-                  <Card key={i} className="border-none shadow-lg">
-                    <CardContent className="p-5">
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-sky-100 text-sky-700 text-sm font-bold flex items-center justify-center">{i + 2}</div>
-                          Passageiro {i + 2}
-                        </h4>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => removerPassageiro(i)} className="text-red-500 hover:bg-red-50">
-                          <Minus className="w-4 h-4" />
-                        </Button>
+                  <FormSection key={i}>
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center text-white text-sm font-bold shadow-glow-primary">{i + 2}</div>
+                        <span className="font-display font-bold text-foreground">Acompanhante {i + 1}</span>
                       </div>
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div className="md:col-span-2 space-y-1.5">
-                          <Label>Nome Completo</Label>
-                          <Input value={p.nome_completo} onChange={e => updatePassageiro(i, 'nome_completo', e.target.value)} />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>CPF</Label>
-                          <Input value={p.cpf} onChange={e => updatePassageiro(i, 'cpf', formatCPF(e.target.value))} placeholder="000.000.000-00" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Telefone</Label>
-                          <Input value={p.telefone} onChange={e => updatePassageiro(i, 'telefone', formatPhone(e.target.value))} placeholder="(38) 99999-9999" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Data de Nascimento</Label>
-                          <Input type="date" value={p.data_nascimento} onChange={e => updatePassageiro(i, 'data_nascimento', e.target.value)} />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Sexo</Label>
-                          <Select value={p.sexo} onValueChange={v => updatePassageiro(i, 'sexo', v)}>
-                            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Masculino">Masculino</SelectItem>
-                              <SelectItem value="Feminino">Feminino</SelectItem>
-                              <SelectItem value="Outro">Outro</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      <button type="button" onClick={() => removerPassageiro(i)} className="w-8 h-8 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors flex items-center justify-center">
+                        <Minus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <Field label="Nome Completo" className="md:col-span-2">
+                        <Input value={p.nome_completo} onChange={e => updatePassageiro(i, 'nome_completo', e.target.value)} />
+                      </Field>
+                      <Field label="CPF">
+                        <Input value={p.cpf} onChange={e => updatePassageiro(i, 'cpf', formatCPF(e.target.value))} placeholder="000.000.000-00" />
+                      </Field>
+                      <Field label="Telefone">
+                        <Input value={p.telefone} onChange={e => updatePassageiro(i, 'telefone', formatPhone(e.target.value))} placeholder="(38) 99999-9999" />
+                      </Field>
+                      <Field label="Data de Nascimento">
+                        <Input type="date" value={p.data_nascimento} onChange={e => updatePassageiro(i, 'data_nascimento', e.target.value)} />
+                      </Field>
+                      <Field label="Sexo">
+                        <Select value={p.sexo} onValueChange={v => updatePassageiro(i, 'sexo', v)}>
+                          <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Masculino">Masculino</SelectItem>
+                            <SelectItem value="Feminino">Feminino</SelectItem>
+                            <SelectItem value="Outro">Outro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                    </div>
+                  </FormSection>
                 ))}
               </div>
             )}
           </div>
         )}
 
-        {/* ── STEP 6: Confirmação ── */}
+        {/* ── STEP 6: Resumo ── */}
         {step === 6 && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-sky-600" /> Confirme seus Dados
-            </h2>
+            <SectionHeader icon={CheckCircle} title="Confirme sua Inscrição" subtitle="Revise os dados antes de enviar" />
             <div className="space-y-4">
-              {/* Viagem */}
-              <Card className="border-none shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-sky-600 to-blue-700 px-5 py-3">
-                  <h3 className="text-white font-bold flex items-center gap-2"><Plane className="w-4 h-4" /> Viagem Selecionada</h3>
-                </div>
-                <CardContent className="p-5">
-                  <p className="text-xl font-bold text-gray-900">{viagemSelecionada?.nome}</p>
-                  <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-600">
-                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4 text-sky-500" />{viagemSelecionada?.destino}</span>
-                    {viagemSelecionada?.data_saida && (
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4 text-sky-500" />
-                        {format(new Date(viagemSelecionada.data_saida + 'T12:00:00'), "dd/MM/yyyy", { locale: ptBR })}
-                      </span>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Dados pessoais */}
-              <Card className="border-none shadow-lg overflow-hidden">
-                <div className="bg-gray-50 px-5 py-3 border-b">
-                  <h3 className="font-bold text-gray-800 flex items-center gap-2"><User className="w-4 h-4" /> Dados Pessoais</h3>
+              {/* Viagem */}
+              <FormSection>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg gradient-primary flex items-center justify-center"><Plane className="w-3.5 h-3.5 text-white" /></div>
+                  <h3 className="font-display font-bold text-foreground">Viagem</h3>
                 </div>
-                <CardContent className="p-5 grid md:grid-cols-2 gap-2 text-sm">
-                  <div><span className="text-gray-500">Nome:</span> <span className="font-medium">{formData.nome_completo}</span></div>
-                  <div><span className="text-gray-500">CPF:</span> <span className="font-medium">{formData.cpf}</span></div>
-                  <div><span className="text-gray-500">RG:</span> <span className="font-medium">{formData.rg}</span></div>
-                  <div><span className="text-gray-500">Sexo:</span> <span className="font-medium">{formData.sexo}</span></div>
-                  <div><span className="text-gray-500">Nascimento:</span> <span className="font-medium">{formData.data_nascimento}</span></div>
-                  <div><span className="text-gray-500">Telefone:</span> <span className="font-medium">{formData.telefone}</span></div>
-                  <div className="md:col-span-2"><span className="text-gray-500">E-mail:</span> <span className="font-medium">{formData.email}</span></div>
+                <p className="font-bold text-lg text-foreground">{viagemSelecionada?.nome}</p>
+                <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{viagemSelecionada?.destino}</span>
+                  {viagemSelecionada?.data_saida && (
+                    <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{format(new Date(viagemSelecionada.data_saida + 'T12:00:00'), "dd/MM/yyyy")}</span>
+                  )}
+                </div>
+              </FormSection>
+
+              {/* Pessoais */}
+              <FormSection>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center"><User className="w-3.5 h-3.5 text-muted-foreground" /></div>
+                  <h3 className="font-display font-bold text-foreground">Dados Pessoais</h3>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-y-2 gap-x-6 text-sm">
+                  {[
+                    ['Nome', formData.nome_completo], ['CPF', formData.cpf], ['RG', formData.rg],
+                    ['Sexo', formData.sexo], ['Nascimento', formData.data_nascimento],
+                    ['WhatsApp', formData.telefone], ['E-mail', formData.email],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex gap-2">
+                      <span className="text-muted-foreground w-24 flex-shrink-0">{k}:</span>
+                      <span className="font-medium text-foreground">{v}</span>
+                    </div>
+                  ))}
                   {formData.possui_crianca_colo && (
-                    <div className="md:col-span-2 bg-blue-50 p-2 rounded-lg">
-                      <span className="text-blue-700 font-medium">🍼 Criança de colo: {formData.nome_crianca_colo}</span>
+                    <div className="sm:col-span-2 bg-primary/5 text-primary text-xs px-3 py-2 rounded-lg mt-1">
+                      🍼 Criança de colo: {formData.nome_crianca_colo || 'a informar'}, {formData.idade_crianca_colo} meses
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </FormSection>
 
               {/* Endereço */}
-              <Card className="border-none shadow-lg overflow-hidden">
-                <div className="bg-gray-50 px-5 py-3 border-b">
-                  <h3 className="font-bold text-gray-800 flex items-center gap-2"><Home className="w-4 h-4" /> Endereço</h3>
+              <FormSection>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center"><Home className="w-3.5 h-3.5 text-muted-foreground" /></div>
+                  <h3 className="font-display font-bold text-foreground">Endereço</h3>
                 </div>
-                <CardContent className="p-5 text-sm">
-                  <p className="font-medium">{formData.rua}, {formData.numero} {formData.complemento && `- ${formData.complemento}`}</p>
-                  <p className="text-gray-600">{formData.bairro} – {formData.cidade}{formData.estado && ` / ${formData.estado}`}</p>
-                  {formData.cep && <p className="text-gray-500">CEP: {formData.cep}</p>}
-                </CardContent>
-              </Card>
+                <p className="text-sm font-medium text-foreground">{formData.rua}, {formData.numero}{formData.complemento ? ` – ${formData.complemento}` : ''}</p>
+                <p className="text-sm text-muted-foreground">{formData.bairro} · {formData.cidade}{formData.estado ? `/${formData.estado}` : ''}{formData.cep ? ` · CEP ${formData.cep}` : ''}</p>
+              </FormSection>
 
               {/* Pagamento */}
-              <Card className="border-none shadow-lg overflow-hidden">
-                <div className="bg-gray-50 px-5 py-3 border-b">
-                  <h3 className="font-bold text-gray-800 flex items-center gap-2"><CreditCard className="w-4 h-4" /> Pagamento</h3>
+              <FormSection>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center"><CreditCard className="w-3.5 h-3.5 text-muted-foreground" /></div>
+                  <h3 className="font-display font-bold text-foreground">Pagamento</h3>
                 </div>
-                <CardContent className="p-5 text-sm grid grid-cols-2 gap-2">
-                  <div><span className="text-gray-500">Forma:</span> <span className="font-medium">{formData.forma_pagamento}</span></div>
+                <div className="flex flex-wrap gap-3 text-sm">
+                  <span className="bg-muted px-3 py-1 rounded-full font-medium">{formData.forma_pagamento}</span>
                   {formData.forma_pagamento === 'Parcelado' && (
-                    <>
-                      <div><span className="text-gray-500">Parcelas:</span> <span className="font-medium">{formData.numero_parcelas}x</span></div>
-                      <div><span className="text-gray-500">Vencimento:</span> <span className="font-medium">Dia {formData.dia_vencimento}</span></div>
-                    </>
+                    <><span className="bg-muted px-3 py-1 rounded-full">{formData.numero_parcelas}x</span>
+                    <span className="bg-muted px-3 py-1 rounded-full">Vence dia {formData.dia_vencimento}</span></>
                   )}
-                  {formData.desconto > 0 && (
-                    <div><span className="text-gray-500">Desconto:</span> <span className="font-medium text-green-600">R$ {formData.desconto.toFixed(2)}</span></div>
-                  )}
-                </CardContent>
-              </Card>
+                </div>
+              </FormSection>
 
               {/* Passageiros */}
               {passageiros.length > 0 && (
-                <Card className="border-none shadow-lg overflow-hidden">
-                  <div className="bg-gray-50 px-5 py-3 border-b">
-                    <h3 className="font-bold text-gray-800 flex items-center gap-2"><Users className="w-4 h-4" /> Passageiros Adicionais ({passageiros.length})</h3>
+                <FormSection>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center"><Users className="w-3.5 h-3.5 text-muted-foreground" /></div>
+                    <h3 className="font-display font-bold text-foreground">Acompanhantes ({passageiros.length})</h3>
                   </div>
-                  <CardContent className="p-5">
-                    <div className="space-y-2">
-                      {passageiros.map((p, i) => (
-                        <div key={i} className="flex items-center gap-3 text-sm bg-gray-50 rounded-lg p-3">
-                          <div className="w-6 h-6 rounded-full bg-sky-100 text-sky-700 text-xs font-bold flex items-center justify-center">{i + 2}</div>
-                          <div>
-                            <p className="font-medium">{p.nome_completo}</p>
-                            {p.cpf && <p className="text-gray-500">CPF: {p.cpf}</p>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                  <div className="space-y-2">
+                    {passageiros.map((p, i) => (
+                      <div key={i} className="flex items-center gap-3 text-sm bg-muted/40 rounded-xl px-3 py-2">
+                        <div className="w-6 h-6 rounded-lg gradient-primary flex items-center justify-center text-white text-[10px] font-bold">{i + 2}</div>
+                        <span className="font-medium text-foreground">{p.nome_completo}</span>
+                        {p.cpf && <span className="text-muted-foreground text-xs">CPF: {p.cpf}</span>}
+                      </div>
+                    ))}
+                  </div>
+                </FormSection>
               )}
 
               {/* Aviso */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-                <p className="font-semibold mb-1">⚠️ Importante</p>
-                <p>Ao confirmar, seus dados serão enviados à equipe Fly Turismo. O pagamento e confirmação final serão combinados diretamente pelo WhatsApp ou e-mail.</p>
+              <div className="flex gap-3 bg-accent/10 border border-accent/20 rounded-2xl p-4">
+                <div className="w-8 h-8 rounded-xl bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <FileText className="w-4 h-4 text-accent" />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-foreground mb-1">Próximos passos</p>
+                  <p className="text-sm text-muted-foreground">Após o envio, nossa equipe entrará em contato pelo WhatsApp para confirmar os detalhes e formas de pagamento.</p>
+                </div>
               </div>
             </div>
           </div>
         )}
+      </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between items-center mt-8">
+      {/* ── Fixed Bottom Navigation ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <Button
             type="button"
             variant="outline"
             onClick={() => setStep(s => s - 1)}
             disabled={step === 1}
-            className="gap-2"
+            className="gap-2 min-w-[100px]"
           >
-            <ChevronLeft className="w-4 h-4" /> Anterior
+            <ChevronLeft className="w-4 h-4" /> Voltar
           </Button>
+
+          <div className="text-xs text-muted-foreground text-center hidden sm:block">
+            Etapa {step} de {STEPS.length}
+          </div>
 
           {step < 6 ? (
             <Button
               type="button"
               onClick={() => setStep(s => s + 1)}
               disabled={!canProceed()}
-              className="gap-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700"
+              className="gradient-primary text-white shadow-glow-primary gap-2 min-w-[120px]"
             >
-              Próximo <ChevronRight className="w-4 h-4" />
+              Continuar <ChevronRight className="w-4 h-4" />
             </Button>
           ) : (
             <Button
               type="button"
               onClick={handleSubmit}
               disabled={submitMutation.isPending}
-              className="gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 px-8"
+              className="gap-2 bg-green-600 hover:bg-green-700 text-white shadow-lg min-w-[160px] text-sm font-semibold"
             >
               {submitMutation.isPending ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
@@ -845,8 +785,6 @@ export default function InscricaoViagem() {
           )}
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }
