@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logoFly from '@/assets/logo-fly-turismo.jpg';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Menu, X, Plane } from 'lucide-react';
@@ -29,13 +30,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
-            {config?.logo_url ? (
-              <img src={config.logo_url} alt="Logo" className="h-12 w-auto object-contain" />
-            ) : (
-              <div className="w-12 h-12 bg-gradient-to-br from-sky-400 via-blue-600 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Plane className="w-7 h-7 text-white" />
-              </div>
-            )}
+            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg flex-shrink-0">
+              <img src={config?.logo_url || logoFly} alt="Logo" className="w-full h-full object-cover" />
+            </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-blue-700 bg-clip-text text-transparent">
                 {config?.nome_empresa || 'Fly Turismo'}

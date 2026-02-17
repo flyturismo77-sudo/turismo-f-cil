@@ -1,4 +1,5 @@
 import React from "react";
+import logoFly from "@/assets/logo-fly-turismo.jpg";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
@@ -119,13 +120,9 @@ export default function Layout({ children, currentPageName }) {
             {/* Logo */}
             <SidebarHeader className="px-5 py-6">
               <div className="flex items-center gap-3">
-                {config?.logo_url ? (
-                  <img src={config.logo_url} alt="Logo" className="w-10 h-10 object-contain rounded-xl" />
-                ) : (
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
-                    <Plane className="w-5 h-5 text-white" />
-                  </div>
-                )}
+                <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg flex-shrink-0">
+                  <img src={config?.logo_url || logoFly} alt="Logo" className="w-full h-full object-cover" />
+                </div>
                 <div>
                   <h2 className="font-display font-bold text-base text-white tracking-tight">
                     {config?.nome_empresa || "Fly Turismo"}

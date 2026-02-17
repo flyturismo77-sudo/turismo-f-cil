@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plane, Mail, Lock, Eye, EyeOff, MapPin, Sun } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, MapPin, Sun } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
+import logoFly from '@/assets/logo-fly-turismo.jpg';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -90,8 +91,8 @@ export default function Login() {
             transition={{ duration: 0.8 }}
           >
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shadow-2xl border border-white/20">
-                <Plane className="w-8 h-8 text-white" />
+              <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-2xl border border-white/20 flex-shrink-0">
+                <img src={logoFly} alt="Fly Turismo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white tracking-tight">Fly Turismo</h1>
@@ -140,10 +141,8 @@ export default function Login() {
         >
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
-              style={{ background: 'linear-gradient(135deg, #0ea5e9, #0369a1)' }}
-            >
-              <Plane className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg flex-shrink-0">
+              <img src={logoFly} alt="Fly Turismo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-800">Fly Turismo</h1>
