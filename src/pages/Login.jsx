@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Mail, Lock, Eye, EyeOff, MapPin, Sun } from 'lucide-react';
+import { Plane, Mail, Lock, Eye, EyeOff, MapPin, Sun } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
 import logoFly from '@/assets/logo-fly-turismo.jpg';
