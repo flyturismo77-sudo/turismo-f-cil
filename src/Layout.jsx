@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logoFly from "@/assets/logo-fly-turismo.jpg";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -21,6 +21,7 @@ import {
   FileText,
   ClipboardList,
 } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 import {
   Sidebar,
   SidebarContent,
@@ -89,6 +90,7 @@ export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const { profile, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [pendingForms, setPendingForms] = useState(0);
 
   const handleLogout = async () => {
     await logout();
@@ -109,6 +111,25 @@ export default function Layout({ children, currentPageName }) {
     retry: 3,
     staleTime: 5 * 60 * 1000,
   });
+
+  // Realtime badge for pending formularios
+  useEffect(() => {
+    const fetchCount = async () => {
+      const { count } = await supabase
+        .from('formularios_contrato')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Pendente');
+      setPendingForms(count || 0);
+    };
+    fetchCount();
+
+    const channel = supabase
+      .channel('formularios_badge')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'formularios_contrato' }, fetchCount)
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, []);
 
   const currentTitle = navSections
     .flatMap(s => s.items)
@@ -158,7 +179,12 @@ export default function Layout({ children, currentPageName }) {
                             >
                               <Link to={item.url} className="flex items-center gap-3 px-3 py-2.5">
                                 <item.icon className={`w-[18px] h-[18px] ${isActive ? 'text-white' : 'opacity-70 group-hover:opacity-100'}`} />
-                                <span className="text-sm font-medium">{item.title}</span>
+                                <span className="text-sm font-medium flex-1">{item.title}</span>
+                                {item.title === 'Formulários' && pendingForms > 0 && (
+                                  <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm">
+                                    {pendingForms > 99 ? '99+' : pendingForms}
+                                  </span>
+                                )}
                               </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
