@@ -1,4 +1,5 @@
 import React from 'react';
+import logoFly from '@/assets/logo-fly-turismo.jpg';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Phone, Mail, MapPin, Facebook, Instagram, Plane } from 'lucide-react';
@@ -20,13 +21,9 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8">
           <div className="col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              {config?.logo_url ? (
-                <img src={config.logo_url} alt="Logo" className="h-12 w-auto object-contain" />
-              ) : (
-                <div className="w-12 h-12 bg-gradient-to-br from-sky-400 to-amber-500 rounded-xl flex items-center justify-center">
-                  <Plane className="w-7 h-7 text-white" />
-                </div>
-              )}
+              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg flex-shrink-0">
+                <img src={config?.logo_url || logoFly} alt="Logo" className="w-full h-full object-cover" />
+              </div>
               <div>
                 <h3 className="text-2xl font-bold">{config?.nome_empresa || 'Fly Turismo'}</h3>
                 <p className="text-amber-400 text-sm">{config?.slogan || 'Seu próximo destino começa aqui'}</p>

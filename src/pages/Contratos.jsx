@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import logoFly from '@/assets/logo-fly-turismo.jpg';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -242,6 +243,14 @@ export default function Contratos() {
       }
       return currentY;
     };
+
+    // Logo no topo
+    try {
+      doc.addImage(logoFly, 'JPEG', pageWidth / 2 - 22, y, 44, 44);
+      y += 50;
+    } catch (e) {
+      y += 5;
+    }
 
     // Title
     doc.setFontSize(16);
