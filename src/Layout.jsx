@@ -20,6 +20,8 @@ import {
   LogOut,
   FileText,
   ClipboardList,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import {
@@ -90,6 +92,20 @@ export default function Layout({ children, currentPageName }) {
   const { profile, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [pendingForms, setPendingForms] = useState(0);
+  const [overdueInstallments, setOverdueInstallments] = useState(0);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', darkMode);
+  }, [darkMode]);
 
   const handleLogout = async () => {
     await logout();
@@ -113,22 +129,62 @@ export default function Layout({ children, currentPageName }) {
 
   // Realtime badge for pending formularios
   useEffect(() => {
-    const fetchCount = async () => {
+    const fetchFormCount = async () => {
       const { count } = await supabase
         .from('formularios_contrato')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'Pendente');
       setPendingForms(count || 0);
     };
-    fetchCount();
+    fetchFormCount();
 
     const channel = supabase
       .channel('formularios_badge')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'formularios_contrato' }, fetchCount)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'formularios_contrato' }, fetchFormCount)
       .subscribe();
 
     return () => supabase.removeChannel(channel);
   }, []);
+
+  // Realtime badge for overdue installments
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+
+    const fetchOverdueCount = async () => {
+      const { count } = await supabase
+        .from('parcelas')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Pendente')
+        .lt('data_vencimento', today);
+      setOverdueInstallments(count || 0);
+    };
+    fetchOverdueCount();
+
+    const channel2 = supabase
+      .channel('parcelas_badge')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'parcelas' }, fetchOverdueCount)
+      .subscribe();
+
+    return () => supabase.removeChannel(channel2);
+  }, []);
+
+  const getBadge = (title) => {
+    if (title === 'Formulários' && pendingForms > 0) {
+      return (
+        <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm">
+          {pendingForms > 99 ? '99+' : pendingForms}
+        </span>
+      );
+    }
+    if (title === 'Recebimentos' && overdueInstallments > 0) {
+      return (
+        <span className="min-w-[18px] h-[18px] bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm">
+          {overdueInstallments > 99 ? '99+' : overdueInstallments}
+        </span>
+      );
+    }
+    return null;
+  };
 
   const currentTitle = navSections
     .flatMap(s => s.items)
@@ -137,7 +193,7 @@ export default function Layout({ children, currentPageName }) {
   return (
     <ErrorBoundary>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-slate-50">
+        <div className="min-h-screen flex w-full bg-slate-50 dark:bg-slate-900">
           <Sidebar className="border-r-0" style={{ background: 'linear-gradient(180deg, #162d4a 0%, #1e3a5f 100%)' }}>
             {/* Logo */}
             <SidebarHeader className="px-5 py-6">
@@ -179,11 +235,7 @@ export default function Layout({ children, currentPageName }) {
                               <Link to={item.url} className="flex items-center gap-3 px-3 py-2.5">
                                 <item.icon className={`w-[18px] h-[18px] ${isActive ? 'text-white' : 'opacity-70 group-hover:opacity-100'}`} />
                                 <span className="text-sm font-medium flex-1">{item.title}</span>
-                                {item.title === 'Formulários' && pendingForms > 0 && (
-                                  <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm">
-                                    {pendingForms > 99 ? '99+' : pendingForms}
-                                  </span>
-                                )}
+                                {getBadge(item.title)}
                               </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
@@ -209,6 +261,13 @@ export default function Layout({ children, currentPageName }) {
                   <p className="font-medium text-slate-200 text-sm truncate">{profile?.full_name || 'Usuário'}</p>
                   <p className="text-[11px] text-slate-500">{profile?.cargo || (isAdmin ? 'Gerente' : 'Funcionário')}</p>
                 </div>
+                <button
+                  onClick={() => setDarkMode(d => !d)}
+                  className="p-2 rounded-lg hover:bg-slate-800 text-slate-500 hover:text-sky-300 transition-colors"
+                  title={darkMode ? "Modo claro" : "Modo escuro"}
+                >
+                  {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
                 <button onClick={handleLogout} className="p-2 rounded-lg hover:bg-slate-800 text-slate-500 hover:text-red-400 transition-colors" title="Sair">
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -218,18 +277,18 @@ export default function Layout({ children, currentPageName }) {
 
           <main className="flex-1 flex flex-col overflow-hidden">
             {/* Top Header Bar */}
-            <header className="bg-white border-b border-slate-100 px-6 py-3.5 flex items-center gap-4 shadow-sm">
-              <SidebarTrigger className="hover:bg-sky-50 p-2 rounded-xl transition-colors duration-200 md:hidden">
-                <Menu className="w-5 h-5 text-slate-600" />
+            <header className="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-6 py-3.5 flex items-center gap-4 shadow-sm">
+              <SidebarTrigger className="hover:bg-sky-50 dark:hover:bg-slate-700 p-2 rounded-xl transition-colors duration-200 md:hidden">
+                <Menu className="w-5 h-5 text-slate-600 dark:text-slate-300" />
               </SidebarTrigger>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-display font-semibold text-slate-800">
+                <h1 className="text-lg font-display font-semibold text-slate-800 dark:text-slate-100">
                   {currentTitle}
                 </h1>
               </div>
             </header>
 
-            <div className="flex-1 overflow-auto p-4 md:p-6 bg-slate-50/80 animate-fade-in">
+            <div className="flex-1 overflow-auto p-4 md:p-6 bg-slate-50/80 dark:bg-slate-900/80 animate-fade-in">
               {children}
             </div>
           </main>
