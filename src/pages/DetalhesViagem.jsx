@@ -607,7 +607,346 @@ export default function DetalhesViagem() {
 
   const modeloNome = viagem.modelo_onibus === 'DD' ? 'Double Deck' : viagem.modelo_onibus === 'VAN' ? 'VAN' : 'Low Driver';
 
-  return (
+  const gerarManualPDF = () => {
+    const now = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<title>Manual do Sistema - Fly Turismo</title>
+<style>
+  @page { size: A4; margin: 15mm 18mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #1e293b; background: #fff; line-height: 1.6; }
+  .capa { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 90vh; text-align: center; page-break-after: always; border: 3px solid #7c3aed; border-radius: 12px; padding: 60px 40px; }
+  .capa h1 { font-size: 36pt; font-weight: 900; color: #7c3aed; margin: 0 0 10px; letter-spacing: -1px; }
+  .capa h2 { font-size: 18pt; color: #64748b; font-weight: 400; margin: 0 0 40px; }
+  .capa .badge { background: #7c3aed; color: #fff; border-radius: 6px; padding: 8px 20px; font-size: 11pt; display: inline-block; margin-bottom: 40px; }
+  .capa .data { font-size: 10pt; color: #94a3b8; margin-top: 30px; }
+  .indice { page-break-after: always; padding: 20px 0; }
+  .indice h2 { font-size: 20pt; color: #7c3aed; border-bottom: 3px solid #7c3aed; padding-bottom: 8px; margin-bottom: 20px; }
+  .indice-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px dashed #e2e8f0; font-size: 10.5pt; }
+  .indice-item .num { color: #7c3aed; font-weight: 700; min-width: 26px; }
+  .secao { page-break-before: always; }
+  .secao-header { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; padding: 20px 24px; border-radius: 8px; margin-bottom: 24px; }
+  .secao-header .num-sec { font-size: 10pt; opacity: 0.8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 2px; }
+  .secao-header h2 { font-size: 20pt; margin: 0; font-weight: 800; }
+  .secao-header p { margin: 6px 0 0; opacity: 0.9; font-size: 10pt; }
+  h3 { font-size: 13pt; color: #4f46e5; margin: 22px 0 8px; padding-left: 12px; border-left: 4px solid #7c3aed; }
+  p { margin: 0 0 10px; text-align: justify; }
+  .dica { background: #f0fdf4; border-left: 4px solid #16a34a; padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 10.5pt; }
+  .dica strong { color: #16a34a; }
+  .atencao { background: #fff7ed; border-left: 4px solid #ea580c; padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 10.5pt; }
+  .atencao strong { color: #ea580c; }
+  .info { background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 10.5pt; }
+  .info strong { color: #2563eb; }
+  .tela { border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; background: #f8fafc; margin: 14px 0; font-size: 9.5pt; }
+  .tela .barra { background: #1e293b; color: #94a3b8; padding: 6px 12px; border-radius: 4px 4px 0 0; margin: -16px -16px 12px; font-size: 9pt; display: flex; gap: 8px; align-items: center; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-r { background: #ef4444; }
+  .dot-y { background: #eab308; }
+  .dot-g { background: #22c55e; }
+  .tela-linha { display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .card-mini { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; flex: 1; min-width: 100px; }
+  .card-mini .label { font-size: 8.5pt; color: #64748b; margin-bottom: 4px; }
+  .card-mini .valor { font-size: 14pt; font-weight: 700; color: #1e293b; }
+  .card-mini.verde .valor { color: #16a34a; }
+  .card-mini.azul .valor { color: #2563eb; }
+  .card-mini.roxa .valor { color: #7c3aed; }
+  .card-mini.ambar .valor { color: #d97706; }
+  .steps { list-style: none; padding: 0; margin: 12px 0; }
+  .steps li { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+  .steps li .step-num { background: #7c3aed; color: #fff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 9pt; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .steps li .step-txt { flex: 1; font-size: 10.5pt; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 9.5pt; }
+  th { background: #7c3aed; color: #fff; padding: 8px 10px; text-align: left; }
+  td { border-bottom: 1px solid #e2e8f0; padding: 7px 10px; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .status { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 8.5pt; font-weight: 600; }
+  .s-verde { background: #dcfce7; color: #16a34a; }
+  .s-amarelo { background: #fef9c3; color: #a16207; }
+  .s-vermelho { background: #fee2e2; color: #dc2626; }
+  .s-azul { background: #dbeafe; color: #1d4ed8; }
+  .rodape { margin-top: 20px; border-top: 2px solid #e2e8f0; padding-top: 12px; font-size: 9pt; color: #94a3b8; text-align: center; }
+  .btn-print { position: fixed; bottom: 24px; right: 24px; background: #7c3aed; color: #fff; border: none; border-radius: 50px; padding: 14px 28px; font-size: 13pt; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(124,58,237,0.4); z-index: 999; }
+  @media print { .btn-print { display: none; } .capa { min-height: auto; } }
+</style>
+</head>
+<body>
+<button class="btn-print" onclick="window.print()">🖨️ Salvar como PDF</button>
+
+<div class="capa">
+  <div style="font-size:60pt;margin-bottom:20px;">✈️</div>
+  <h1>Fly Turismo</h1>
+  <h2>Sistema de Gestão de Viagens</h2>
+  <div class="badge">📖 MANUAL COMPLETO DO SISTEMA</div>
+  <p style="max-width:480px;color:#64748b;font-size:11pt;">Este manual descreve detalhadamente todos os módulos e funcionalidades do sistema de gestão, desde o cadastro de viagens até o check-in de passageiros. Destinado a administradores e funcionários.</p>
+  <div class="data">Gerado em ${now}</div>
+</div>
+
+<div class="indice">
+  <h2>📋 Índice</h2>
+  <div class="indice-item"><span><span class="num">1.</span> Dashboard — Visão Geral</span><span style="color:#94a3b8">Pág. 3</span></div>
+  <div class="indice-item"><span><span class="num">2.</span> Módulo Viagens — Gestão de Pacotes</span><span style="color:#94a3b8">Pág. 4</span></div>
+  <div class="indice-item"><span><span class="num">3.</span> Detalhes da Viagem — Passageiros e Contratos</span><span style="color:#94a3b8">Pág. 5</span></div>
+  <div class="indice-item"><span><span class="num">4.</span> Mapa de Assentos — Alocação de Poltronas</span><span style="color:#94a3b8">Pág. 6</span></div>
+  <div class="indice-item"><span><span class="num">5.</span> Módulo Financeiro — Parcelas e Recebimentos</span><span style="color:#94a3b8">Pág. 7</span></div>
+  <div class="indice-item"><span><span class="num">6.</span> Contratos Digitais — Geração e Assinatura</span><span style="color:#94a3b8">Pág. 8</span></div>
+  <div class="indice-item"><span><span class="num">7.</span> Equipe — Gerenciamento de Funcionários</span><span style="color:#94a3b8">Pág. 9</span></div>
+  <div class="indice-item"><span><span class="num">8.</span> Check-in e Embarque — QR Code</span><span style="color:#94a3b8">Pág. 10</span></div>
+  <div class="indice-item"><span><span class="num">9.</span> Calendário — Viagens e Parcelas</span><span style="color:#94a3b8">Pág. 11</span></div>
+  <div class="indice-item"><span><span class="num">10.</span> Clientes — Base de Passageiros</span><span style="color:#94a3b8">Pág. 12</span></div>
+  <div class="indice-item"><span><span class="num">11.</span> Fornecedores — Parceiros e Serviços</span><span style="color:#94a3b8">Pág. 13</span></div>
+  <div class="indice-item"><span><span class="num">12.</span> Relatórios e Exportação</span><span style="color:#94a3b8">Pág. 14</span></div>
+  <div class="indice-item"><span><span class="num">13.</span> Configurações do Sistema</span><span style="color:#94a3b8">Pág. 15</span></div>
+  <div class="indice-item"><span><span class="num">14.</span> Formulários Personalizados</span><span style="color:#94a3b8">Pág. 16</span></div>
+  <div class="indice-item"><span><span class="num">15.</span> Boas Práticas e Fluxo Recomendado</span><span style="color:#94a3b8">Pág. 17</span></div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 1</div><h2>📊 Dashboard — Visão Geral</h2><p>Painel principal com resumo de todas as operações em tempo real</p></div>
+  <p>O Dashboard é a primeira tela exibida após o login. Ele apresenta um resumo rápido de toda a operação da empresa: viagens, passageiros, financeiro e atividades recentes.</p>
+  <h3>Cartões de Estatísticas</h3>
+  <div class="tela">
+    <div class="barra"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span style="margin-left:8px;font-size:8pt;">Sistema Fly Turismo — Dashboard</span></div>
+    <div class="tela-linha">
+      <div class="card-mini azul"><div class="label">✈️ Total de Viagens</div><div class="valor">12</div></div>
+      <div class="card-mini verde"><div class="label">👥 Passageiros</div><div class="valor">348</div></div>
+      <div class="card-mini roxa"><div class="label">💰 Receita do Mês</div><div class="valor">R$ 42.800</div></div>
+      <div class="card-mini ambar"><div class="label">⚠️ Parcelas Vencidas</div><div class="valor">7</div></div>
+    </div>
+  </div>
+  <p>Cada cartão exibe um número atualizado em tempo real. Abaixo há um feed de atividades recentes com últimos cadastros, pagamentos e alterações.</p>
+  <div class="dica"><strong>✅ Dica:</strong> Verifique o Dashboard toda manhã. Ele alerta sobre parcelas vencidas e viagens próximas.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 2</div><h2>✈️ Módulo Viagens — Gestão de Pacotes</h2><p>Cadastro, edição e acompanhamento de todas as viagens disponíveis</p></div>
+  <p>O módulo de Viagens é o coração do sistema. Aqui são criadas todas as excursões da empresa com destino, datas, capacidade, valores e status.</p>
+  <h3>Como Criar uma Nova Viagem</h3>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Acesse <strong>Viagens</strong> no menu lateral.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Clique em <strong>"Nova Viagem"</strong> no canto superior direito.</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Preencha: <strong>Nome</strong>, <strong>Destino</strong>, <strong>Data de Saída</strong> e <strong>Data de Retorno</strong>.</div></li>
+    <li><div class="step-num">4</div><div class="step-txt">Selecione o <strong>Modelo do Ônibus</strong>: Low Driver (44 lugares), Double Deck ou VAN.</div></li>
+    <li><div class="step-num">5</div><div class="step-txt">Defina até <strong>3 faixas de valor</strong> (lote 1, 2 e 3) e faça upload de imagens.</div></li>
+    <li><div class="step-num">6</div><div class="step-txt">Clique em <strong>"Salvar Viagem"</strong>. A viagem aparece com status <span class="status s-azul">Aberta</span>.</div></li>
+  </ul>
+  <h3>Status das Viagens</h3>
+  <table>
+    <tr><th>Status</th><th>Significado</th><th>Ação Típica</th></tr>
+    <tr><td><span class="status s-azul">Aberta</span></td><td>Aceitando inscrições</td><td>Adicionar clientes, divulgar</td></tr>
+    <tr><td><span class="status s-amarelo">Em andamento</span></td><td>Viagem em curso</td><td>Check-in, monitoramento</td></tr>
+    <tr><td><span class="status s-verde">Concluída</span></td><td>Finalizada com sucesso</td><td>Fechamento financeiro</td></tr>
+    <tr><td><span class="status s-vermelho">Cancelada</span></td><td>Viagem cancelada</td><td>Devoluções, comunicado</td></tr>
+  </table>
+  <h3>Modo Pirapark</h3>
+  <p>Ativa cálculo automático de valor por faixa etária: 0-5 anos = Isento (R$ 0), 6-11 anos = Criança (R$ 389,90), 12+ anos = Adulto (R$ 429,90).</p>
+  <div class="dica"><strong>✅ Dica:</strong> Defina os 3 valores (lotes) antes de começar as vendas. Registre qual valor cada cliente pagou no momento da compra.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 3</div><h2>🗂️ Detalhes da Viagem — Passageiros e Contratos</h2><p>Gerenciamento completo de passageiros, documentos e contratos de uma viagem</p></div>
+  <p>Ao clicar em uma viagem, você acessa a página de Detalhes — a mais completa do sistema, reunindo todas as informações operacionais.</p>
+  <h3>Como Adicionar um Passageiro</h3>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Clique em <strong>"Adicionar Cliente"</strong> no canto superior direito.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Preencha: nome, CPF, telefone, data de nascimento e local de embarque.</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Selecione o <strong>Valor do pacote</strong> e a <strong>forma de pagamento</strong>.</div></li>
+    <li><div class="step-num">4</div><div class="step-txt">Se houver criança de colo, marque a opção e preencha os dados da criança.</div></li>
+    <li><div class="step-num">5</div><div class="step-txt">Defina cor e número de grupo para organizar famílias/amigos juntos.</div></li>
+    <li><div class="step-num">6</div><div class="step-txt">Clique em <strong>"Salvar"</strong>. A poltrona é atribuída depois no mapa de assentos.</div></li>
+  </ul>
+  <h3>Seção: Contratos desta Viagem</h3>
+  <p>Abaixo da lista de passageiros há a seção com todos os contratos vinculados. Para contratos pendentes: botões de <strong>Copiar Link</strong> e <strong>QR Code</strong>. Para contratos assinados: exibe o nome e data da assinatura.</p>
+  <h3>Impressão da Lista</h3>
+  <p>O botão <strong>"Imprimir"</strong> gera a lista A4 com todos os passageiros, assentos, local de embarque e tipo, organizada por grupos e cores — ideal para o guia no dia da viagem.</p>
+  <div class="dica"><strong>✅ Dica:</strong> Use o campo de busca para encontrar passageiros rapidamente por nome, CPF ou telefone.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 4</div><h2>💺 Mapa de Assentos — Alocação de Poltronas</h2><p>Interface visual para atribuir poltronas a cada passageiro</p></div>
+  <p>O mapa visual do ônibus permite atribuir poltronas numeradas a cada passageiro, garantindo organização no embarque.</p>
+  <h3>Como Atribuir uma Poltrona</h3>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Acesse <strong>Assentos</strong> e selecione a viagem.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Clique em uma poltrona <strong>verde (disponível)</strong>.</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Selecione o passageiro na lista que aparecer e confirme.</div></li>
+    <li><div class="step-num">4</div><div class="step-txt">A poltrona muda de cor indicando que está ocupada.</div></li>
+  </ul>
+  <table>
+    <tr><th>Cor</th><th>Significado</th></tr>
+    <tr><td>🟩 Verde</td><td>Disponível — pode ser atribuída</td></tr>
+    <tr><td>🟥 Vermelho/Colorida</td><td>Ocupada — com passageiro</td></tr>
+    <tr><td>⬛ Cinza</td><td>Bloqueada ou fora de uso</td></tr>
+  </table>
+  <table>
+    <tr><th>Modelo</th><th>Capacidade</th><th>Layout</th></tr>
+    <tr><td>Low Driver (JG 44)</td><td>44 poltronas</td><td>4 colunas (2+2)</td></tr>
+    <tr><td>Double Deck</td><td>Até 60 poltronas</td><td>2 andares</td></tr>
+    <tr><td>VAN</td><td>Até 16 lugares</td><td>Compacto</td></tr>
+  </table>
+  <div class="atencao"><strong>⚠️ Importante:</strong> Adicione o passageiro primeiro em Detalhes da Viagem, depois atribua a poltrona. Crianças de colo não recebem poltrona.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 5</div><h2>💰 Módulo Financeiro — Parcelas e Recebimentos</h2><p>Controle completo de recebimentos, parcelas, alertas e situação por viagem</p></div>
+  <p>Acompanhe todos os pagamentos dos passageiros, gere parcelas, registre recebimentos e visualize a saúde financeira de cada viagem.</p>
+  <h3>Como Registrar um Pagamento</h3>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Acesse <strong>Recebimentos</strong> e selecione a viagem.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Encontre o passageiro e clique em <strong>"Registrar Pagamento"</strong>.</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Informe valor, data, forma de pagamento e anexe o comprovante.</div></li>
+    <li><div class="step-num">4</div><div class="step-txt">Confirme. O status do passageiro é atualizado automaticamente.</div></li>
+  </ul>
+  <p>Parcelas: <span class="status s-verde">Pagas</span> = quitadas | <span class="status s-amarelo">Pendentes</span> = dentro do prazo | <span class="status s-vermelho">Vencidas</span> = em atraso.</p>
+  <p>O sistema alerta automaticamente sobre parcelas que vencem nos <strong>próximos 7 dias</strong> e parcelas já vencidas. O módulo <strong>Despesas</strong> registra gastos da empresa e da equipe, permitindo calcular a <strong>Rentabilidade Real</strong>.</p>
+  <div class="dica"><strong>✅ Dica:</strong> Registre pagamentos no dia em que ocorrem. Acesse o Calendário de Parcelas toda semana para identificar vencimentos próximos.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 6</div><h2>📝 Contratos Digitais — Geração e Assinatura</h2><p>Contratos jurídicos automáticos com assinatura eletrônica validada</p></div>
+  <p>Gera contratos de viagem personalizados e permite assinatura eletrônica pelo celular do cliente, sem impressão.</p>
+  <h3>Como Gerar um Contrato</h3>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Acesse <strong>Contratos</strong> e clique em <strong>"Novo Contrato"</strong>.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Selecione a viagem e preencha os dados do contratante (responsável).</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Adicione passageiros, valor total, parcelas e dia de vencimento.</div></li>
+    <li><div class="step-num">4</div><div class="step-txt">Clique em <strong>"Gerar Contrato"</strong>. Um link único de assinatura é criado.</div></li>
+    <li><div class="step-num">5</div><div class="step-txt">Compartilhe via <strong>Copiar Link</strong> (WhatsApp/e-mail) ou <strong>QR Code</strong>.</div></li>
+  </ul>
+  <h3>Processo de Assinatura pelo Cliente</h3>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Cliente acessa o link pelo celular — contrato completo é exibido.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Informa nome completo e CPF para validar identidade.</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Clica em <strong>"Assinar"</strong>. Sistema registra nome, CPF, data/hora e IP.</div></li>
+    <li><div class="step-num">4</div><div class="step-txt">PDF gerado automaticamente com bloco de assinatura no rodapé.</div></li>
+  </ul>
+  <div class="info"><strong>ℹ️ Validade Jurídica:</strong> A assinatura registra IP, data e confirmação por CPF, conferindo validade legal ao documento.</div>
+  <div class="dica"><strong>✅ Dica:</strong> Gere o contrato assim que o cliente confirmar a reserva. Clientes que assinam digitalmente confirmam o compromisso.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 7</div><h2>👨‍💼 Equipe — Gerenciamento de Funcionários</h2><p>Cadastro e controle dos membros da equipe por viagem</p></div>
+  <p>Cadastre guias, motoristas, auxiliares e coordenadores. Cada membro pode ser vinculado a viagens específicas.</p>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Acesse <strong>Equipe</strong> e clique em <strong>"Adicionar Membro"</strong>.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Preencha: nome, cargo, CPF, telefone e e-mail.</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Vincule à viagem desejada (opcional) e salve.</div></li>
+  </ul>
+  <p>Em <strong>Despesas Pessoal</strong>, registre diárias, adiantamentos e outros gastos vinculados a cada membro e viagem para controle preciso.</p>
+  <div class="dica"><strong>✅ Dica:</strong> Mantenha o cadastro atualizado com foto e contato para facilitar a comunicação durante a viagem.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 8</div><h2>🛂 Check-in e Embarque — QR Code</h2><p>Controle ágil de embarque com QR Code por passageiro</p></div>
+  <p>Usado no dia da viagem para controlar o embarque. Cada passageiro tem um QR Code único com seus dados.</p>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Acesse <strong>Check-in / Embarque</strong> e selecione a viagem.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Para cada passageiro: marque manualmente ou use o QR Code para confirmar embarque.</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Use o filtro por <strong>Local de Embarque</strong> para controlar cada ponto de coleta.</div></li>
+    <li><div class="step-num">4</div><div class="step-txt">A barra de progresso mostra em tempo real: <strong>32/44 embarcados (72%)</strong>.</div></li>
+  </ul>
+  <div class="info"><strong>ℹ️ Persistência:</strong> O progresso de check-in fica salvo no dispositivo. Pode fechar e reabrir sem perder dados.</div>
+  <div class="dica"><strong>✅ Dica:</strong> Deixe a tela aberta no tablet do guia durante todo o embarque para controle em tempo real.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 9</div><h2>📅 Calendário — Viagens e Parcelas</h2><p>Visão mensal de viagens programadas e vencimentos financeiros</p></div>
+  <p>Visão mensal com dois tipos de eventos: viagens programadas e vencimentos de parcelas.</p>
+  <p><strong>Aba Viagens:</strong> Exibe datas de saída e retorno coloridas por status. <strong>Aba Parcelas:</strong> Vencimentos por passageiro — <span class="status s-vermelho">🔴 Vencida</span> | <span class="status s-amarelo">🟡 Pendente</span> | <span class="status s-verde">🟢 Paga</span>.</p>
+  <p>Abaixo do calendário: resumo financeiro com <strong>Total Vencido</strong>, <strong>A Vencer</strong> e <strong>Total Pago</strong> do mês.</p>
+  <div class="dica"><strong>✅ Dica:</strong> Revise o Calendário toda semana para identificar vencimentos próximos e fazer cobranças preventivas.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 10</div><h2>👥 Clientes — Base de Passageiros</h2><td>Cadastro geral e histórico de todos os passageiros</td></div>
+  <p>Base completa de todos os passageiros cadastrados. Visualize histórico de viagens, situação financeira e dados pessoais. Pesquise por nome, CPF ou telefone. Filtre por viagem ou status de pagamento.</p>
+  <p>O sistema permite <strong>importação em massa</strong> via arquivo JSON — útil para migrar dados de sistemas anteriores.</p>
+  <div class="atencao"><strong>⚠️ LGPD:</strong> Dados de clientes são confidenciais. Não compartilhe listagens sem necessidade. Todos os acessos são registrados nos Logs de Auditoria.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 11</div><h2>🏢 Fornecedores — Parceiros e Serviços</h2><p>Cadastro de hotéis, transportadoras, guias e parceiros</p></div>
+  <p>Mantém o cadastro de empresas e profissionais parceiros: hotéis, restaurantes, transportadoras, guias e parques.</p>
+  <table>
+    <tr><th>Categoria</th><th>Exemplos</th></tr>
+    <tr><td>Hospedagem</td><td>Hotéis, pousadas, resorts</td></tr>
+    <tr><td>Transporte</td><td>Transportadoras, locadoras</td></tr>
+    <tr><td>Alimentação</td><td>Restaurantes, buffets</td></tr>
+    <tr><td>Lazer / Parques</td><td>Parques temáticos, atrações</td></tr>
+    <tr><td>Guias</td><td>Guias turísticos profissionais</td></tr>
+    <tr><td>Seguro</td><td>Seguradoras de viagem</td></tr>
+  </table>
+  <div class="dica"><strong>✅ Dica:</strong> Vincule pagamentos a fornecedores nas Despesas da Empresa. Rastreie quanto foi gasto com cada parceiro por viagem.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 12</div><h2>📈 Relatórios e Exportação</h2><p>Relatórios financeiros, listas e exportação de dados</p></div>
+  <table>
+    <tr><th>Relatório</th><th>O que contém</th></tr>
+    <tr><td>Lista de Passageiros</td><td>Passageiros com assento, tipo e local de embarque</td></tr>
+    <tr><td>Financeiro por Viagem</td><td>Receitas, despesas, saldo e rentabilidade</td></tr>
+    <tr><td>Parcelas em Aberto</td><td>Clientes com parcelas pendentes ou vencidas</td></tr>
+    <tr><td>Histórico de Pagamentos</td><td>Todos os pagamentos no período</td></tr>
+    <tr><td>Rentabilidade</td><td>Lucro líquido por viagem (receita − despesas)</td></tr>
+  </table>
+  <p>Exporte dados para <strong>CSV/Excel</strong> no menu Exportação. Em Detalhes da Viagem, <strong>"Salvar Documento"</strong> arquiva a lista na aba Documentos criando histórico permanente.</p>
+  <div class="dica"><strong>✅ Dica:</strong> Gere o relatório de Rentabilidade após cada viagem para análise e planejamento futuro.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 13</div><h2>⚙️ Configurações do Sistema</h2><p>Personalização da empresa, identidade visual e dados de contato</p></div>
+  <p>Personalize o sistema com dados da empresa: nome, logo, slogan, endereço, telefone, WhatsApp, redes sociais e texto "Sobre nós". Defina cor primária e secundária usadas nos documentos. No menu <strong>Usuários</strong>, o administrador gerencia acessos.</p>
+  <div class="atencao"><strong>⚠️ Atenção:</strong> Apenas administradores acessam Configurações e Usuários. O sistema tem dois perfis: <strong>Administrador</strong> (acesso total) e <strong>Funcionário</strong> (acesso operacional).</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 14</div><h2>📋 Formulários Personalizados</h2><p>Formulários de inscrição customizados e públicos</p></div>
+  <p>Crie formulários de inscrição personalizados para divulgar publicamente. Clientes preenchem online e os dados chegam direto ao sistema.</p>
+  <ul class="steps">
+    <li><div class="step-num">1</div><div class="step-txt">Acesse <strong>Formulários</strong> e crie um novo formulário.</div></li>
+    <li><div class="step-num">2</div><div class="step-txt">Defina título, descrição e campos personalizados.</div></li>
+    <li><div class="step-num">3</div><div class="step-txt">Ative o formulário e copie o link público para divulgar.</div></li>
+  </ul>
+  <p>A página <strong>/InscricaoViagem</strong> é o formulário público padrão — divulgue nas redes sociais junto com a arte da viagem.</p>
+  <div class="dica"><strong>✅ Dica:</strong> Dados de inscrições chegam prontos no sistema, eliminando retrabalho de digitação.</div>
+</div>
+
+<div class="secao">
+  <div class="secao-header"><div class="num-sec">Módulo 15</div><h2>🏆 Boas Práticas e Fluxo Recomendado</h2><p>Roteiro ideal do planejamento ao encerramento de uma viagem</p></div>
+  <h3>📌 Fluxo Completo de uma Viagem</h3>
+  <div class="tela">
+    <div class="barra"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span style="margin-left:8px;">Fluxo de Trabalho Completo</span></div>
+    <div style="padding:8px 0;">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><div style="background:#7c3aed;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:700;flex-shrink:0;">1</div><div><strong>PLANEJAMENTO:</strong> Criar viagem com datas, modelo do ônibus e 3 valores (lotes).</div></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><div style="background:#7c3aed;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:700;flex-shrink:0;">2</div><div><strong>VENDAS:</strong> Adicionar passageiros, gerar contratos e enviar links de assinatura.</div></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><div style="background:#7c3aed;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:700;flex-shrink:0;">3</div><div><strong>ALOCAÇÃO:</strong> Atribuir poltronas no mapa de assentos para cada passageiro.</div></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><div style="background:#7c3aed;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:700;flex-shrink:0;">4</div><div><strong>FINANCEIRO:</strong> Acompanhar parcelas e registrar recebimentos regularmente.</div></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><div style="background:#7c3aed;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:700;flex-shrink:0;">5</div><div><strong>PRÉ-EMBARQUE:</strong> Imprimir lista de passageiros; conferir documentos e pagamentos.</div></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><div style="background:#7c3aed;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:700;flex-shrink:0;">6</div><div><strong>EMBARQUE:</strong> Usar Check-in para marcar passageiros conforme embarcam.</div></div>
+      <div style="display:flex;gap:8px;align-items:center;"><div style="background:#16a34a;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:700;flex-shrink:0;">7</div><div><strong>ENCERRAMENTO:</strong> Registrar despesas, gerar relatório de rentabilidade e arquivar.</div></div>
+    </div>
+  </div>
+  <div class="dica"><strong>✅ Ordem certa:</strong> Crie viagem → adicione clientes → atribua assentos → gere contratos → acompanhe financeiro → faça check-in → encerre.</div>
+  <div class="dica"><strong>✅ Grupos e cores:</strong> Organize famílias com grupos. A lista impressa ficará agrupada visualmente — facilita o embarque.</div>
+  <div class="dica"><strong>✅ Calendário semanal:</strong> Revise toda segunda-feira para identificar parcelas vencendo na semana.</div>
+  <div class="atencao"><strong>⚠️ Evite:</strong> Lançar pagamentos sem comprovante | Deixar passageiros sem poltrona no dia do embarque | Arquivar viagens sem fechar o financeiro.</div>
+  <h3>🛠️ Logs de Auditoria</h3>
+  <p>Em <strong>Logs de Auditoria</strong> no menu lateral, você vê todos os cadastros, edições e exclusões do sistema com data, hora e usuário responsável. Use para rastrear qualquer alteração.</p>
+  <div class="rodape">
+    <p><strong>Fly Turismo</strong> — Sistema de Gestão de Viagens</p>
+    <p>Manual gerado em ${now} • Versão 1.0 • Confidencial — uso interno</p>
+  </div>
+</div>
+
+</body></html>`;
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+  };
+
+
     <div className="p-6 md:p-8 space-y-6">
       {showSuccessMessage && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-in slide-in-from-right">
@@ -679,9 +1018,10 @@ export default function DetalhesViagem() {
       )}
 
       <Tabs defaultValue="detalhes" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="detalhes">Detalhes e Passageiros</TabsTrigger>
           <TabsTrigger value="documentos">Documentos da Viagem</TabsTrigger>
+          <TabsTrigger value="manual">📖 Manual do Sistema</TabsTrigger>
         </TabsList>
 
         <TabsContent value="detalhes" className="space-y-6">
@@ -1051,6 +1391,63 @@ export default function DetalhesViagem() {
                 <p className="text-sm mt-1">Use o botão "Salvar Documento" nas listas para arquivar relatórios aqui.</p>
               </div>
             )}
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="manual">
+        <Card className="shadow-lg">
+          <CardHeader className="border-b border-border">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              📖 Manual Completo do Sistema
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Gere e baixe o manual de instrução completo do sistema Fly Turismo com explicação de todos os módulos.
+            </p>
+          </CardHeader>
+          <CardContent className="p-8 flex flex-col items-center gap-6">
+            <div className="w-full max-w-lg text-center space-y-4">
+              <div className="w-24 h-24 bg-violet-100 dark:bg-violet-900/30 rounded-full flex items-center justify-center mx-auto">
+                <FileText className="w-12 h-12 text-violet-600 dark:text-violet-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-foreground">Manual de Instrução</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                O manual cobre todos os módulos do sistema: Dashboard, Viagens, Passageiros, Assentos, Financeiro, 
+                Contratos, Equipe, Check-in, Calendário, Fornecedores, Relatórios e Configurações. 
+                Ideal para treinar novos funcionários ou consultar dúvidas.
+              </p>
+              <div className="grid grid-cols-2 gap-3 text-left mt-4">
+                {[
+                  "📊 Dashboard e Estatísticas",
+                  "✈️ Gestão de Viagens",
+                  "👥 Cadastro de Passageiros",
+                  "💺 Mapa de Assentos",
+                  "💰 Módulo Financeiro",
+                  "📝 Contratos e Assinaturas",
+                  "👨‍💼 Gestão de Equipe",
+                  "🛂 Check-in e Embarque",
+                  "📅 Calendário de Viagens",
+                  "🏢 Fornecedores",
+                  "📈 Relatórios e Exportação",
+                  "⚙️ Configurações do Sistema",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white px-10 py-6 text-lg gap-3 shadow-lg"
+              onClick={gerarManualPDF}
+            >
+              <Download className="w-6 h-6" />
+              Baixar Manual em PDF
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              O manual será aberto em uma nova aba — use Ctrl+P (ou Cmd+P) para salvar como PDF.
+            </p>
           </CardContent>
         </Card>
       </TabsContent>
