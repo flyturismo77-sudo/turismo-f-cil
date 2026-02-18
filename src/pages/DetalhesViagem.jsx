@@ -14,7 +14,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { ArrowLeft, MapPin, Calendar, Users, Bus, Loader2, Armchair, UserPlus, Printer, CheckCircle, Search, Trash2, Pencil, Save, FileText, Download } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Users, Bus, Loader2, Armchair, UserPlus, Printer, CheckCircle, Search, Trash2, Pencil, Save, FileText, Download, Link2, QrCode, Copy, CheckCheck } from "lucide-react";
+import { Dialog as QRDialog, DialogContent as QRDialogContent, DialogHeader as QRDialogHeader, DialogTitle as QRDialogTitle } from "@/components/ui/dialog";
+import { QRCodeSVG } from "qrcode.react";
+import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -27,7 +31,10 @@ export default function DetalhesViagem() {
   const viagemId = urlParams.get('id');
   const queryClient = useQueryClient();
 
+  const { toast } = useToast();
   const [showClienteForm, setShowClienteForm] = useState(false);
+  const [contratoQR, setContratoQR] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
   const [editingCliente, setEditingCliente] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   // Removed showMapaAssentos and selectedPoltrona states
@@ -70,6 +77,20 @@ export default function DetalhesViagem() {
   const { data: documentos = [] } = useQuery({
     queryKey: ['documentos-viagem', viagemId],
     queryFn: () => base44.entities.DocumentoViagem.filter({ id_viagem: viagemId }),
+    enabled: !!viagemId,
+  });
+
+  const { data: contratos = [] } = useQuery({
+    queryKey: ['contratos-viagem', viagemId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('formularios_contrato')
+        .select('id, nome_completo, status, link_assinatura, assinatura_nome, assinatura_data, created_at')
+        .eq('id_viagem', viagemId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
     enabled: !!viagemId,
   });
 
@@ -915,7 +936,79 @@ export default function DetalhesViagem() {
         </CardContent>
       </Card>
 
+      {/* Contratos da viagem */}
+      {contratos.length > 0 && (
+        <Card className="shadow-lg">
+          <CardHeader className="border-b border-border">
+            <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+              <FileText className="w-5 h-5 text-violet-500" />
+              Contratos desta Viagem ({contratos.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-2">
+            {contratos.map((contrato) => {
+              const linkAssinatura = contrato.link_assinatura
+                ? `${window.location.origin}/AssinaturaContrato?token=${contrato.link_assinatura}`
+                : null;
+              const assinado = !!contrato.assinatura_nome;
+              const isCopied = copiedId === contrato.id;
+
+              return (
+                <div
+                  key={contrato.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border ${
+                    assinado ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/10" : "border-border"
+                  }`}
+                >
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${assinado ? "bg-emerald-500" : "bg-amber-400"}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground truncate">{contrato.nome_completo}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {assinado ? `✅ Assinado por ${contrato.assinatura_nome}` : "⏳ Aguardando assinatura"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    {linkAssinatura && !assinado && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`h-8 px-2 gap-1 ${isCopied ? "text-emerald-600" : "text-muted-foreground hover:text-foreground"}`}
+                          onClick={() => {
+                            navigator.clipboard.writeText(linkAssinatura);
+                            setCopiedId(contrato.id);
+                            toast({ title: "✅ Link copiado!", description: "Cole no WhatsApp ou e-mail do cliente." });
+                            setTimeout(() => setCopiedId(null), 2500);
+                          }}
+                          title="Copiar link de assinatura"
+                        >
+                          {isCopied ? <CheckCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                          <span className="text-xs">{isCopied ? "Copiado!" : "Copiar link"}</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 gap-1 text-muted-foreground hover:text-foreground"
+                          onClick={() => setContratoQR({ ...contrato, link: linkAssinatura })}
+                          title="Ver QR Code do link"
+                        >
+                          <QrCode className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                    {assinado && (
+                      <span className="text-xs text-emerald-600 font-medium px-2">✅ Assinado</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
+
       </TabsContent>
+
 
       <TabsContent value="documentos">
         <Card className="shadow-lg border-none">
@@ -959,7 +1052,41 @@ export default function DetalhesViagem() {
       </TabsContent>
       </Tabs>
 
+      {/* Modal QR Code do contrato */}
+      <QRDialog open={!!contratoQR} onOpenChange={() => setContratoQR(null)}>
+        <QRDialogContent className="max-w-sm">
+          <QRDialogHeader>
+            <QRDialogTitle className="text-center text-foreground">QR Code — Assinatura</QRDialogTitle>
+          </QRDialogHeader>
+          {contratoQR && (
+            <div className="flex flex-col items-center gap-4 py-2">
+              <div className="bg-white p-4 rounded-2xl shadow-inner border border-border">
+                <QRCodeSVG value={contratoQR.link} size={200} level="H" includeMargin={false} />
+              </div>
+              <div className="text-center space-y-1 w-full">
+                <p className="font-bold text-foreground">{contratoQR.nome_completo}</p>
+                <p className="text-xs text-muted-foreground break-all">{contratoQR.link}</p>
+              </div>
+              <Button
+                className="w-full gap-2"
+                onClick={() => {
+                  navigator.clipboard.writeText(contratoQR.link);
+                  toast({ title: "✅ Link copiado!" });
+                }}
+              >
+                <Copy className="w-4 h-4" />
+                Copiar Link
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Envie este QR Code ou o link para o cliente assinar o contrato digitalmente.
+              </p>
+            </div>
+          )}
+        </QRDialogContent>
+      </QRDialog>
+
       <Dialog open={showClienteForm} onOpenChange={setShowClienteForm}>
+
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
