@@ -602,8 +602,8 @@ export default function DetalhesViagem() {
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-gray-900">{viagem.nome}</h1>
-          <p className="text-gray-500 mt-1">Detalhes completos da viagem</p>
+          <h1 className="text-3xl font-bold text-foreground">{viagem.nome}</h1>
+          <p className="text-muted-foreground mt-1">Detalhes completos da viagem</p>
           
           <div className="flex flex-wrap gap-2 mt-3">
             <Badge variant="secondary" className="text-sm px-3 py-1 bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-200 shadow-sm">
@@ -665,119 +665,119 @@ export default function DetalhesViagem() {
 
         <TabsContent value="detalhes" className="space-y-6">
       <div className="grid md:grid-cols-5 gap-6">
-        <Card className="shadow-lg border-none">
+        <Card className="shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
-              <MapPin className="w-5 h-5 text-sky-600" />
-              <p className="text-sm text-gray-600">Destino</p>
+              <MapPin className="w-5 h-5 text-sky-500" />
+              <p className="text-sm text-muted-foreground">Destino</p>
             </div>
-            <p className="text-lg font-bold text-gray-900">{viagem.destino}</p>
+            <p className="text-lg font-bold text-foreground">{viagem.destino}</p>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-none">
+        <Card className="shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Calendar className="w-5 h-5 text-amber-600" />
-              <p className="text-sm text-gray-600">Datas</p>
+              <Calendar className="w-5 h-5 text-amber-500" />
+              <p className="text-sm text-muted-foreground">Datas</p>
             </div>
-            <p className="text-sm font-semibold text-gray-900">
+            <p className="text-sm font-semibold text-foreground">
               {format(new Date(viagem.data_saida), "dd/MM/yy")} - {format(new Date(viagem.data_retorno), "dd/MM/yy")}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-none">
+        <Card className="shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Bus className="w-5 h-5 text-purple-600" />
-              <p className="text-sm text-gray-600">Modelo</p>
+              <Bus className="w-5 h-5 text-purple-500" />
+              <p className="text-sm text-muted-foreground">Modelo</p>
             </div>
-            <p className="text-lg font-bold text-purple-900">{modeloNome}</p>
-            <p className="text-xs text-gray-500">{viagem.vagas_totais} lugares</p>
+            <p className="text-lg font-bold text-purple-500">{modeloNome}</p>
+            <p className="text-xs text-muted-foreground">{viagem.vagas_totais} lugares</p>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-none">
+        <Card className="shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Users className="w-5 h-5 text-green-600" />
-              <p className="text-sm text-gray-600">Ocupação</p>
+              <Users className="w-5 h-5 text-green-500" />
+              <p className="text-sm text-muted-foreground">Ocupação</p>
             </div>
-            <p className="text-lg font-bold text-gray-900">
+            <p className="text-lg font-bold text-foreground">
               {viagem.vagas_ocupadas || 0}/{viagem.vagas_totais}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {Math.round(((viagem.vagas_ocupadas || 0) / viagem.vagas_totais) * 100)}% ocupado
             </p>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-none bg-gradient-to-br from-blue-50 to-indigo-50">
+        <Card className="shadow-lg bg-primary/10">
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Users className="w-5 h-5 text-blue-600" />
-              <p className="text-sm text-gray-600">Total Pessoas</p>
+              <Users className="w-5 h-5 text-primary" />
+              <p className="text-sm text-muted-foreground">Total Pessoas</p>
             </div>
-            <p className="text-lg font-bold text-blue-900">{totalPassageiros}</p>
-            <p className="text-xs text-gray-500">{comAssento} c/ assento, {semAssento} s/ assento</p>
+            <p className="text-lg font-bold text-primary">{totalPassageiros}</p>
+            <p className="text-xs text-muted-foreground">{comAssento} c/ assento, {semAssento} s/ assento</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid md:grid-cols-4 gap-6">
-        <Card className="shadow-lg border-none bg-gradient-to-br from-green-50 to-emerald-100">
+        <Card className="shadow-lg border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30">
           <CardContent className="p-6">
-            <p className="text-sm text-green-700 font-medium mb-2">💰 1º Valor (Inicial)</p>
-            <h3 className="text-2xl font-bold text-green-900">
+            <p className="text-sm text-green-700 dark:text-green-400 font-medium mb-2">💰 1º Valor (Inicial)</p>
+            <h3 className="text-2xl font-bold text-green-800 dark:text-green-300">
               R$ {(viagem.valor_1 || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </h3>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-none bg-gradient-to-br from-sky-50 to-blue-100">
+        <Card className="shadow-lg border-sky-200 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/30">
           <CardContent className="p-6">
-            <p className="text-sm text-sky-700 font-medium mb-2">💵 2º Valor (Intermediário)</p>
-            <h3 className="text-2xl font-bold text-sky-900">
+            <p className="text-sm text-sky-700 dark:text-sky-400 font-medium mb-2">💵 2º Valor (Intermediário)</p>
+            <h3 className="text-2xl font-bold text-sky-800 dark:text-sky-300">
               R$ {(viagem.valor_2 || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </h3>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-none bg-gradient-to-br from-amber-50 to-orange-100">
+        <Card className="shadow-lg border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30">
           <CardContent className="p-6">
-            <p className="text-sm text-amber-700 font-medium mb-2">💸 3º Valor (Final)</p>
-            <h3 className="text-2xl font-bold text-amber-900">
+            <p className="text-sm text-amber-700 dark:text-amber-400 font-medium mb-2">💸 3º Valor (Final)</p>
+            <h3 className="text-2xl font-bold text-amber-800 dark:text-amber-300">
               R$ {(viagem.valor_3 || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </h3>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-none bg-gradient-to-br from-purple-50 to-pink-100">
+        <Card className="shadow-lg border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/30">
           <CardContent className="p-6">
-            <p className="text-sm text-purple-700 font-medium mb-2">Status</p>
+            <p className="text-sm text-purple-700 dark:text-purple-400 font-medium mb-2">Status</p>
             <Badge className="text-lg px-4 py-2">{viagem.status}</Badge>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="shadow-lg border-none">
-        <CardHeader className="border-b border-gray-100">
-          <CardTitle className="text-xl">Passageiros Cadastrados ({clientes.length})</CardTitle>
+      <Card className="shadow-lg">
+        <CardHeader className="border-b border-border">
+          <CardTitle className="text-xl text-foreground">Passageiros Cadastrados ({clientes.length})</CardTitle>
           <div className="flex gap-4 mt-3">
-            <Badge className="bg-green-100 text-green-700">
+            <Badge className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400">
               {clientesPagos} Pagos
             </Badge>
-            <Badge className="bg-yellow-100 text-yellow-700">
+            <Badge className="bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400">
               {clientesParciais} Parciais
             </Badge>
-            <Badge className="bg-red-100 text-red-700">
+            <Badge className="bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400">
               {clientesPendentes} Pendentes
             </Badge>
           </div>
           
           <div className="mt-6 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <Input
               placeholder="Buscar passageiro por nome, CPF, telefone..."
               value={searchTerm}
@@ -816,25 +816,25 @@ export default function DetalhesViagem() {
               return (
                 <React.Fragment key={cliente.id}>
                   {isNewGroup && (
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-2"></div>
+                    <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent my-2"></div>
                   )}
-              <div key={cliente.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <div key={cliente.id} className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3 flex-1">
                     <div className="flex items-center gap-2 min-w-[80px]">
-                       <span className="text-sm font-bold text-gray-500">#{index + 1}</span>
+                       <span className="text-sm font-bold text-muted-foreground">#{index + 1}</span>
                        {cliente?.cor_grupo && (
                          <div className="flex items-center gap-1">
-                           <div className={`w-5 h-5 rounded-full ${getCorDisplay(cliente.cor_grupo, cliente.numero_grupo)} border-2 border-white shadow-md`} title={`${cliente.cor_grupo} - Grupo ${cliente.numero_grupo || 1}`}></div>
-                           <span className="text-xs font-semibold text-gray-600">G{cliente.numero_grupo || 1}</span>
+                           <div className={`w-5 h-5 rounded-full ${getCorDisplay(cliente.cor_grupo, cliente.numero_grupo)} border-2 border-background shadow-md`} title={`${cliente.cor_grupo} - Grupo ${cliente.numero_grupo || 1}`}></div>
+                           <span className="text-xs font-semibold text-muted-foreground">G{cliente.numero_grupo || 1}</span>
                          </div>
                        )}
                      </div>
                     <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                    <h4 className="font-semibold text-foreground flex items-center gap-2">
                       {cliente.nome_completo}
                       {cliente.e_crianca_colo && (
-                        <Badge className="bg-purple-100 text-purple-700 text-xs">
+                        <Badge className="bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 text-xs">
                           Criança de colo
                         </Badge>
                       )}
@@ -845,7 +845,7 @@ export default function DetalhesViagem() {
                         </Badge>
                       )}
                     </h4>
-                    <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-600">
+                    <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
                       <span>📱 {cliente.telefone}</span>
                       <span>🆔 {cliente.cpf}</span>
                       {cliente.local_embarque && (
@@ -858,9 +858,9 @@ export default function DetalhesViagem() {
                   </div>
                   <div className="text-right flex flex-col items-end gap-2">
                     <Badge className={
-                      cliente.status_pagamento === 'Pago' ? 'bg-green-100 text-green-700' :
-                      cliente.status_pagamento === 'Parcial' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
+                      cliente.status_pagamento === 'Pago' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400' :
+                      cliente.status_pagamento === 'Parcial' ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400' :
+                      'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400'
                     }>
                       {cliente.status_pagamento}
                     </Badge>
@@ -870,7 +870,7 @@ export default function DetalhesViagem() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditCliente(cliente)}
-                        className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 h-8 px-2"
+                        className="text-blue-500 hover:text-blue-400 hover:bg-blue-500/10 h-8 px-2"
                         title="Editar cliente"
                       >
                         <Pencil className="w-4 h-4 mr-1" />
@@ -881,7 +881,7 @@ export default function DetalhesViagem() {
                         variant="ghost"
                         size="sm"
                         onClick={() => removeClienteMutation.mutate(cliente)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 px-2"
+                        className="text-red-500 hover:text-red-400 hover:bg-red-500/10 h-8 px-2"
                         title="Excluir cliente da viagem"
                       >
                         <Trash2 className="w-4 h-4 mr-1" />
@@ -896,12 +896,12 @@ export default function DetalhesViagem() {
                   );
                   })}
             {filteredAndSortedClientes.length === 0 && (
-              <div className="text-center py-12 text-gray-500">
-                <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-12 text-muted-foreground">
+                <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/40" />
                 <p className="mb-4">Nenhum passageiro cadastrado nesta viagem ainda</p>
                 <Button 
                   onClick={() => {
-                    resetForm(); // resetForm now handles setting valor_total_pacote and valor_selecionado correctly
+                    resetForm();
                     setShowClienteForm(true);
                   }}
                   className="bg-gradient-to-r from-green-500 to-green-600"
@@ -929,18 +929,18 @@ export default function DetalhesViagem() {
             {documentos.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {documentos.map((doc) => (
-                  <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-all">
+                  <div key={doc.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-all">
                     <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 text-primary" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-medium text-gray-900 truncate" title={doc.nome}>{doc.nome}</p>
-                        <p className="text-xs text-gray-500">{doc.tipo} • {format(new Date(doc.created_date || new Date()), "dd/MM/yyyy HH:mm")}</p>
+                        <p className="font-medium text-foreground truncate" title={doc.nome}>{doc.nome}</p>
+                        <p className="text-xs text-muted-foreground">{doc.tipo} • {format(new Date(doc.created_date || new Date()), "dd/MM/yyyy HH:mm")}</p>
                       </div>
                     </div>
                     <a href={doc.url} target="_blank" rel="noopener noreferrer" download>
-                      <Button variant="ghost" size="icon" className="text-gray-500 hover:text-blue-600">
+                      <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
                         <Download className="w-4 h-4" />
                       </Button>
                     </a>
@@ -948,8 +948,8 @@ export default function DetalhesViagem() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed">
-                <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <div className="text-center py-12 text-muted-foreground bg-muted/30 rounded-xl border-2 border-dashed border-border">
+                <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/40" />
                 <p>Nenhum documento salvo ainda.</p>
                 <p className="text-sm mt-1">Use o botão "Salvar Documento" nas listas para arquivar relatórios aqui.</p>
               </div>
