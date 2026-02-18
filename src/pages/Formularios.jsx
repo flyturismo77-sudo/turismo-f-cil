@@ -275,12 +275,34 @@ export default function Formularios() {
         .eq('id', formulario.id);
       if (formErr) throw formErr;
     },
-    onSuccess: () => {
+    onSuccess: (_, formulario) => {
       queryClient.invalidateQueries(['formularios_contrato']);
       queryClient.invalidateQueries(['clientes']);
       queryClient.invalidateQueries(['viagens']);
       queryClient.invalidateQueries(['parcelas']);
       toast.success('Formulário processado! Cliente e parcelas criados com sucesso.');
+
+      // Enviar e-mail de confirmação para o cliente
+      if (formulario.email) {
+        const viagem = viagens.find(v => v.id === formulario.id_viagem);
+        const valorFinal = (formulario.valor_total || viagem?.valor_1 || 0) - (formulario.desconto || 0);
+        const numParcelas = formulario.numero_parcelas || 1;
+        const emailBody = `Olá, ${formulario.nome_completo}!\n\nSua inscrição foi confirmada com sucesso. 🎉\n\n` +
+          `📍 Viagem: ${viagem?.nome || '—'} — ${viagem?.destino || ''}\n` +
+          `📅 Data de Saída: ${viagem?.data_saida ? new Date(viagem.data_saida + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}\n\n` +
+          `💳 Forma de Pagamento: ${formulario.forma_pagamento}${numParcelas > 1 ? ` em ${numParcelas}x` : ''}\n` +
+          `💰 Valor Total: R$ ${valorFinal.toFixed(2)}\n` +
+          (numParcelas > 1 ? `📆 Vencimento das parcelas: Todo dia ${formulario.dia_vencimento || 10}\n` : '') +
+          `\nEm breve entraremos em contato com mais detalhes.\n\nFly Turismo — Equipe de Atendimento`;
+
+        supabase.functions.invoke('send-email', {
+          body: {
+            to: formulario.email,
+            subject: `✅ Inscrição confirmada: ${viagem?.nome || 'Viagem'}`,
+            body: emailBody,
+          },
+        }).catch(() => {}); // silently fail - email is bonus
+      }
     },
     onError: (err) => toast.error('Erro ao processar: ' + err.message),
   });

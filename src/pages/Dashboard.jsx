@@ -1,9 +1,10 @@
 import React from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
-import { Plane, Users, DollarSign, TrendingUp, Calendar, Bell, CheckCircle, ArrowUpRight } from "lucide-react";
+import { Plane, Users, DollarSign, TrendingUp, Calendar, Bell, CheckCircle, ArrowUpRight, AlertTriangle, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { differenceInDays } from "date-fns";
 import StatCard from "../components/dashboard/StatCard";
@@ -50,6 +51,33 @@ export default function Dashboard() {
     retry: 2,
   });
 
+  const { data: formularios = [] } = useQuery({
+    queryKey: ['formularios_contrato'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('formularios_contrato')
+        .select('id, status, created_at');
+      if (error) throw error;
+      return data || [];
+    },
+    retry: 2,
+  });
+
+  const { data: parcelas = [] } = useQuery({
+    queryKey: ['parcelas_dashboard'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('parcelas')
+        .select('id, status, data_vencimento, valor_parcela')
+        .eq('status', 'Pendente')
+        .lt('data_vencimento', today);
+      if (error) throw error;
+      return data || [];
+    },
+    retry: 2,
+  });
+
   const viagensAtivas = viagens.filter(v => !v.arquivada);
   const totalReceita = pagamentos.reduce((sum, p) => sum + (p.valor || 0), 0);
   const proximasViagens = viagensAtivas.filter(v => {
@@ -57,6 +85,14 @@ export default function Dashboard() {
     const dias = differenceInDays(new Date(v.data_saida), new Date());
     return dias >= 0 && dias <= 30;
   });
+
+  // Conversão de formulários
+  const totalForms = formularios.length;
+  const formsProcessados = formularios.filter(f => f.status === 'Processado').length;
+  const taxaConversao = totalForms > 0 ? Math.round((formsProcessados / totalForms) * 100) : 0;
+
+  // Parcelas em atraso
+  const totalVencido = parcelas.reduce((s, p) => s + (p.valor_parcela || 0), 0);
 
   const statusPagamento = [
     { name: 'Pago', value: clientes.filter(c => c.status_pagamento === 'Pago').length },
@@ -79,6 +115,9 @@ export default function Dashboard() {
   const receitaData = Object.values(receitaMensal).slice(-6);
 
   const alertas = [];
+  if (parcelas.length > 0) {
+    alertas.push({ tipo: 'danger', titulo: 'Parcelas em atraso!', mensagem: `${parcelas.length} parcela(s) vencida(s) — total de R$ ${totalVencido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} em aberto.` });
+  }
   viagensAtivas.forEach(viagem => {
     const vagasRestantes = (viagem.vagas_totais || 0) - (viagem.vagas_ocupadas || 0);
     if (vagasRestantes <= 10 && vagasRestantes > 0) {
@@ -122,8 +161,16 @@ export default function Dashboard() {
       {alertas.length > 0 && (
         <div className="space-y-3">
           {alertas.map((alerta, index) => (
-            <Alert key={index} className={`rounded-xl ${alerta.tipo === 'warning' ? 'bg-amber-50 border-amber-200' : 'bg-sky-50 border-sky-200'}`}>
-              <Bell className={`h-4 w-4 ${alerta.tipo === 'warning' ? 'text-amber-500' : 'text-sky-500'}`} />
+            <Alert key={index} className={`rounded-xl ${
+              alerta.tipo === 'danger' ? 'bg-red-50 border-red-200' :
+              alerta.tipo === 'warning' ? 'bg-amber-50 border-amber-200' : 
+              'bg-sky-50 border-sky-200'
+            }`}>
+              {alerta.tipo === 'danger' ? (
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+              ) : (
+                <Bell className={`h-4 w-4 ${alerta.tipo === 'warning' ? 'text-amber-500' : 'text-sky-500'}`} />
+              )}
               <AlertTitle className="text-slate-700">{alerta.titulo}</AlertTitle>
               <AlertDescription className="text-slate-500">{alerta.mensagem}</AlertDescription>
             </Alert>
@@ -132,6 +179,192 @@ export default function Dashboard() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <StatCard
+          title="Receita Total"
+          value={`R$ ${totalReceita.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+          subtitle="Em pagamentos recebidos"
+          icon={DollarSign}
+          gradient="from-emerald-400 to-emerald-500"
+          delay={0}
+        />
+        <StatCard
+          title="Viagens Ativas"
+          value={viagensAtivas.length}
+          subtitle={`${viagens.length} total`}
+          icon={Plane}
+          gradient="from-sky-400 to-blue-500"
+          delay={0.1}
+        />
+        <StatCard
+          title="Clientes Totais"
+          value={clientes.length}
+          subtitle={`${clientes.filter(c => c.status_pagamento === 'Pendente' || !c.status_pagamento).length} pendentes`}
+          icon={Users}
+          gradient="from-violet-400 to-violet-500"
+          delay={0.2}
+        />
+        <StatCard
+          title="Próximas Viagens"
+          value={proximasViagens.length}
+          subtitle="Nos próximos 30 dias"
+          icon={Calendar}
+          gradient="from-amber-400 to-orange-500"
+          delay={0.3}
+        />
+      </div>
+
+      {!sistemaNovo && (
+        <>
+          {/* Taxa de ocupação por viagem */}
+          {viagensAtivas.filter(v => v.vagas_totais > 0).length > 0 && (
+            <Card className="shadow-sm border-slate-200/60 bg-white dark:bg-card">
+              <CardHeader className="border-b border-slate-100 dark:border-border pb-4">
+                <CardTitle className="text-lg font-display font-bold text-slate-800 dark:text-foreground flex items-center gap-2">
+                  <Plane className="w-5 h-5 text-sky-400" />
+                  Taxa de Ocupação por Viagem
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                {viagensAtivas.filter(v => v.vagas_totais > 0).slice(0, 5).map(v => {
+                  const pct = Math.min(100, Math.round(((v.vagas_ocupadas || 0) / v.vagas_totais) * 100));
+                  return (
+                    <div key={v.id} className="space-y-1.5">
+                      <div className="flex justify-between text-sm">
+                        <span className="font-medium text-slate-700 dark:text-foreground truncate max-w-[60%]">{v.nome}</span>
+                        <span className="text-slate-500 dark:text-muted-foreground tabular-nums">{v.vagas_ocupadas || 0}/{v.vagas_totais} vagas ({pct}%)</span>
+                      </div>
+                      <Progress value={pct} className="h-2" />
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Conversão + Receita mensal */}
+          <div className="grid lg:grid-cols-3 gap-5">
+            {/* Conversão de leads */}
+            <Card className="shadow-sm border-slate-200/60 bg-white dark:bg-card">
+              <CardHeader className="border-b border-slate-100 dark:border-border pb-4">
+                <CardTitle className="text-lg font-display font-bold text-slate-800 dark:text-foreground flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-violet-400" />
+                  Conversão de Leads
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 flex flex-col items-center justify-center gap-4">
+                <div className="relative w-32 h-32">
+                  <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" strokeWidth="3" />
+                    <circle
+                      cx="18" cy="18" r="15.9" fill="none"
+                      stroke="#8b5cf6" strokeWidth="3"
+                      strokeDasharray={`${taxaConversao} ${100 - taxaConversao}`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl font-bold text-slate-800 dark:text-foreground">{taxaConversao}%</span>
+                    <span className="text-xs text-muted-foreground">conversão</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 w-full text-center">
+                  <div className="bg-slate-50 dark:bg-muted rounded-lg p-3">
+                    <p className="text-2xl font-bold text-slate-700 dark:text-foreground">{totalForms}</p>
+                    <p className="text-xs text-muted-foreground">Recebidos</p>
+                  </div>
+                  <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3">
+                    <p className="text-2xl font-bold text-emerald-600">{formsProcessados}</p>
+                    <p className="text-xs text-muted-foreground">Convertidos</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Receita mensal */}
+            <Card className="shadow-sm border-slate-200/60 bg-white dark:bg-card lg:col-span-2">
+              <CardHeader className="border-b border-slate-100 dark:border-border pb-4">
+                <CardTitle className="text-lg font-display font-bold text-slate-800 dark:text-foreground flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-emerald-400" />
+                  Receita Mensal
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                {receitaData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={receitaData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                      <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                      <Tooltip 
+                        formatter={(v) => `R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                        contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                      />
+                      <Bar dataKey="valor" fill="#38bdf8" name="Receita" radius={[8,8,0,0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-52 flex items-center justify-center text-slate-400">Nenhum pagamento registrado</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Status de pagamentos */}
+          <Card className="shadow-sm border-slate-200/60 bg-white dark:bg-card">
+            <CardHeader className="border-b border-slate-100 dark:border-border pb-4">
+              <CardTitle className="text-lg font-display font-bold text-slate-800 dark:text-foreground flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-sky-400" />
+                Status de Pagamentos dos Clientes
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              {statusPagamento.length > 0 ? (
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={statusPagamento}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        dataKey="value"
+                      >
+                        {statusPagamento.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="grid grid-cols-3 md:grid-cols-1 gap-3 w-full md:w-auto">
+                    {statusPagamento.map((item, i) => (
+                      <div key={item.name} className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: COLORS[i] }} />
+                        <span className="text-sm text-slate-600 dark:text-muted-foreground">{item.name}:</span>
+                        <span className="text-sm font-bold text-slate-800 dark:text-foreground">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="h-40 flex items-center justify-center text-slate-400">Nenhum dado disponível</div>
+              )}
+            </CardContent>
+          </Card>
+
+          <RecentActivity 
+            viagens={viagensAtivas}
+            clientes={clientes}
+            pagamentos={pagamentos}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
         <StatCard
           title="Receita Total"
           value={`R$ ${totalReceita.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
