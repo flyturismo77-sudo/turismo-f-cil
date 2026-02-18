@@ -14,11 +14,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
   Plus, DollarSign, TrendingUp, TrendingDown, Loader2, Eye, CheckCircle2,
-  AlertTriangle, Clock, Search, Upload, Calendar as CalendarIcon, CreditCard
+  AlertTriangle, Clock, Search, Upload, Calendar as CalendarIcon, CreditCard, FileDown
 } from "lucide-react";
 import { format, differenceInDays, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/components/ui/use-toast";
+import { gerarReciboPDF } from "@/lib/gerarReciboPDF";
 
 const FORMAS_PAGAMENTO = [
   'PIX', 'Dinheiro', 'Cartão Crédito', 'Cartão Débito', 'Boleto', 'Transferência'
@@ -220,13 +221,18 @@ export default function Recebimentos() {
         }).eq('id', cliente.id);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_, { parcela, dados }) => {
       queryClient.invalidateQueries({ queryKey: ['parcelas'] });
       queryClient.invalidateQueries({ queryKey: ['pagamentos'] });
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
       setShowMarcarPaga(false);
+      // Gera recibo automaticamente após marcar como paga
+      const cliente = clientes.find(c => c.id === parcela.id_cliente);
+      const viagem = viagens.find(v => v.id === parcela.id_viagem);
+      const parcelaAtualizada = { ...parcela, ...dados, status: 'Paga' };
+      gerarReciboPDF({ parcela: parcelaAtualizada, cliente, viagem, config: null });
       setSelectedParcela(null);
-      toast({ title: "✅ Parcela marcada como paga!" });
+      toast({ title: "✅ Parcela marcada como paga!", description: "Recibo PDF gerado automaticamente." });
     },
     onError: (err) => toast({ title: "Erro", description: err.message, variant: "destructive" })
   });
@@ -517,13 +523,15 @@ export default function Recebimentos() {
                     <TableHead>Data Pagamento</TableHead>
                     <TableHead>Forma</TableHead>
                     <TableHead>Comprovante</TableHead>
+                    <TableHead>Recibo</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {pagas.length === 0 ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhuma parcela paga</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Nenhuma parcela paga</TableCell></TableRow>
                   ) : pagas.map(p => {
                     const cliente = getCliente(p.id_cliente);
+                    const viagem = getViagem(p.id_viagem);
                     return (
                       <TableRow key={p.id}>
                         <TableCell className="font-medium">{cliente?.nome_completo || 'N/A'}</TableCell>
@@ -537,6 +545,16 @@ export default function Recebimentos() {
                               <Eye className="w-3 h-3" /> Ver
                             </a>
                           ) : '-'}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-sky-200 text-sky-700 hover:bg-sky-50 gap-1"
+                            onClick={() => gerarReciboPDF({ parcela: p, cliente, viagem, config: null })}
+                          >
+                            <FileDown className="w-3 h-3" /> PDF
+                          </Button>
                         </TableCell>
                       </TableRow>
                     );
