@@ -13,6 +13,7 @@ import ViagensPublico from '@/pages/ViagensPublico';
 import Sobre from '@/pages/Sobre';
 import Contato from '@/pages/Contato';
 import AdminRoute from '@/components/AdminRoute';
+import AssinaturaContrato from '@/pages/AssinaturaContrato';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -65,6 +66,7 @@ const AppRoutes = () => {
       <Route path="/ViagensPublico" element={<ViagensPublico />} />
       <Route path="/Sobre" element={<Sobre />} />
       <Route path="/Contato" element={<Contato />} />
+      <Route path="/AssinaturaContrato" element={<AssinaturaContrato />} />
       
       <Route path="/" element={
         <ProtectedRoute>

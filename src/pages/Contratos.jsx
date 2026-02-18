@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { 
   FileText, Plus, Download, Eye, Search, Trash2, Edit, 
-  Loader2, User, Plane, Calendar, DollarSign, MessageCircle 
+  Loader2, User, Plane, Calendar, DollarSign, MessageCircle, Link2, CheckCircle2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -373,6 +373,20 @@ export default function Contratos() {
     toast({ title: 'PDF gerado com sucesso!' });
   };
 
+  const copiarLinkAssinatura = (contrato) => {
+    if (!contrato.link_assinatura) {
+      toast({ title: 'Este contrato não possui link de assinatura.', variant: 'destructive' });
+      return;
+    }
+    const url = `${window.location.origin}/AssinaturaContrato?id=${contrato.link_assinatura}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast({ title: '✅ Link de assinatura copiado!', description: 'Cole no WhatsApp ou e-mail para o cliente assinar.' });
+    }).catch(() => {
+      // fallback para dispositivos sem clipboard API
+      window.prompt('Copie o link abaixo:', url);
+    });
+  };
+
   const enviarWhatsApp = (contrato) => {
     const viagem = viagens.find(v => v.id === contrato.id_viagem) || contrato.viagens || {};
     const empresa = config || {};
@@ -512,6 +526,14 @@ export default function Contratos() {
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => gerarPDF(contrato)} title="Gerar PDF" className="hover:bg-sky-50 hover:text-sky-600">
                         <Download className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost" size="icon"
+                        onClick={() => copiarLinkAssinatura(contrato)}
+                        title={contrato.assinatura_data ? "Contrato já assinado" : "Copiar link de assinatura"}
+                        className={contrato.assinatura_data ? "hover:bg-green-50 text-green-500" : "hover:bg-violet-50 hover:text-violet-600"}
+                      >
+                        {contrato.assinatura_data ? <CheckCircle2 className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => enviarWhatsApp(contrato)} title="Enviar via WhatsApp" className="hover:bg-emerald-50 hover:text-emerald-600">
                         <MessageCircle className="w-4 h-4" />

@@ -491,6 +491,10 @@ export type Database = {
       }
       formularios_contrato: {
         Row: {
+          assinatura_cpf: string | null
+          assinatura_data: string | null
+          assinatura_ip: string | null
+          assinatura_nome: string | null
           bairro: string | null
           cidade: string | null
           cpf: string | null
@@ -504,6 +508,7 @@ export type Database = {
           id: string
           id_viagem: string | null
           idade_crianca_colo: number | null
+          link_assinatura: string | null
           nome_completo: string
           nome_crianca_colo: string | null
           numero: string | null
@@ -519,6 +524,10 @@ export type Database = {
           valor_total: number | null
         }
         Insert: {
+          assinatura_cpf?: string | null
+          assinatura_data?: string | null
+          assinatura_ip?: string | null
+          assinatura_nome?: string | null
           bairro?: string | null
           cidade?: string | null
           cpf?: string | null
@@ -532,6 +541,7 @@ export type Database = {
           id?: string
           id_viagem?: string | null
           idade_crianca_colo?: number | null
+          link_assinatura?: string | null
           nome_completo: string
           nome_crianca_colo?: string | null
           numero?: string | null
@@ -547,6 +557,10 @@ export type Database = {
           valor_total?: number | null
         }
         Update: {
+          assinatura_cpf?: string | null
+          assinatura_data?: string | null
+          assinatura_ip?: string | null
+          assinatura_nome?: string | null
           bairro?: string | null
           cidade?: string | null
           cpf?: string | null
@@ -560,6 +574,7 @@ export type Database = {
           id?: string
           id_viagem?: string | null
           idade_crianca_colo?: number | null
+          link_assinatura?: string | null
           nome_completo?: string
           nome_crianca_colo?: string | null
           numero?: string | null
