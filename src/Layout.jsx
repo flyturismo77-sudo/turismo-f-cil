@@ -48,6 +48,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/lib/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+// Items marked adminOnly are hidden from employees in the sidebar
 const navSections = [
   {
     label: "Principal",
@@ -72,9 +73,9 @@ const navSections = [
     label: "Financeiro",
     items: [
       { title: "Recebimentos", url: createPageUrl("Recebimentos"), icon: Receipt },
-      { title: "Rentabilidade", url: createPageUrl("Rentabilidade"), icon: TrendingUp },
-      { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck },
-      { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2 },
+      { title: "Rentabilidade", url: createPageUrl("Rentabilidade"), icon: TrendingUp, adminOnly: true },
+      { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck, adminOnly: true },
+      { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2, adminOnly: true },
     ]
   },
   {
@@ -86,6 +87,7 @@ const navSections = [
   },
   {
     label: "Sistema",
+    adminOnly: true,
     items: [
       { title: "Usuários", url: createPageUrl("Usuarios"), icon: UserCog },
       { title: "Backup", url: createPageUrl("GerenciamentoArquivos"), icon: HardDrive },
@@ -230,41 +232,48 @@ export default function Layout({ children, currentPageName }) {
             </SidebarHeader>
             
             <SidebarContent className="px-3 py-1 overflow-y-auto">
-              {navSections.map((section, idx) => (
-                <SidebarGroup key={section.label}>
-                  <SidebarGroupLabel className="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em] px-3 mb-1">
-                    {section.label}
-                  </SidebarGroupLabel>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {section.items.map((item) => {
-                        const isActive = location.pathname === item.url;
-                        return (
-                          <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton 
-                              asChild 
-                              className={`group transition-all duration-200 rounded-xl mb-0.5 ${
-                                isActive 
-                                  ? 'bg-gradient-to-r from-sky-400 to-sky-500 text-white shadow-lg shadow-sky-500/25' 
-                                  : 'text-slate-400 hover:bg-slate-800 hover:text-sky-300'
-                              }`}
-                            >
-                              <Link to={item.url} className="flex items-center gap-3 px-3 py-2.5">
-                                <item.icon className={`w-[18px] h-[18px] ${isActive ? 'text-white' : 'opacity-70 group-hover:opacity-100'}`} />
-                                <span className="text-sm font-medium flex-1">{item.title}</span>
-                                {getBadge(item.title)}
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                        );
-                      })}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                  {idx < navSections.length - 1 && (
-                    <Separator className="my-2 bg-slate-800" />
-                  )}
-                </SidebarGroup>
-              ))}
+              {navSections.map((section, idx) => {
+                // Hide entire section if adminOnly and user is not admin
+                if (section.adminOnly && !isAdmin) return null;
+                // Filter individual admin-only items
+                const visibleItems = section.items.filter(item => !item.adminOnly || isAdmin);
+                if (visibleItems.length === 0) return null;
+                return (
+                  <SidebarGroup key={section.label}>
+                    <SidebarGroupLabel className="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em] px-3 mb-1">
+                      {section.label}
+                    </SidebarGroupLabel>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {visibleItems.map((item) => {
+                          const isActive = location.pathname === item.url;
+                          return (
+                            <SidebarMenuItem key={item.title}>
+                              <SidebarMenuButton 
+                                asChild 
+                                className={`group transition-all duration-200 rounded-xl mb-0.5 ${
+                                  isActive 
+                                    ? 'bg-gradient-to-r from-sky-400 to-sky-500 text-white shadow-lg shadow-sky-500/25' 
+                                    : 'text-slate-400 hover:bg-slate-800 hover:text-sky-300'
+                                }`}
+                              >
+                                <Link to={item.url} className="flex items-center gap-3 px-3 py-2.5">
+                                  <item.icon className={`w-[18px] h-[18px] ${isActive ? 'text-white' : 'opacity-70 group-hover:opacity-100'}`} />
+                                  <span className="text-sm font-medium flex-1">{item.title}</span>
+                                  {getBadge(item.title)}
+                                </Link>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          );
+                        })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                    {idx < navSections.length - 1 && (
+                      <Separator className="my-2 bg-slate-800" />
+                    )}
+                  </SidebarGroup>
+                );
+              })}
             </SidebarContent>
 
             <SidebarFooter className="px-4 py-4 border-t border-slate-800">

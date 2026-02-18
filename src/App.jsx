@@ -12,6 +12,7 @@ import Home from '@/pages/Home';
 import ViagensPublico from '@/pages/ViagensPublico';
 import Sobre from '@/pages/Sobre';
 import Contato from '@/pages/Contato';
+import AdminRoute from '@/components/AdminRoute';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -42,6 +43,17 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// Pages that require admin (Gerente) role
+const ADMIN_ONLY_PAGES = new Set([
+  'Rentabilidade',
+  'DespesasPessoal',
+  'DespesasEmpresa',
+  'Usuarios',
+  'GerenciamentoArquivos',
+  'MigracaoDD',
+  'Configuracoes',
+]);
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -69,7 +81,11 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <LayoutWrapper currentPageName={path}>
-                <Page />
+                {ADMIN_ONLY_PAGES.has(path) ? (
+                  <AdminRoute><Page /></AdminRoute>
+                ) : (
+                  <Page />
+                )}
               </LayoutWrapper>
             </ProtectedRoute>
           }
