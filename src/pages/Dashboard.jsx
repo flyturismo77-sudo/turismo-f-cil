@@ -1,9 +1,8 @@
 import React from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
-import { Plane, Users, DollarSign, TrendingUp, Calendar, Bell, CheckCircle, ArrowUpRight, AlertTriangle, FileText } from "lucide-react";
+import { Plane, Users, DollarSign, TrendingUp, Calendar, Bell, CheckCircle, AlertTriangle, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { differenceInDays } from "date-fns";
@@ -86,12 +85,9 @@ export default function Dashboard() {
     return dias >= 0 && dias <= 30;
   });
 
-  // Conversão de formulários
   const totalForms = formularios.length;
   const formsProcessados = formularios.filter(f => f.status === 'Processado').length;
   const taxaConversao = totalForms > 0 ? Math.round((formsProcessados / totalForms) * 100) : 0;
-
-  // Parcelas em atraso
   const totalVencido = parcelas.reduce((s, p) => s + (p.valor_parcela || 0), 0);
 
   const statusPagamento = [
@@ -163,7 +159,7 @@ export default function Dashboard() {
           {alertas.map((alerta, index) => (
             <Alert key={index} className={`rounded-xl ${
               alerta.tipo === 'danger' ? 'bg-red-50 border-red-200' :
-              alerta.tipo === 'warning' ? 'bg-amber-50 border-amber-200' : 
+              alerta.tipo === 'warning' ? 'bg-amber-50 border-amber-200' :
               'bg-sky-50 border-sky-200'
             }`}>
               {alerta.tipo === 'danger' ? (
@@ -295,11 +291,11 @@ export default function Dashboard() {
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                       <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 12 }} />
                       <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                      <Tooltip 
-                        formatter={(v) => `R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                      <Tooltip
+                        formatter={(v) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                         contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                       />
-                      <Bar dataKey="valor" fill="#38bdf8" name="Receita" radius={[8,8,0,0]} />
+                      <Bar dataKey="valor" fill="#38bdf8" name="Receita" radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
@@ -354,116 +350,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <RecentActivity 
-            viagens={viagensAtivas}
-            clientes={clientes}
-            pagamentos={pagamentos}
-          />
-        </>
-      )}
-    </div>
-  );
-}
-
-        <StatCard
-          title="Receita Total"
-          value={`R$ ${totalReceita.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-          subtitle="Em pagamentos recebidos"
-          icon={DollarSign}
-          gradient="from-emerald-400 to-emerald-500"
-          delay={0}
-        />
-        <StatCard
-          title="Viagens Ativas"
-          value={viagensAtivas.length}
-          subtitle={`${viagens.length} total`}
-          icon={Plane}
-          gradient="from-sky-400 to-blue-500"
-          delay={0.1}
-        />
-        <StatCard
-          title="Clientes Totais"
-          value={clientes.length}
-          subtitle={`${clientes.filter(c => c.status_pagamento === 'Pendente' || !c.status_pagamento).length} pendentes`}
-          icon={Users}
-          gradient="from-violet-400 to-violet-500"
-          delay={0.2}
-        />
-        <StatCard
-          title="Próximas Viagens"
-          value={proximasViagens.length}
-          subtitle="Nos próximos 30 dias"
-          icon={Calendar}
-          gradient="from-amber-400 to-orange-500"
-          delay={0.3}
-        />
-      </div>
-
-      {!sistemaNovo && (
-        <>
-          <div className="grid lg:grid-cols-2 gap-5">
-            <Card className="shadow-sm border-slate-200/60 bg-white">
-              <CardHeader className="border-b border-slate-100 pb-4">
-                <CardTitle className="text-lg font-display font-bold text-slate-800 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-emerald-400" />
-                  Receita Mensal
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                {receitaData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={receitaData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                      <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                      <Tooltip 
-                        formatter={(v) => `R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
-                        contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
-                      />
-                      <Bar dataKey="valor" fill="#38bdf8" name="Receita" radius={[8,8,0,0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-64 flex items-center justify-center text-slate-400">Nenhum pagamento registrado</div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border-slate-200/60 bg-white">
-              <CardHeader className="border-b border-slate-100 pb-4">
-                <CardTitle className="text-lg font-display font-bold text-slate-800 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-sky-400" />
-                  Status de Pagamentos
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                {statusPagamento.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={statusPagamento}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={100}
-                        dataKey="value"
-                      >
-                        {statusPagamento.map((_, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-64 flex items-center justify-center text-slate-400">Nenhum dado disponível</div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <RecentActivity 
+          <RecentActivity
             viagens={viagensAtivas}
             clientes={clientes}
             pagamentos={pagamentos}
