@@ -279,10 +279,10 @@ export default function Recebimentos() {
     <div className="p-6 md:p-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">📥 Recebimentos</h1>
-          <p className="text-gray-500 mt-1">Controle de pagamentos e parcelas de clientes</p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">📥 Recebimentos</h1>
+        <p className="text-muted-foreground mt-1">Controle de pagamentos e parcelas de clientes</p>
+      </div>
         <div className="flex gap-3 flex-wrap">
           <Select value={selectedViagem} onValueChange={setSelectedViagem}>
             <SelectTrigger className="w-56">
@@ -306,54 +306,54 @@ export default function Recebimentos() {
 
       {/* Stats Cards */}
       <div className="grid md:grid-cols-4 gap-4">
-        <Card className="shadow-lg border-none bg-gradient-to-br from-green-50 to-green-100">
+        <Card className="shadow-lg border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30">
           <CardContent className="p-5">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-green-700 font-medium">Total Recebido</p>
-                <h3 className="text-2xl font-bold text-green-900 mt-1">R$ {totalRecebido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+                <p className="text-sm text-green-700 dark:text-green-400 font-medium">Total Recebido</p>
+                <h3 className="text-2xl font-bold text-green-900 dark:text-green-300 mt-1">R$ {totalRecebido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
               </div>
-              <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-700" />
+              <div className="w-10 h-10 bg-green-200 dark:bg-green-800 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-green-700 dark:text-green-400" />
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="shadow-lg border-none bg-gradient-to-br from-orange-50 to-orange-100">
+        <Card className="shadow-lg border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30">
           <CardContent className="p-5">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-orange-700 font-medium">Pendente</p>
-                <h3 className="text-2xl font-bold text-orange-900 mt-1">R$ {totalPendente.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+                <p className="text-sm text-orange-700 dark:text-orange-400 font-medium">Pendente</p>
+                <h3 className="text-2xl font-bold text-orange-900 dark:text-orange-300 mt-1">R$ {totalPendente.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
               </div>
-              <div className="w-10 h-10 bg-orange-200 rounded-xl flex items-center justify-center">
-                <Clock className="w-5 h-5 text-orange-700" />
+              <div className="w-10 h-10 bg-orange-200 dark:bg-orange-800 rounded-xl flex items-center justify-center">
+                <Clock className="w-5 h-5 text-orange-700 dark:text-orange-400" />
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="shadow-lg border-none bg-gradient-to-br from-red-50 to-red-100">
+        <Card className="shadow-lg border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
           <CardContent className="p-5">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-red-700 font-medium">Atrasadas</p>
-                <h3 className="text-2xl font-bold text-red-900 mt-1">{atrasadas.length}</h3>
+                <p className="text-sm text-red-700 dark:text-red-400 font-medium">Atrasadas</p>
+                <h3 className="text-2xl font-bold text-red-900 dark:text-red-300 mt-1">{atrasadas.length}</h3>
               </div>
-              <div className="w-10 h-10 bg-red-200 rounded-xl flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-700" />
+              <div className="w-10 h-10 bg-red-200 dark:bg-red-800 rounded-xl flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-700 dark:text-red-400" />
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="shadow-lg border-none bg-gradient-to-br from-amber-50 to-amber-100">
+        <Card className="shadow-lg border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30">
           <CardContent className="p-5">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-amber-700 font-medium">Vencendo em 3 dias</p>
-                <h3 className="text-2xl font-bold text-amber-900 mt-1">{proximasVencer.length}</h3>
+                <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">Vencendo em 3 dias</p>
+                <h3 className="text-2xl font-bold text-amber-900 dark:text-amber-300 mt-1">{proximasVencer.length}</h3>
               </div>
-              <div className="w-10 h-10 bg-amber-200 rounded-xl flex items-center justify-center">
-                <CalendarIcon className="w-5 h-5 text-amber-700" />
+              <div className="w-10 h-10 bg-amber-200 dark:bg-amber-800 rounded-xl flex items-center justify-center">
+                <CalendarIcon className="w-5 h-5 text-amber-700 dark:text-amber-400" />
               </div>
             </div>
           </CardContent>
@@ -378,19 +378,19 @@ export default function Recebimentos() {
         {/* Alertas Tab */}
         <TabsContent value="alertas" className="space-y-4">
           {atrasadas.length === 0 && proximasVencer.length === 0 ? (
-            <Card className="border-none bg-gradient-to-br from-green-50 to-emerald-50">
+            <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30">
               <CardContent className="p-8 text-center">
                 <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-3" />
-                <h3 className="text-lg font-bold text-green-900">Tudo em dia!</h3>
-                <p className="text-green-700">Nenhuma parcela atrasada ou próxima do vencimento</p>
+                <h3 className="text-lg font-bold text-green-900 dark:text-green-300">Tudo em dia!</h3>
+                <p className="text-green-700 dark:text-green-400">Nenhuma parcela atrasada ou próxima do vencimento</p>
               </CardContent>
             </Card>
           ) : (
             <>
               {atrasadas.length > 0 && (
-                <Card className="border-2 border-red-300 bg-gradient-to-br from-red-50 to-rose-50">
+                <Card className="border-2 border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-red-900 flex items-center gap-2">
+                    <CardTitle className="text-red-900 dark:text-red-400 flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5" /> Parcelas Atrasadas ({atrasadas.length})
                     </CardTitle>
                   </CardHeader>
@@ -399,10 +399,10 @@ export default function Recebimentos() {
                       const cliente = getCliente(p.id_cliente);
                       const diasAtrasados = Math.abs(differenceInDays(new Date(p.data_vencimento), hoje));
                       return (
-                        <div key={p.id} className="bg-white rounded-lg p-3 border-l-4 border-red-500 flex justify-between items-center">
+                        <div key={p.id} className="bg-card rounded-lg p-3 border-l-4 border-red-500 flex justify-between items-center">
                           <div>
-                            <p className="font-semibold">{cliente?.nome_completo || 'N/A'}</p>
-                            <p className="text-sm text-gray-600">Parcela {p.numero_parcela}/{p.total_parcelas} • Venc: {format(new Date(p.data_vencimento), "dd/MM/yyyy")}</p>
+                            <p className="font-semibold text-foreground">{cliente?.nome_completo || 'N/A'}</p>
+                            <p className="text-sm text-muted-foreground">Parcela {p.numero_parcela}/{p.total_parcelas} • Venc: {format(new Date(p.data_vencimento), "dd/MM/yyyy")}</p>
                             <Badge variant="destructive" className="mt-1">{diasAtrasados} dia(s) atrasado</Badge>
                           </div>
                           <div className="text-right">
@@ -418,9 +418,9 @@ export default function Recebimentos() {
                 </Card>
               )}
               {proximasVencer.length > 0 && (
-                <Card className="border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50">
+                <Card className="border-2 border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-amber-900 flex items-center gap-2">
+                    <CardTitle className="text-amber-900 dark:text-amber-400 flex items-center gap-2">
                       <Clock className="w-5 h-5" /> Vencendo em breve ({proximasVencer.length})
                     </CardTitle>
                   </CardHeader>
@@ -429,11 +429,11 @@ export default function Recebimentos() {
                       const cliente = getCliente(p.id_cliente);
                       const diasRestantes = differenceInDays(new Date(p.data_vencimento), hoje);
                       return (
-                        <div key={p.id} className="bg-white rounded-lg p-3 border-l-4 border-amber-500 flex justify-between items-center">
+                        <div key={p.id} className="bg-card rounded-lg p-3 border-l-4 border-amber-500 flex justify-between items-center">
                           <div>
-                            <p className="font-semibold">{cliente?.nome_completo || 'N/A'}</p>
-                            <p className="text-sm text-gray-600">Parcela {p.numero_parcela}/{p.total_parcelas} • Venc: {format(new Date(p.data_vencimento), "dd/MM/yyyy")}</p>
-                            <Badge className="mt-1 bg-amber-200 text-amber-900">Faltam {diasRestantes} dia(s)</Badge>
+                            <p className="font-semibold text-foreground">{cliente?.nome_completo || 'N/A'}</p>
+                            <p className="text-sm text-muted-foreground">Parcela {p.numero_parcela}/{p.total_parcelas} • Venc: {format(new Date(p.data_vencimento), "dd/MM/yyyy")}</p>
+                            <Badge className="mt-1 bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-200">Faltam {diasRestantes} dia(s)</Badge>
                           </div>
                           <div className="text-right">
                             <p className="font-bold text-amber-700">R$ {(p.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
@@ -469,13 +469,13 @@ export default function Recebimentos() {
                 </TableHeader>
                 <TableBody>
                   {pendentes.length === 0 ? (
-                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-gray-500">Nenhuma parcela pendente</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Nenhuma parcela pendente</TableCell></TableRow>
                   ) : pendentes.map(p => {
                     const cliente = getCliente(p.id_cliente);
                     const diasRestantes = differenceInDays(new Date(p.data_vencimento), hoje);
                     const isAtrasada = diasRestantes < 0;
                     return (
-                      <TableRow key={p.id} className={isAtrasada ? 'bg-red-50' : diasRestantes <= 3 ? 'bg-amber-50' : ''}>
+                      <TableRow key={p.id} className={isAtrasada ? 'bg-red-50 dark:bg-red-950/20' : diasRestantes <= 3 ? 'bg-amber-50 dark:bg-amber-950/20' : ''}>
                         <TableCell className="font-medium">{cliente?.nome_completo || 'N/A'}</TableCell>
                         <TableCell>{p.numero_parcela}/{p.total_parcelas}</TableCell>
                         <TableCell className="font-bold">R$ {(p.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
@@ -484,9 +484,9 @@ export default function Recebimentos() {
                           {isAtrasada ? (
                             <Badge variant="destructive">{Math.abs(diasRestantes)}d atrasado</Badge>
                           ) : diasRestantes <= 3 ? (
-                            <Badge className="bg-amber-200 text-amber-900">{diasRestantes}d restante(s)</Badge>
+                            <Badge className="bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-200">{diasRestantes}d restante(s)</Badge>
                           ) : (
-                            <span className="text-gray-600">{diasRestantes} dias</span>
+                            <span className="text-muted-foreground">{diasRestantes} dias</span>
                           )}
                         </TableCell>
                         <TableCell>{p.forma_pagamento}</TableCell>
@@ -521,14 +521,14 @@ export default function Recebimentos() {
                 </TableHeader>
                 <TableBody>
                   {pagas.length === 0 ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-500">Nenhuma parcela paga</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhuma parcela paga</TableCell></TableRow>
                   ) : pagas.map(p => {
                     const cliente = getCliente(p.id_cliente);
                     return (
                       <TableRow key={p.id}>
                         <TableCell className="font-medium">{cliente?.nome_completo || 'N/A'}</TableCell>
                         <TableCell>{p.numero_parcela}/{p.total_parcelas}</TableCell>
-                        <TableCell className="font-bold text-green-700">R$ {(p.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                        <TableCell className="font-bold text-green-600 dark:text-green-400">R$ {(p.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                         <TableCell>{p.data_pagamento ? format(new Date(p.data_pagamento), "dd/MM/yyyy") : '-'}</TableCell>
                         <TableCell>{p.forma_pagamento}</TableCell>
                         <TableCell>
@@ -564,17 +564,17 @@ export default function Recebimentos() {
                 </TableHeader>
                 <TableBody>
                   {pagamentos.length === 0 ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-500">Nenhum pagamento registrado</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhum pagamento registrado</TableCell></TableRow>
                   ) : pagamentos.map(p => {
                     const cliente = getCliente(p.id_cliente);
                     return (
                       <TableRow key={p.id}>
                         <TableCell>{p.data_pagamento ? format(new Date(p.data_pagamento), "dd/MM/yyyy") : '-'}</TableCell>
                         <TableCell className="font-medium">{cliente?.nome_completo || 'N/A'}</TableCell>
-                        <TableCell className="font-bold text-green-700">R$ {(p.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                        <TableCell className="font-bold text-green-600 dark:text-green-400">R$ {(p.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                         <TableCell>{p.forma_pagamento}</TableCell>
                         <TableCell>{p.numero_parcela || '-'}</TableCell>
-                        <TableCell className="text-sm text-gray-500">{p.observacoes || '-'}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{p.observacoes || '-'}</TableCell>
                       </TableRow>
                     );
                   })}
@@ -714,10 +714,10 @@ export default function Recebimentos() {
           </DialogHeader>
           {selectedParcela && (
             <form onSubmit={e => { e.preventDefault(); marcarPagaMutation.mutate({ parcela: selectedParcela, dados: formMarcarPaga }); }} className="space-y-4">
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="font-semibold">{getCliente(selectedParcela.id_cliente)?.nome_completo}</p>
-                <p className="text-sm text-gray-600">Parcela {selectedParcela.numero_parcela}/{selectedParcela.total_parcelas}</p>
-                <p className="text-lg font-bold text-green-700">R$ {(selectedParcela.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <p className="font-semibold text-foreground">{getCliente(selectedParcela.id_cliente)?.nome_completo}</p>
+                <p className="text-sm text-muted-foreground">Parcela {selectedParcela.numero_parcela}/{selectedParcela.total_parcelas}</p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">R$ {(selectedParcela.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
               </div>
               <div>
                 <Label>Data do Pagamento *</Label>

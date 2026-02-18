@@ -24,9 +24,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Search, Edit, Trash2, Loader2, MessageSquare, CheckCircle, UserPlus, X } from "lucide-react";
 
 const statusColors = {
-  "Pago": "bg-green-100 text-green-700",
-  "Pendente": "bg-red-100 text-red-700",
-  "Parcial": "bg-yellow-100 text-yellow-700"
+  "Pago": "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400",
+  "Pendente": "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400",
+  "Parcial": "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400"
 };
 
 export default function Clientes() {
@@ -478,8 +478,8 @@ export default function Clientes() {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Clientes</h1>
-          <p className="text-gray-500 mt-1">Gerencie todos os clientes cadastrados</p>
+          <h1 className="text-3xl font-bold text-foreground">Clientes</h1>
+          <p className="text-muted-foreground mt-1">Gerencie todos os clientes cadastrados</p>
         </div>
         <Button
           onClick={() => {
@@ -538,10 +538,10 @@ export default function Clientes() {
         </Select>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg border-none overflow-hidden">
+      <div className="bg-card rounded-xl shadow-lg border border-border overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50">
+            <TableRow className="bg-muted/50">
               <TableHead>Nome</TableHead>
               <TableHead>CPF</TableHead>
               <TableHead>Sexo</TableHead>
@@ -562,17 +562,17 @@ export default function Clientes() {
               const isCriancaIsenta = !isPirapark && cliente.idade !== undefined && cliente.idade !== null && cliente.idade <= 5 && !cliente.e_crianca_colo;
               const valorFinal = cliente.valor_total_pacote;
               return (
-                <TableRow key={cliente.id} className="hover:bg-gray-50">
+                <TableRow key={cliente.id} className="hover:bg-muted/50">
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       {cliente.nome_completo}
                       {isCriancaIsenta && (
-                        <Badge className="bg-red-100 text-red-700 text-xs">
+                        <Badge className="bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 text-xs">
                           Criança (Isento)
                         </Badge>
                       )}
                       {cliente.e_crianca_colo && (
-                        <Badge className="bg-purple-100 text-purple-700 text-xs">
+                        <Badge className="bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 text-xs">
                           Colo
                         </Badge>
                       )}
@@ -585,23 +585,23 @@ export default function Clientes() {
                   </TableCell>
                   <TableCell>{cliente.telefone}</TableCell>
                   <TableCell>{getViagemNome(cliente.id_viagem)}</TableCell>
-                  <TableCell className="text-sm text-gray-600">
+                  <TableCell className="text-sm text-muted-foreground">
                     {cliente.local_embarque || '-'}
                   </TableCell>
                   <TableCell>
                     {cliente.e_crianca_colo ? (
-                      <Badge variant="outline" className="text-xs bg-purple-50">
+                      <Badge variant="outline" className="text-xs bg-purple-50 dark:bg-purple-900/20">
                         Sem assento
                       </Badge>
                     ) : cliente.poltrona ? (
                       <div>
-                        <Badge variant="outline" className="bg-green-50 text-green-700">#{cliente.poltrona}</Badge>
+                        <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400">#{cliente.poltrona}</Badge>
                         {cliente.andar_onibus && (
-                          <p className="text-xs text-gray-500 mt-1">{cliente.andar_onibus}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{cliente.andar_onibus}</p>
                         )}
                       </div>
                     ) : (
-                      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300">
+                      <Badge variant="outline" className="bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700">
                         Sem assento
                       </Badge>
                     )}
@@ -652,7 +652,7 @@ export default function Clientes() {
       </div>
 
       {filteredClientes.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-muted-foreground">
           Nenhum cliente encontrado
         </div>
       )}
@@ -782,7 +782,7 @@ export default function Clientes() {
             </div>
 
             <div className="border-t pt-4">
-              <h3 className="font-semibold mb-4 text-gray-900">Endereço</h3>
+              <h3 className="font-semibold mb-4 text-foreground">Endereço</h3>
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="md:col-span-2 space-y-2">
                   <Label>Rua</Label>
@@ -983,14 +983,14 @@ export default function Clientes() {
 
             {!editingCliente && (
               <div className="border-t pt-4">
-                <h3 className="font-semibold mb-4 text-gray-900 flex items-center justify-between">
+                <h3 className="font-semibold mb-4 text-foreground flex items-center justify-between">
                   Acompanhantes
                   <Button type="button" variant="outline" size="sm" onClick={addAcompanhante} disabled={!formData.id_viagem}>
                     <UserPlus className="w-4 h-4 mr-2" /> Adicionar Acompanhante
                   </Button>
                 </h3>
                 {acompanhantes.length === 0 && (
-                  <p className="text-gray-500 text-sm italic">Adicione acompanhantes para esta viagem (opcional).</p>
+                  <p className="text-muted-foreground text-sm italic">Adicione acompanhantes para esta viagem (opcional).</p>
                 )}
                 <div className="space-y-6">
                   {acompanhantes.map((acompanhante, index) => {
@@ -998,7 +998,7 @@ export default function Clientes() {
                     const isPiraparkAcomp = acompanhanteViagem?.modo_pirapark;
                     const idadeAcomp = acompanhante.idade || 0;
                     return (
-                      <div key={index} className="border p-4 rounded-lg bg-gray-50 relative">
+                      <div key={index} className="border border-border p-4 rounded-lg bg-muted/30 relative">
                         <Button 
                           type="button" 
                           variant="ghost" 
