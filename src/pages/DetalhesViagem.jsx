@@ -937,8 +937,7 @@ export default function DetalhesViagem() {
       </Card>
 
       {/* Contratos da viagem */}
-      {contratos.length > 0 && (
-        <Card className="shadow-lg">
+      <Card className="shadow-lg">
           <CardHeader className="border-b border-border">
             <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
               <FileText className="w-5 h-5 text-violet-500" />
@@ -946,6 +945,12 @@ export default function DetalhesViagem() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-2">
+            {contratos.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                <FileText className="w-10 h-10 mx-auto mb-2 text-muted-foreground/40" />
+                <p className="text-sm">Nenhum contrato gerado para esta viagem ainda.</p>
+              </div>
+            )}
             {contratos.map((contrato) => {
               const linkAssinatura = contrato.link_assinatura
                 ? `${window.location.origin}/AssinaturaContrato?token=${contrato.link_assinatura}`
@@ -1005,7 +1010,6 @@ export default function DetalhesViagem() {
             })}
           </CardContent>
         </Card>
-      )}
 
       </TabsContent>
 
