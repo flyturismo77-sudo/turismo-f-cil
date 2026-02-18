@@ -22,6 +22,10 @@ import {
   ClipboardList,
   Moon,
   Sun,
+  Calendar,
+  CheckSquare,
+  TrendingUp,
+  Bell,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import {
@@ -49,13 +53,16 @@ const navSections = [
     label: "Principal",
     items: [
       { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
+      { title: "Notificações", url: createPageUrl("Notificacoes"), icon: Bell },
       { title: "Viagens", url: createPageUrl("Viagens"), icon: Plane },
+      { title: "Calendário", url: createPageUrl("Calendario"), icon: Calendar },
       { title: "Clientes", url: createPageUrl("Clientes"), icon: Users },
     ]
   },
   {
     label: "Operacional",
     items: [
+      { title: "Check-in", url: createPageUrl("CheckinEmbarque"), icon: CheckSquare },
       { title: "Assentos", url: createPageUrl("Assentos"), icon: Armchair },
       { title: "Quartos", url: createPageUrl("MapaQuartos"), icon: Hotel },
       { title: "Equipe", url: createPageUrl("Equipe"), icon: UsersRound },
@@ -65,6 +72,7 @@ const navSections = [
     label: "Financeiro",
     items: [
       { title: "Recebimentos", url: createPageUrl("Recebimentos"), icon: Receipt },
+      { title: "Rentabilidade", url: createPageUrl("Rentabilidade"), icon: TrendingUp },
       { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck },
       { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2 },
     ]
@@ -168,6 +176,8 @@ export default function Layout({ children, currentPageName }) {
     return () => supabase.removeChannel(channel2);
   }, []);
 
+  const totalNotifs = pendingForms + overdueInstallments;
+
   const getBadge = (title) => {
     if (title === 'Formulários' && pendingForms > 0) {
       return (
@@ -180,6 +190,13 @@ export default function Layout({ children, currentPageName }) {
       return (
         <span className="min-w-[18px] h-[18px] bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm">
           {overdueInstallments > 99 ? '99+' : overdueInstallments}
+        </span>
+      );
+    }
+    if (title === 'Notificações' && totalNotifs > 0) {
+      return (
+        <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm">
+          {totalNotifs > 99 ? '99+' : totalNotifs}
         </span>
       );
     }

@@ -2,6 +2,8 @@
  * pages.config.js - Page routing configuration
  */
 import Assentos from './pages/Assentos';
+import Calendario from './pages/Calendario';
+import CheckinEmbarque from './pages/CheckinEmbarque';
 import Clientes from './pages/Clientes';
 import Configuracoes from './pages/Configuracoes';
 import Contratos from './pages/Contratos';
@@ -14,7 +16,9 @@ import Formularios from './pages/Formularios';
 import GerenciamentoArquivos from './pages/GerenciamentoArquivos';
 import MapaQuartos from './pages/MapaQuartos';
 import MigracaoDD from './pages/MigracaoDD';
+import Notificacoes from './pages/Notificacoes';
 import Recebimentos from './pages/Recebimentos';
+import Rentabilidade from './pages/Rentabilidade';
 import Usuarios from './pages/Usuarios';
 import Viagens from './pages/Viagens';
 import __Layout from './Layout.jsx';
@@ -22,6 +26,8 @@ import __Layout from './Layout.jsx';
 
 export const PAGES = {
     "Assentos": Assentos,
+    "Calendario": Calendario,
+    "CheckinEmbarque": CheckinEmbarque,
     "Clientes": Clientes,
     "Configuracoes": Configuracoes,
     "Contratos": Contratos,
@@ -34,7 +40,9 @@ export const PAGES = {
     "GerenciamentoArquivos": GerenciamentoArquivos,
     "MapaQuartos": MapaQuartos,
     "MigracaoDD": MigracaoDD,
+    "Notificacoes": Notificacoes,
     "Recebimentos": Recebimentos,
+    "Rentabilidade": Rentabilidade,
     "Usuarios": Usuarios,
     "Viagens": Viagens,
 }
