@@ -29,6 +29,12 @@ const fmtDate = (d) => {
   return `${day}/${m}/${y}`;
 };
 
+const statusColors = {
+  "Pago": "bg-green-100 text-green-700",
+  "Pendente": "bg-red-100 text-red-700",
+  "Parcial": "bg-yellow-100 text-yellow-700",
+};
+
 const statusParcela = (parcela) => {
   if (parcela.status === "Pago") return { label: "Pago", color: "bg-green-100 text-green-700", icon: CheckCircle2 };
   const hoje = new Date();
@@ -335,8 +341,3 @@ export default function PortalCliente() {
   );
 }
 
-const statusColors = {
-  "Pago": "bg-green-100 text-green-700",
-  "Pendente": "bg-red-100 text-red-700",
-  "Parcial": "bg-yellow-100 text-yellow-700",
-};
