@@ -21,7 +21,6 @@ import Recebimentos from './pages/Recebimentos';
 import Rentabilidade from './pages/Rentabilidade';
 import Usuarios from './pages/Usuarios';
 import Viagens from './pages/Viagens';
-import Documentacao from './pages/Documentacao';
 import __Layout from './Layout.jsx';
 
 
@@ -46,7 +45,6 @@ export const PAGES = {
     "Rentabilidade": Rentabilidade,
     "Usuarios": Usuarios,
     "Viagens": Viagens,
-    "Documentacao": Documentacao,
 }
 
 export const pagesConfig = {
