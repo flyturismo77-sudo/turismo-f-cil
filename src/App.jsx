@@ -14,6 +14,7 @@ import Sobre from '@/pages/Sobre';
 import Contato from '@/pages/Contato';
 import AdminRoute from '@/components/AdminRoute';
 import AssinaturaContrato from '@/pages/AssinaturaContrato';
+import PortalCliente from '@/pages/PortalCliente';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -67,6 +68,7 @@ const AppRoutes = () => {
       <Route path="/Sobre" element={<Sobre />} />
       <Route path="/Contato" element={<Contato />} />
       <Route path="/AssinaturaContrato" element={<AssinaturaContrato />} />
+      <Route path="/PortalCliente" element={<PortalCliente />} />
       
       <Route path="/" element={
         <ProtectedRoute>
