@@ -946,7 +946,7 @@ export default function DetalhesViagem() {
     win.document.close();
   };
 
-
+  return (
     <div className="p-6 md:p-8 space-y-6">
       {showSuccessMessage && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-in slide-in-from-right">
