@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Edit, Trash2, Loader2, MessageSquare, CheckCircle, UserPlus, X } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Loader2, MessageSquare, CheckCircle, UserPlus, X, ExternalLink, Copy } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const statusColors = {
   "Pago": "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400",
@@ -30,6 +31,7 @@ const statusColors = {
 };
 
 export default function Clientes() {
+  const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editingCliente, setEditingCliente] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -459,6 +461,13 @@ export default function Clientes() {
     window.open(url, '_blank');
   };
 
+  const compartilharPortal = (cliente) => {
+    const url = `${window.location.origin}/PortalCliente?id=${cliente.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast({ title: "Link copiado!", description: `Portal de ${cliente.nome_completo} copiado para a área de transferência.` });
+    });
+  };
+
   const getFaixaEtariaPirapark = (idade) => {
     // NOVA REGRA
     if (idade === null || idade === undefined || idade === '') return { label: 'Adulto (Sem data de nascimento)', color: 'bg-green-100 text-green-700' };
@@ -617,7 +626,16 @@ export default function Clientes() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => compartilharPortal(cliente)}
+                        className="text-sky-600 hover:text-sky-700"
+                        title="Copiar link do Portal do Cliente"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
