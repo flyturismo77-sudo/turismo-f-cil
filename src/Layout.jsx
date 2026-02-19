@@ -26,6 +26,7 @@ import {
   CheckSquare,
   TrendingUp,
   Bell,
+  BookOpen,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import {
@@ -93,6 +94,7 @@ const navSections = [
       { title: "Backup", url: createPageUrl("GerenciamentoArquivos"), icon: HardDrive },
       { title: "Migração DD", url: createPageUrl("MigracaoDD"), icon: RefreshCw },
       { title: "Configurações", url: createPageUrl("Configuracoes"), icon: Settings },
+      { title: "Manual PDF", url: createPageUrl("Documentacao"), icon: BookOpen },
     ]
   },
 ];
