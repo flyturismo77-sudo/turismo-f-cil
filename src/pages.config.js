@@ -21,6 +21,12 @@ import Recebimentos from './pages/Recebimentos';
 import Rentabilidade from './pages/Rentabilidade';
 import Usuarios from './pages/Usuarios';
 import Viagens from './pages/Viagens';
+import Fornecedores from './pages/Fornecedores';
+import Exportacao from './pages/Exportacao';
+import Relatorios from './pages/Relatorios';
+import WhatsApp from './pages/WhatsApp';
+import Mensagens from './pages/Mensagens';
+import LogsAuditoria from './pages/LogsAuditoria';
 import __Layout from './Layout.jsx';
 
 
@@ -37,14 +43,20 @@ export const PAGES = {
     "DetalhesViagem": DetalhesViagem,
     "Equipe": Equipe,
     "Formularios": Formularios,
+    "Fornecedores": Fornecedores,
     "GerenciamentoArquivos": GerenciamentoArquivos,
+    "LogsAuditoria": LogsAuditoria,
     "MapaQuartos": MapaQuartos,
+    "Mensagens": Mensagens,
     "MigracaoDD": MigracaoDD,
     "Notificacoes": Notificacoes,
     "Recebimentos": Recebimentos,
+    "Relatorios": Relatorios,
     "Rentabilidade": Rentabilidade,
     "Usuarios": Usuarios,
     "Viagens": Viagens,
+    "WhatsApp": WhatsApp,
+    "Exportacao": Exportacao,
 }
 
 export const pagesConfig = {
