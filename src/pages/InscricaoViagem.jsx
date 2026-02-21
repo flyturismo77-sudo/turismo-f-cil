@@ -287,7 +287,7 @@ export default function InscricaoViagem() {
               <div className="space-y-3">
                 {viagens.map(viagem => {
                   const selected = formData.id_viagem === viagem.id;
-                  const vagas = (viagem.vagas_totais || 0) - (viagem.vagas_ocupadas || 0);
+                  
                   const imgSrc = (viagem.imagens_urls?.length > 0 ? viagem.imagens_urls[0] : null) || viagem.imagem_url;
                   return (
                     <button
@@ -322,11 +322,6 @@ export default function InscricaoViagem() {
                           <div>
                             <div className="flex items-start justify-between gap-2 mb-3">
                               <h3 className="font-display font-bold text-lg text-foreground leading-tight">{viagem.nome}</h3>
-                              {vagas < 10 && vagas > 0 && (
-                                <span className="text-[10px] bg-destructive/10 text-destructive font-bold px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
-                                  Últimas vagas!
-                                </span>
-                              )}
                             </div>
                             <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground mb-4">
                               <span className="flex items-center gap-1.5">
@@ -340,31 +335,9 @@ export default function InscricaoViagem() {
                                   {viagem.data_retorno && ` → ${format(new Date(viagem.data_retorno + 'T12:00:00'), "dd 'de' MMMM", { locale: ptBR })}`}
                                 </span>
                               )}
-                              <span className="flex items-center gap-1.5">
-                                <Users className="w-3.5 h-3.5 text-primary" />
-                                {vagas} vagas disponíveis
-                              </span>
                             </div>
                           </div>
 
-                          {/* Valores */}
-                          <div className="flex flex-wrap gap-2 items-center">
-                            {viagem.valor_1 > 0 && (
-                              <div className="bg-primary/10 text-primary font-bold text-sm px-3 py-1 rounded-full">
-                                A partir de R$ {Number(viagem.valor_1).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </div>
-                            )}
-                            {viagem.valor_2 > 0 && (
-                              <div className="text-xs text-muted-foreground">
-                                Lote 2: R$ {Number(viagem.valor_2).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </div>
-                            )}
-                            {viagem.valor_3 > 0 && (
-                              <div className="text-xs text-muted-foreground">
-                                Lote 3: R$ {Number(viagem.valor_3).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </div>
-                            )}
-                          </div>
                         </div>
                       </div>
                     </button>
