@@ -76,11 +76,6 @@ export default function ViagensPublico() {
                   <div className="absolute top-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-full font-bold shadow-xl">
                     R$ {viagem.valor_total?.toLocaleString('pt-BR')}
                   </div>
-                  {viagem.vagas_totais - viagem.vagas_ocupadas < 10 && (
-                    <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-xl">
-                      Últimas Vagas!
-                    </div>
-                  )}
                 </div>
                 
                 <CardContent className="p-6">
@@ -101,12 +96,6 @@ export default function ViagensPublico() {
                       <Calendar className="w-4 h-4 text-amber-600" />
                       <span className="font-medium">
                         Retorno: {format(new Date(viagem.data_retorno), "dd/MM/yyyy")}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Users className="w-4 h-4 text-green-600" />
-                      <span className="font-medium text-green-700">
-                        {viagem.vagas_totais - viagem.vagas_ocupadas} vagas disponíveis
                       </span>
                     </div>
                   </div>
