@@ -74,6 +74,7 @@ const navSections = [
     items: [
       { title: "Recebimentos", url: createPageUrl("Recebimentos"), icon: Receipt },
       { title: "Rentabilidade", url: createPageUrl("Rentabilidade"), icon: TrendingUp, adminOnly: true },
+      { title: "Desp. Viagem", url: createPageUrl("DespesasViagem"), icon: Plane, adminOnly: true },
       { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck, adminOnly: true },
       { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2, adminOnly: true },
     ]
