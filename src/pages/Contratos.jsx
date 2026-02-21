@@ -423,98 +423,101 @@ export default function Contratos() {
       y += 4;
     }
 
-    // Assinaturas
-    y = checkPage(y, 50);
-    y += 6;
-    y = addText(
-      'Por estarem assim justos e contratados, firmam o presente instrumento, em duas vias de igual teor, juntamente com 02(duas) testemunhas.',
-      margin, y, { fontSize: 10 }
-    );
-    y += 10;
+    // ═══ PÁGINA DE ASSINATURAS ═══
+    // Sempre em nova página, seguindo o layout do documento oficial
+    doc.addPage();
+    y = 20;
+    const centerX = pageWidth / 2;
 
-    const now = new Date();
-    y = addText(
-      `Januária, Minas Gerais, ${format(now, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}.`,
-      margin, y
-    );
+    // Logo no topo da página de assinatura
+    try {
+      doc.addImage(logoFly, 'JPEG', centerX - 18, y, 36, 36);
+      y += 42;
+    } catch (e) {
+      y += 5;
+    }
+
+    // Texto de encerramento
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    const textoEncerramento = 'Por estarem assim justos e contratados, firmam o presente instrumento, em duas vias de igual teor, juntamente com 02(duas) testemunhas.';
+    const linhasEnc = doc.splitTextToSize(textoEncerramento, contentWidth);
+    doc.text(linhasEnc, margin, y);
+    y += linhasEnc.length * 5 + 10;
+
+    // Data
+    if (contrato.assinatura_data) {
+      const dataAss = new Date(contrato.assinatura_data);
+      y = addText(
+        `Januária, Minas Gerais, ${format(dataAss, "dd", { locale: ptBR })}, de ${format(dataAss, "MMMM", { locale: ptBR })}, ${format(dataAss, "yyyy")}.`,
+        margin, y
+      );
+    } else {
+      y = addText(
+        'Januária, Minas Gerais, ______________, de ______________, 202___.', 
+        margin, y
+      );
+    }
     y += 15;
 
-    // Se assinado eletronicamente, preencher ambas assinaturas automaticamente
+    // Se assinado eletronicamente — selo gov.br + assinaturas preenchidas
     if (contrato.assinatura_data && contrato.assinatura_nome) {
-      // ── CONTRATADA (assinatura automática da empresa) ──
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.text(empresa.nome_empresa || 'FLY TURISMO', margin, y);
-      y += 4;
+      // ── Selo de assinatura digital gov.br ──
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
-      doc.text(`CNPJ: 14.121.276/0001-32`, margin, y);
-      y += 3;
-      doc.line(margin, y, margin + 75, y);
+      doc.text('Documento assinado digitalmente', centerX, y, { align: 'center' });
       y += 4;
-      addText('CONTRATADA', margin, y, { fontStyle: 'bold' });
-      y += 12;
-
-      // ── CONTRATANTE (dados da assinatura eletrônica) ──
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.text(contrato.assinatura_nome, margin, y);
-      y += 4;
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`CPF: ${contrato.assinatura_cpf || contrato.cpf || '—'}`, margin, y);
-      y += 3;
-      doc.line(margin, y, margin + 75, y);
-      y += 4;
-      addText('CONTRATANTE', margin, y, { fontStyle: 'bold' });
-
-      // ── Selo de assinatura digital ──
-      y += 12;
-      y = checkPage(y, 55);
-
-      const boxX = margin;
-      const boxW = contentWidth;
-      const boxH = 42;
-
-      doc.setDrawColor(34, 139, 34);
-      doc.setLineWidth(0.8);
-      doc.roundedRect(boxX, y, boxW, boxH, 3, 3);
-
-      doc.setFillColor(34, 139, 34);
-      doc.circle(boxX + 8, y + 10, 5, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text('✓', boxX + 8, y + 12, { align: 'center' });
-
-      doc.setTextColor(34, 139, 34);
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text('ASSINADO DIGITALMENTE', boxX + 18, y + 12);
-
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'normal');
-
-      const dataAssinatura = format(new Date(contrato.assinatura_data), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR });
-      doc.text(`Assinante: ${contrato.assinatura_nome}`, boxX + 6, y + 20);
-      doc.text(`CPF: ${contrato.assinatura_cpf || contrato.cpf || '—'}`, boxX + 6, y + 26);
-      doc.text(`Data/Hora: ${dataAssinatura}`, boxX + 6, y + 32);
 
       doc.setFontSize(7);
-      doc.setTextColor(120, 120, 120);
-      doc.text('Assinatura eletrônica com validade jurídica nos termos da Lei nº 14.063/2020.', boxX + 6, y + 38);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 80, 160);
+      doc.text('gov.br', centerX, y, { align: 'center' });
       doc.setTextColor(0, 0, 0);
-    } else {
-      // Contrato ainda não assinado: linhas em branco para assinatura manual
-      doc.line(margin, y, margin + 75, y);
       y += 4;
-      addText('CONTRATADA', margin, y, { fontStyle: 'bold' });
-      y += 10;
 
-      doc.line(margin, y, margin + 75, y);
-      y += 4;
-      addText('CONTRATANTE', margin, y, { fontStyle: 'bold' });
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.text((contrato.assinatura_nome || '').toUpperCase(), centerX, y, { align: 'center' });
+      y += 3;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6);
+      const dataAssinatura = format(new Date(contrato.assinatura_data), "dd/MM/yyyy HH:mm:ss xx", { locale: ptBR });
+      doc.text(`Data: ${dataAssinatura}`, centerX, y, { align: 'center' });
+      y += 3;
+      doc.text('Verifique em https://validar.iti.gov.br', centerX, y, { align: 'center' });
+      y += 8;
+
+      // Linha CONTRATADA
+      const lineW = 80;
+      doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
+      y += 5;
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('CONTRATADA', centerX, y, { align: 'center' });
+      y += 20;
+
+      // Linha CONTRATANTE
+      doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
+      y += 5;
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('CONTRATANTE', centerX, y, { align: 'center' });
+
+    } else {
+      // Contrato não assinado — linhas em branco centralizadas
+      const lineW = 80;
+      doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
+      y += 5;
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('CONTRATADA', centerX, y, { align: 'center' });
+      y += 20;
+
+      doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
+      y += 5;
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('CONTRATANTE', centerX, y, { align: 'center' });
     }
 
     doc.save(`Contrato_${contrato.nome_completo?.replace(/\s+/g, '_') || 'Viagem'}.pdf`);
