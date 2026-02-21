@@ -558,6 +558,136 @@ export default function Contratos() {
     window.open(url, '_blank');
   };
 
+  // Gerar PDF do contrato em branco (sem dados de cliente) com página de assinatura
+  const gerarPDFEmBranco = () => {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = 210;
+    const marg = 20;
+    const cWidth = pageWidth - marg * 2;
+    let yy = 20;
+    const emp = config || {};
+
+    const addTxt = (text, x, curY, options = {}) => {
+      const { fontSize = 10, fontStyle = 'normal', align = 'left', maxWidth = cWidth } = options;
+      doc.setFontSize(fontSize);
+      doc.setFont('helvetica', fontStyle);
+      const lines = doc.splitTextToSize(text, maxWidth);
+      doc.text(lines, x, curY, { align });
+      return curY + (lines.length * fontSize * 0.4);
+    };
+
+    const chkPage = (curY, needed = 30) => {
+      if (curY + needed > 280) { doc.addPage(); return 20; }
+      return curY;
+    };
+
+    // Logo
+    try { doc.addImage(logoFly, 'JPEG', pageWidth / 2 - 22, yy, 44, 44); yy += 50; } catch (e) { yy += 5; }
+
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('CONTRATO DE VIAGEM', pageWidth / 2, yy, { align: 'center' });
+    yy += 12;
+
+    yy = addTxt(
+      `CONTRATADA: ${emp.nome_empresa || 'FLY TURISMO'}, com sede na ${emp.endereco || 'Rua Padre Idelino, 66, centro - Januária – MG – CEP:39.480-000'}, Fone:${emp.telefone || '(38)9755-2155'}, CNPJ 14.121.276 / 0001-32.`,
+      marg, yy, { fontSize: 10, fontStyle: 'bold' }
+    );
+    yy += 4;
+
+    yy = addTxt('CONTRATANTE: ___________________________________, Est. Civil: ___________ Data de Nascimento: ___/___/______', marg, yy);
+    yy += 2;
+    yy = addTxt('RG: ___________________    CPF: ___________________', marg, yy);
+    yy += 2;
+    yy = addTxt('Endereço: ___________________________________, ___    Bairro: ___________________', marg, yy);
+    yy += 2;
+    yy = addTxt('Cidade: ___________________    Fone: ___________________', marg, yy);
+    yy += 2;
+    yy = addTxt('Email: ___________________________________.', marg, yy);
+    yy += 6;
+
+    yy = addTxt(
+      'PACOTE ADQUIRIDO: Pacote para ___________________________________, Data inicial: ___/___/______, Data final: ___/___/______, conforme condições descritas no ROTEIRO ANEXO que passa a integrar o presente contrato.',
+      marg, yy, { fontStyle: 'bold' }
+    );
+    yy += 4;
+
+    for (let i = 0; i < 3; i++) {
+      yy = addTxt(`Passageiro ${String(i + 1).padStart(2, '0')}: ___________________________________`, marg, yy);
+      yy += 1;
+      yy = addTxt('CPF: ___________________________________', marg, yy);
+      yy += 2;
+    }
+    yy += 2;
+
+    yy = addTxt(
+      'O pacote de viagem contratado será no valor de R$ ___________, com pagamento em ___ parcelas, com vencimento mensal no dia ___, devendo a quitação total ocorrer até 05 (cinco) dias antes saída da viagem contratada.',
+      marg, yy
+    );
+    yy += 6;
+
+    const cls = [
+      'As partes acima qualificadas resolvem firmar o presente contrato, elaborado de acordo com a Lei nº 8.078/1990, deliberação normativa da Embratur nº 161/85 e as normas da Associação Brasileira das Agências de Viagem, cujas cláusulas e condições encontram a seguir dispostas.',
+      'Os serviços adquiridos pela parte Contratante incluem transporte terrestre e acomodação conforme especificado no programa de viagem e confirmação de reserva, conforme roteiro descrito nas redes sociais da Agência Contratada, documentos estes integrantes do presente contrato.',
+      'Os direitos e obrigações que as partes estão mutuamente assumindo neste contrato começam a viger a partir da sua assinatura e se efetivam no momento da confirmação da reserva, quando do pagamento do preço do pacote turístico ou do produto discriminado ou ao menos o valor da entrada do pacote.',
+      'Os pagamentos serão realizados em pix, cartão de crédito ou dinheiro na agência mediante recibo, ou boleto conforme acordado no momento da contratação. O preço do pacote poderá ser parcelado conforme ofertado pela contratada, mas com quitação sempre antes do início do passeio. O preço de pacotes para crianças deverá ser consultado junto a Contratada.',
+    ];
+    for (const c of cls) { yy = chkPage(yy, 20); yy = addTxt(c, marg, yy, { fontSize: 9 }); yy += 3; }
+
+    const clsNum = [
+      { num: 'I', text: 'O atraso no pagamento de qualquer das parcelas acarretará ao Contratante multa moratória desde logo fixada em 1% sobre o valor da prestação, além de juros calculados ao mês de 0,33% sobre o valor da prestação acrescido de correção monetária conforme índices legais, despesas de cobrança extrajudicial e judicial, honorários advocatícios e custas judiciais, quando necessária a propositura da ação.\n\nO atraso no pagamento da parcela por mais de 10 (dez) dias, facultará a Contratada a proceder ao protesto por falta de pagamento, junto ao competente cartório, valendo este contrato, acompanhado da respectiva nota fiscal de serviços, como título executivo extrajudicial.' },
+      { num: 'II', text: 'Solicitações de CANCELAMENTO ou transferências da viagem por conta do CONTRATANTE deverão ser solicitadas por escrito ou via e-mail: flyturismo77@gmail.com no prazo de até 30 (trinta) dias antes do início da partida da excursão.' },
+      { num: 'III', text: 'O Contratante pode optar por remarcar a viagem até 72 (setenta e duas) horas antes, entretanto pagará uma taxa de custo operacional no percentual de 20% do valor contratado por pessoa. No caso de cancelamento da viagem por parte da FLY TURISMO, por não ter atingido o número mínimo de 30 (trinta) passageiros, a mesma se reserva no direito de oferecer outra data para a viagem. A reserva feita pelo passageiro só será garantida mediante assinatura do CONTRATO e pagamento da entrada do pacote. O roteiro poderá sofrer alterações desde com aviso prévio, mediante as condições meteorológicas ou operacionais.' },
+      { num: 'IV', text: 'Os termos da excursão contratada poderão ser cancelados ou adiados algum tipo de passeio, caso as condições climáticas adversas não permitam, ex: chuvas, ventos, tempestades e etc.' },
+      { num: 'V', text: 'A viagem será com ônibus que contará com ar condicionado, frigobar, água mineral, e toalete. Apartamentos com ar condicionado, TV, Frigobar e banheiro. Guia especializado acompanhando o grupo e agenciando passeios locais.' },
+      { num: 'VI', text: 'A inadimplência no caso de contrato parcelado, vencida a 3ª parcela sem pagamento, restará rescindido, com multa rescisória de perdimento do valor pago no percentual de 30% com recebimento agendado, 90 (noventa) dias após a realização da viagem contratada.' },
+      { num: 'VII', text: 'O cancelamento do contrato poderá ocorrer com prazo superior ou igual a 30 (trinta) dias antes da data estipulada para o início da viagem, com multa contratual de perda de 10%, entre 30 (trinta) e 21 (vinte e um) dias, multa de 20%, e prazo inferior a 21 (vinte e um) dias multa de 30% e a restituição dos valores ocorrerá após 90 (noventa) dias do término do contrato da viagem com agendamento prévio com a Contratada.\n\nAlém das multas previstas são deduzidas as despesas de taxas de juros de cartão de crédito, financiamentos e multas eventualmente cobradas pelos fornecedores (transportes, receptivos, hotéis, restaurantes e outros serviços), devidamente comprovados e que não forem passíveis de recuperação.\n\nEm caso de óbito (ascendentes e descendentes) ou problemas de saúde do Contratante, será efetuada a devolução da integralidade do valor pago se comprovado através de atestado médico com CRM, no prazo máximo de 30 (trinta) dias após a viagem contratada.\n\nCaso haja desistência por parte do Contratante a menos de 48 horas antes da viagem, não haverá devolução de valores nem concessão de bônus para o desistente.\n\nOs atrasos e os cancelamentos de trajetos motivados por razões técnicas, operacionais, mecânicas ou meteorológicas, sobre os quais a Contratada e seus prestadores de serviços terceirizados não possuem poder de previsão ou controle, estão incluídos nos casos fortuitos ou de força maior, que a isentam de responsabilidade civil e criminal.' },
+      { num: 'VIII', text: 'Outros serviços não descritos no contrato não serão responsabilidade do Contratado. Os passeios opcionais não estão inclusos no preço contratado, não tendo a Contratada qualquer responsabilidade quando a contratação e execução.\n\nFica estabelecido entre as partes que o foro escolhido é o da comarca de Januária, para resolver as controvérsias que eventualmente surjam deste contrato.' },
+    ];
+    for (const c of clsNum) {
+      yy = chkPage(yy, 25);
+      doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+      doc.text(c.num, pageWidth / 2, yy, { align: 'center' }); yy += 5;
+      yy = addTxt(c.text, marg, yy, { fontSize: 9 }); yy += 4;
+    }
+
+    // ═══ PÁGINA DE ASSINATURA ═══
+    doc.addPage();
+    yy = 20;
+    const cx = pageWidth / 2;
+    try { doc.addImage(logoFly, 'JPEG', cx - 18, yy, 36, 36); yy += 42; } catch (e) { yy += 5; }
+
+    doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+    const txtEnc = 'Por estarem assim justos e contratados, firmam o presente instrumento, em duas vias de igual teor, juntamente com 02(duas) testemunhas.';
+    const lnsEnc = doc.splitTextToSize(txtEnc, cWidth);
+    doc.text(lnsEnc, marg, yy); yy += lnsEnc.length * 5 + 10;
+
+    yy = addTxt('Januária, Minas Gerais, ______________, de ______________, 202___.', marg, yy);
+    yy += 15;
+
+    // Selo gov.br
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+    doc.text('Documento assinado digitalmente', cx, yy, { align: 'center' }); yy += 4;
+    doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 80, 160);
+    doc.text('gov.br', cx, yy, { align: 'center' });
+    doc.setTextColor(0, 0, 0); yy += 4;
+    doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+    doc.text('MARCELLY BEATRIZ LOPES LUNA', cx, yy, { align: 'center' }); yy += 3;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6);
+    doc.text('Verifique em https://validar.iti.gov.br', cx, yy, { align: 'center' }); yy += 8;
+
+    const lW = 80;
+    doc.line(cx - lW / 2, yy, cx + lW / 2, yy); yy += 5;
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+    doc.text('CONTRATADA', cx, yy, { align: 'center' }); yy += 20;
+    doc.line(cx - lW / 2, yy, cx + lW / 2, yy); yy += 5;
+    doc.text('CONTRATANTE', cx, yy, { align: 'center' });
+
+    doc.save('Contrato_em_Branco_Fly_Turismo.pdf');
+    toast({ title: '📄 PDF do contrato em branco gerado com sucesso!' });
+  };
+
   const filteredContratos = contratos.filter(c =>
     c.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.cpf?.includes(searchTerm)
@@ -573,9 +703,14 @@ export default function Contratos() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-white">Contratos</h2>
             <p className="text-white/80 text-sm mt-1">Gerencie e gere contratos de viagem</p>
           </div>
-          <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="gap-2 bg-white text-sky-600 hover:bg-white/90 shadow-lg font-semibold">
-            <Plus className="w-4 h-4" /> Novo Contrato
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={gerarPDFEmBranco} variant="outline" className="gap-2 bg-white/80 text-sky-700 hover:bg-white shadow-lg font-semibold">
+              <Download className="w-4 h-4" /> Contrato em Branco
+            </Button>
+            <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="gap-2 bg-white text-sky-600 hover:bg-white/90 shadow-lg font-semibold">
+              <Plus className="w-4 h-4" /> Novo Contrato
+            </Button>
+          </div>
         </div>
         {/* Stats */}
         <div className="relative grid grid-cols-3 gap-4 mt-6">
