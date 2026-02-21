@@ -237,11 +237,11 @@ export default function FormularioContrato() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>RG *</Label>
+                      <Label>RG</Label>
                       <Input
                         value={formData.rg}
                         onChange={(e) => setFormData({...formData, rg: e.target.value})}
-                        required
+                        placeholder="Opcional"
                       />
                     </div>
                     <div className="space-y-2">
