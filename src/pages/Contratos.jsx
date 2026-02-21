@@ -445,19 +445,11 @@ export default function Contratos() {
     doc.text(linhasEnc, margin, y);
     y += linhasEnc.length * 5 + 10;
 
-    // Data
-    if (contrato.assinatura_data) {
-      const dataAss = new Date(contrato.assinatura_data);
-      y = addText(
-        `Januária, Minas Gerais, ${format(dataAss, "dd", { locale: ptBR })}, de ${format(dataAss, "MMMM", { locale: ptBR })}, ${format(dataAss, "yyyy")}.`,
-        margin, y
-      );
-    } else {
-      y = addText(
-        'Januária, Minas Gerais, ______________, de ______________, 202___.', 
-        margin, y
-      );
-    }
+    // Data — sempre com campos em branco como no documento original
+    y = addText(
+      'Januária, Minas Gerais, ______________, de ______________, 202___.', 
+      margin, y
+    );
     y += 15;
 
     // Se assinado eletronicamente — selo gov.br + assinaturas preenchidas
