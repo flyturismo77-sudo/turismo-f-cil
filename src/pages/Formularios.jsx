@@ -13,14 +13,18 @@ import {
   FileText, Users, CheckCircle, Copy, ExternalLink, Loader2,
   Search, Filter, Download, Eye, QrCode, MapPin, Phone, Mail,
   CreditCard, Baby, Calendar, User, X, ChevronDown, ChevronUp,
+  Send, Link2, MessageCircle, ShieldCheck,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import logoFly from '@/assets/logo-fly-turismo.jpg';
+import jsPDF from 'jspdf';
 
 const statusColors = {
   "Pendente": "bg-yellow-100 text-yellow-700 border-yellow-200",
-  "Recebido": "bg-blue-100 text-blue-700 border-blue-200",
+  "Contrato Enviado": "bg-violet-100 text-violet-700 border-violet-200",
+  "Assinado": "bg-blue-100 text-blue-700 border-blue-200",
   "Processado": "bg-green-100 text-green-700 border-green-200",
 };
 
@@ -46,7 +50,7 @@ function FormularioModal({ form, viagens, open, onClose }) {
         <div className="space-y-5 mt-2">
           {/* Status + Viagem */}
           <div className="flex items-center gap-3 flex-wrap">
-            <Badge className={`${statusColors[form.status]} border text-xs px-3 py-1`}>{form.status}</Badge>
+            <Badge className={`${statusColors[form.status] || statusColors['Pendente']} border text-xs px-3 py-1`}>{form.status}</Badge>
             {viagem && (
               <span className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5" />
@@ -129,6 +133,33 @@ function FormularioModal({ form, viagens, open, onClose }) {
               </Section>
             </>
           )}
+
+          {/* Assinatura info */}
+          {form.assinatura_data && (
+            <>
+              <Separator />
+              <Section title="Assinatura Eletrônica" icon={<ShieldCheck className="w-4 h-4" />}>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm space-y-1">
+                  <p className="text-green-800"><strong>Nome:</strong> {form.assinatura_nome}</p>
+                  <p className="text-green-800"><strong>CPF:</strong> {form.assinatura_cpf}</p>
+                  <p className="text-green-800"><strong>Data:</strong> {format(new Date(form.assinatura_data), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
+                </div>
+              </Section>
+            </>
+          )}
+
+          {/* Link de assinatura */}
+          {form.link_assinatura && !form.assinatura_data && (
+            <>
+              <Separator />
+              <div className="bg-violet-50 border border-violet-200 rounded-lg p-3 text-sm">
+                <p className="text-violet-700 font-semibold mb-1">📎 Link de assinatura enviado</p>
+                <p className="text-violet-600 text-xs break-all">
+                  {window.location.origin}/AssinaturaContrato?id={form.link_assinatura}
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -192,6 +223,14 @@ export default function Formularios() {
     },
   });
 
+  const { data: config } = useQuery({
+    queryKey: ['config-empresa'],
+    queryFn: async () => {
+      const { data } = await supabase.from('configuracao_empresa').select('*').limit(1).maybeSingle();
+      return data;
+    },
+  });
+
   // Real-time subscription for formularios_contrato
   useEffect(() => {
     const channel = supabase
@@ -214,12 +253,63 @@ export default function Formularios() {
     onSuccess: () => queryClient.invalidateQueries(['formularios_contrato']),
   });
 
+  // ── GERAR CONTRATO: cria link_assinatura e muda status para "Contrato Enviado" ──
+  const gerarContratoMutation = useMutation({
+    mutationFn: async (formulario) => {
+      // Gerar ID único para link de assinatura
+      const linkId = crypto.randomUUID();
+      
+      const { error } = await supabase
+        .from('formularios_contrato')
+        .update({ 
+          link_assinatura: linkId,
+          status: 'Contrato Enviado',
+        })
+        .eq('id', formulario.id);
+      if (error) throw error;
+
+      return { ...formulario, link_assinatura: linkId };
+    },
+    onSuccess: (formulario) => {
+      queryClient.invalidateQueries(['formularios_contrato']);
+      
+      // Copiar link para clipboard
+      const url = `${window.location.origin}/AssinaturaContrato?id=${formulario.link_assinatura}`;
+      navigator.clipboard.writeText(url).catch(() => {});
+
+      // Abrir WhatsApp com link do contrato
+      const viagem = viagens.find(v => v.id === formulario.id_viagem);
+      const telefone = formulario.telefone?.replace(/\D/g, '') || '';
+      const telFormatado = telefone.startsWith('55') ? telefone : '55' + telefone;
+      
+      const mensagem = `📄 *CONTRATO DE VIAGEM - FLY TURISMO*\n\n` +
+        `Olá, *${formulario.nome_completo}*! 👋\n\n` +
+        `Seu contrato para a viagem *${viagem?.nome || ''}* (${viagem?.destino || ''}) está pronto para assinatura.\n\n` +
+        `📝 *Clique no link abaixo para assinar:*\n${url}\n\n` +
+        `💰 Valor: R$ ${Number(formulario.valor_total || viagem?.valor_1 || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n` +
+        `💳 Pagamento: ${formulario.forma_pagamento || 'À Vista'}${formulario.numero_parcelas > 1 ? ` em ${formulario.numero_parcelas}x` : ''}\n\n` +
+        `Após assinar, entraremos em contato para finalizar sua reserva. ✈️\n\n` +
+        `_Fly Turismo - Sua viagem começa aqui!_`;
+
+      window.open(`https://wa.me/${telFormatado}?text=${encodeURIComponent(mensagem)}`, '_blank');
+      
+      toast.success('Contrato gerado! Link copiado e WhatsApp aberto.');
+    },
+    onError: (err) => toast.error('Erro ao gerar contrato: ' + err.message),
+  });
+
+  // ── PROCESSAR: só funciona quando status é "Assinado" ──
   const processarMutation = useMutation({
     mutationFn: async (formulario) => {
+      // Verificar se está assinado
+      if (formulario.status !== 'Assinado') {
+        throw new Error('O contrato precisa ser assinado pelo cliente antes de processar.');
+      }
+
       const viagem = viagens.find(v => v.id === formulario.id_viagem);
       const valorFinal = (formulario.valor_total || viagem?.valor_1 || 0) - (formulario.desconto || 0);
 
-      // 1. Criar cliente
+      // 1. Criar cliente principal
       const { data: cliente, error: clienteErr } = await supabase
         .from('clientes')
         .insert({
@@ -247,7 +337,29 @@ export default function Formularios() {
         .single();
       if (clienteErr) throw clienteErr;
 
-      // 2. Gerar parcelas automaticamente
+      // 2. Criar passageiros adicionais como clientes vinculados
+      const passageirosAdicionais = formulario.passageiros?.filter(p => p.nome_completo) || [];
+      let totalPessoas = 1;
+      
+      for (const p of passageirosAdicionais) {
+        const { error: pErr } = await supabase
+          .from('clientes')
+          .insert({
+            nome_completo: p.nome_completo,
+            cpf: p.cpf || null,
+            telefone: p.telefone || null,
+            data_nascimento: p.data_nascimento || null,
+            sexo: p.sexo || null,
+            id_viagem: formulario.id_viagem,
+            id_cliente_principal: cliente.id,
+            status_pagamento: 'Vinculado',
+            valor_total_pacote: 0,
+            valor_pago: 0,
+          });
+        if (!pErr) totalPessoas++;
+      }
+
+      // 3. Gerar parcelas automaticamente
       const numParcelas = formulario.numero_parcelas || 1;
       if (numParcelas > 0) {
         const valorParcela = valorFinal / numParcelas;
@@ -271,29 +383,31 @@ export default function Formularios() {
         if (parcelasErr) throw parcelasErr;
       }
 
-      // 3. Atualizar vagas da viagem
+      // 4. Atualizar vagas da viagem
       if (viagem) {
         await supabase
           .from('viagens')
-          .update({ vagas_ocupadas: (viagem.vagas_ocupadas || 0) + 1 })
+          .update({ vagas_ocupadas: (viagem.vagas_ocupadas || 0) + totalPessoas })
           .eq('id', viagem.id);
       }
 
-      // 4. Marcar formulário como processado
+      // 5. Marcar formulário como processado
       const { error: formErr } = await supabase
         .from('formularios_contrato')
         .update({ status: 'Processado' })
         .eq('id', formulario.id);
       if (formErr) throw formErr;
+
+      return { formulario, totalPessoas };
     },
-    onSuccess: (_, formulario) => {
+    onSuccess: ({ formulario, totalPessoas }) => {
       queryClient.invalidateQueries(['formularios_contrato']);
       queryClient.invalidateQueries(['clientes']);
       queryClient.invalidateQueries(['viagens']);
       queryClient.invalidateQueries(['parcelas']);
-      toast.success('Formulário processado! Cliente e parcelas criados com sucesso.');
+      toast.success(`Processado! ${totalPessoas} pessoa(s) inserida(s) na viagem com parcelas criadas.`);
 
-      // Enviar e-mail de confirmação para o cliente
+      // Enviar e-mail de confirmação
       if (formulario.email) {
         const viagem = viagens.find(v => v.id === formulario.id_viagem);
         const valorFinal = (formulario.valor_total || viagem?.valor_1 || 0) - (formulario.desconto || 0);
@@ -312,15 +426,30 @@ export default function Formularios() {
             subject: `✅ Inscrição confirmada: ${viagem?.nome || 'Viagem'}`,
             body: emailBody,
           },
-        }).catch(() => {}); // silently fail - email is bonus
+        }).catch(() => {});
       }
     },
-    onError: (err) => toast.error('Erro ao processar: ' + err.message),
+    onError: (err) => toast.error(err.message),
   });
+
+  const handleGerarContrato = (form) => {
+    if (form.link_assinatura) {
+      // Já tem contrato, só copia o link
+      const url = `${window.location.origin}/AssinaturaContrato?id=${form.link_assinatura}`;
+      navigator.clipboard.writeText(url).catch(() => {});
+      toast.success('Link do contrato copiado!');
+      return;
+    }
+    gerarContratoMutation.mutate(form);
+  };
 
   const handleProcessar = (form) => {
     if (form.status === 'Processado') {
       toast.info('Este formulário já foi processado!');
+      return;
+    }
+    if (form.status !== 'Assinado') {
+      toast.error('O cliente precisa assinar o contrato antes de processar!');
       return;
     }
     processarMutation.mutate(form);
@@ -350,6 +479,30 @@ export default function Formularios() {
     };
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   }, []);
+
+  const copiarLinkAssinatura = (form) => {
+    if (!form.link_assinatura) return;
+    const url = `${window.location.origin}/AssinaturaContrato?id=${form.link_assinatura}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Link de assinatura copiado!');
+    });
+  };
+
+  const enviarWhatsAppContrato = (form) => {
+    if (!form.link_assinatura) return;
+    const viagem = viagens.find(v => v.id === form.id_viagem);
+    const url = `${window.location.origin}/AssinaturaContrato?id=${form.link_assinatura}`;
+    const telefone = form.telefone?.replace(/\D/g, '') || '';
+    const telFormatado = telefone.startsWith('55') ? telefone : '55' + telefone;
+    
+    const mensagem = `📄 *CONTRATO DE VIAGEM - FLY TURISMO*\n\n` +
+      `Olá, *${form.nome_completo}*! 👋\n\n` +
+      `Seu contrato para a viagem *${viagem?.nome || ''}* está pronto.\n\n` +
+      `📝 *Assine aqui:*\n${url}\n\n` +
+      `_Fly Turismo ✈️_`;
+
+    window.open(`https://wa.me/${telFormatado}?text=${encodeURIComponent(mensagem)}`, '_blank');
+  };
 
   const getViagemNome = (id) => {
     const v = viagens.find(v => v.id === id);
@@ -387,10 +540,11 @@ export default function Formularios() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Pendentes', status: 'Pendente', color: 'bg-yellow-50 border-yellow-200 text-yellow-700' },
-          { label: 'Recebidos', status: 'Recebido', color: 'bg-blue-50 border-blue-200 text-blue-700' },
+          { label: 'Contrato Enviado', status: 'Contrato Enviado', color: 'bg-violet-50 border-violet-200 text-violet-700' },
+          { label: 'Assinados', status: 'Assinado', color: 'bg-blue-50 border-blue-200 text-blue-700' },
           { label: 'Processados', status: 'Processado', color: 'bg-green-50 border-green-200 text-green-700' },
         ].map(({ label, status, color }) => (
           <div key={status} className={`rounded-xl border p-4 ${color} cursor-pointer transition-all hover:shadow-md`}
@@ -399,6 +553,20 @@ export default function Formularios() {
             <p className="text-sm font-medium">{label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Flow explanation */}
+      <div className="bg-muted/50 rounded-xl border p-4">
+        <p className="text-sm font-semibold text-foreground mb-2">📋 Fluxo do formulário:</p>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-medium">1. Pendente</span>
+          <span>→</span>
+          <span className="bg-violet-100 text-violet-700 px-2 py-1 rounded-full font-medium">2. Gerar Contrato</span>
+          <span>→</span>
+          <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">3. Cliente Assina</span>
+          <span>→</span>
+          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">4. Processar (insere na viagem)</span>
+        </div>
       </div>
 
       {/* QR Code Panel */}
@@ -446,14 +614,15 @@ export default function Formularios() {
           />
         </div>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="w-48">
             <Filter className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="Todos">Todos os status</SelectItem>
             <SelectItem value="Pendente">Pendente</SelectItem>
-            <SelectItem value="Recebido">Recebido</SelectItem>
+            <SelectItem value="Contrato Enviado">Contrato Enviado</SelectItem>
+            <SelectItem value="Assinado">Assinado</SelectItem>
             <SelectItem value="Processado">Processado</SelectItem>
           </SelectContent>
         </Select>
@@ -482,9 +651,12 @@ export default function Formularios() {
             key={form.id}
             form={form}
             viagemNome={getViagemNome(form.id_viagem)}
-            onStatusChange={(id, s) => updateStatusMutation.mutate({ id, status: s })}
+            onGerarContrato={handleGerarContrato}
             onProcessar={handleProcessar}
             onView={() => setSelectedForm(form)}
+            onCopiarLink={copiarLinkAssinatura}
+            onEnviarWhatsApp={enviarWhatsAppContrato}
+            isGenerating={gerarContratoMutation.isPending}
             isProcessing={processarMutation.isPending}
           />
         ))}
@@ -512,8 +684,20 @@ export default function Formularios() {
 }
 
 // ─── Card Item ────────────────────────────────────────────────────────────────
-function FormularioCard({ form, viagemNome, onStatusChange, onProcessar, onView, isProcessing }) {
+function FormularioCard({ form, viagemNome, onGerarContrato, onProcessar, onView, onCopiarLink, onEnviarWhatsApp, isGenerating, isProcessing }) {
   const [expanded, setExpanded] = useState(false);
+
+  const getStatusStep = () => {
+    switch (form.status) {
+      case 'Pendente': return 1;
+      case 'Contrato Enviado': return 2;
+      case 'Assinado': return 3;
+      case 'Processado': return 4;
+      default: return 0;
+    }
+  };
+
+  const step = getStatusStep();
 
   return (
     <Card className="border shadow-sm hover:shadow-md transition-shadow">
@@ -528,7 +712,7 @@ function FormularioCard({ form, viagemNome, onStatusChange, onProcessar, onView,
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <p className="font-semibold text-foreground">{form.nome_completo}</p>
-              <Badge className={`${statusColors[form.status]} border text-[11px] px-2 py-0`}>{form.status}</Badge>
+              <Badge className={`${statusColors[form.status] || statusColors['Pendente']} border text-[11px] px-2 py-0`}>{form.status}</Badge>
             </div>
             <p className="text-sm text-muted-foreground mt-0.5">
               {viagemNome} · {form.telefone || '—'} · {form.forma_pagamento}
@@ -538,21 +722,6 @@ function FormularioCard({ form, viagemNome, onStatusChange, onProcessar, onView,
 
           {/* Actions */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Select
-              value={form.status}
-              onValueChange={(v) => onStatusChange(form.id, v)}
-              disabled={form.status === 'Processado'}
-            >
-              <SelectTrigger className="w-36 h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Pendente">Pendente</SelectItem>
-                <SelectItem value="Recebido">Recebido</SelectItem>
-                <SelectItem value="Processado">Processado</SelectItem>
-              </SelectContent>
-            </Select>
-
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onView} title="Ver detalhes">
               <Eye className="w-4 h-4" />
             </Button>
@@ -565,7 +734,8 @@ function FormularioCard({ form, viagemNome, onStatusChange, onProcessar, onView,
 
         {/* Expanded */}
         {expanded && (
-          <div className="mt-4 pt-4 border-t space-y-3">
+          <div className="mt-4 pt-4 border-t space-y-4">
+            {/* Info grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
               <div><span className="text-muted-foreground text-xs">CPF</span><p className="font-medium">{form.cpf || '—'}</p></div>
               <div><span className="text-muted-foreground text-xs">Email</span><p className="font-medium truncate">{form.email || '—'}</p></div>
@@ -587,24 +757,78 @@ function FormularioCard({ form, viagemNome, onStatusChange, onProcessar, onView,
               </p>
             )}
 
-            {form.status !== 'Processado' && (
-              <Button
-                onClick={() => onProcessar(form)}
-                disabled={isProcessing}
-                size="sm"
-                className="gap-2 bg-green-600 hover:bg-green-700 text-white mt-1"
-              >
-                {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                Processar e Criar Cliente + Parcelas
-              </Button>
-            )}
-
-            {form.status === 'Processado' && (
-              <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
-                <CheckCircle className="w-4 h-4" />
-                Processado — cliente e parcelas criados no sistema
+            {/* Assinatura info */}
+            {form.assinatura_data && (
+              <div className="flex items-center gap-2 text-sm bg-blue-50 text-blue-700 rounded-lg px-3 py-2">
+                <ShieldCheck className="w-4 h-4" />
+                Assinado em {format(new Date(form.assinatura_data), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })} por {form.assinatura_nome}
               </div>
             )}
+
+            {/* ── STEP ACTIONS ── */}
+            <div className="flex flex-wrap gap-2 mt-2">
+              {/* Step 1: Pendente → Gerar Contrato */}
+              {step === 1 && (
+                <Button
+                  onClick={() => onGerarContrato(form)}
+                  disabled={isGenerating}
+                  size="sm"
+                  className="gap-2 bg-violet-600 hover:bg-violet-700 text-white"
+                >
+                  {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  Gerar Contrato e Enviar
+                </Button>
+              )}
+
+              {/* Step 2: Contrato Enviado → aguardando assinatura */}
+              {step === 2 && (
+                <>
+                  <div className="w-full flex items-center gap-2 text-sm bg-violet-50 text-violet-700 rounded-lg px-3 py-2 mb-1">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Aguardando assinatura do cliente...
+                  </div>
+                  <Button
+                    onClick={() => onCopiarLink(form)}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Link2 className="w-4 h-4" />
+                    Copiar Link
+                  </Button>
+                  <Button
+                    onClick={() => onEnviarWhatsApp(form)}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Reenviar WhatsApp
+                  </Button>
+                </>
+              )}
+
+              {/* Step 3: Assinado → Processar */}
+              {step === 3 && (
+                <Button
+                  onClick={() => onProcessar(form)}
+                  disabled={isProcessing}
+                  size="sm"
+                  className="gap-2 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  Processar — Inserir na Viagem
+                </Button>
+              )}
+
+              {/* Step 4: Processado */}
+              {step === 4 && (
+                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
+                  <CheckCircle className="w-4 h-4" />
+                  Processado — cliente inserido na viagem com parcelas criadas
+                </div>
+              )}
+            </div>
           </div>
         )}
       </CardContent>
