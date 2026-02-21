@@ -133,7 +133,7 @@ export default function Contratos() {
 
   const processarMutation = useMutation({
     mutationFn: async (contrato) => {
-      if (contrato.status !== 'Assinado') throw new Error('O contrato precisa estar assinado.');
+      if (contrato.status !== 'Assinado' && contrato.status !== 'Assinado Manualmente') throw new Error('O contrato precisa estar assinado.');
       const viagem = viagens.find(v => v.id === contrato.id_viagem);
       const valorFinal = (contrato.valor_total || viagem?.valor_1 || 0) - (contrato.desconto || 0);
 
@@ -204,7 +204,7 @@ export default function Contratos() {
 
   const handleProcessar = (contrato) => {
     if (contrato.status === 'Processado') { toast({ title: 'Já processado!' }); return; }
-    if (contrato.status !== 'Assinado') { toast({ title: 'Cliente precisa assinar primeiro.', variant: 'destructive' }); return; }
+    if (contrato.status !== 'Assinado' && contrato.status !== 'Assinado Manualmente') { toast({ title: 'Cliente precisa assinar primeiro.', variant: 'destructive' }); return; }
     setProcessingId(contrato.id);
     processarMutation.mutate(contrato);
   };
@@ -589,7 +589,8 @@ export default function Contratos() {
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <Badge className={
-                      contrato.status === 'Assinado' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 
+                      contrato.status === 'Assinado' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' :
+                      contrato.status === 'Assinado Manualmente' ? 'bg-teal-100 text-teal-700 hover:bg-teal-100' :
                       contrato.status === 'Processado' ? 'bg-green-100 text-green-700 hover:bg-green-100' :
                       contrato.status === 'Contrato Enviado' ? 'bg-violet-100 text-violet-700 hover:bg-violet-100' :
                       contrato.status === 'Cancelado' ? 'bg-red-100 text-red-700 hover:bg-red-100' : 
@@ -632,7 +633,7 @@ export default function Contratos() {
                       </Button>
                     </div>
                     {/* Processar button for signed contracts */}
-                    {contrato.status === 'Assinado' && (
+                    {(contrato.status === 'Assinado' || contrato.status === 'Assinado Manualmente') && (
                       <Button
                         size="sm"
                         onClick={() => handleProcessar(contrato)}
@@ -877,7 +878,10 @@ export default function Contratos() {
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Pendente">Pendente</SelectItem>
-                      <SelectItem value="Assinado">Assinado</SelectItem>
+                      <SelectItem value="Contrato Enviado">Contrato Enviado</SelectItem>
+                      <SelectItem value="Assinado">Assinado (Digital)</SelectItem>
+                      <SelectItem value="Assinado Manualmente">Assinado Manualmente</SelectItem>
+                      <SelectItem value="Processado">Processado</SelectItem>
                       <SelectItem value="Cancelado">Cancelado</SelectItem>
                     </SelectContent>
                   </Select>
