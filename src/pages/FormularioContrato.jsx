@@ -91,10 +91,14 @@ export default function FormularioContrato() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createMutation.mutate({
+    const dataToSend = {
       ...formData,
-      passageiros: passageiros.filter(p => p.nome_completo && p.cpf)
-    });
+      id_viagem: formData.id_viagem || null,
+      passageiros: passageiros.filter(p => p.nome_completo && p.cpf),
+      desconto: formData.desconto || 0,
+      idade_crianca_colo: formData.idade_crianca_colo || 0,
+    };
+    createMutation.mutate(dataToSend);
   };
 
   const viagemSelecionada = viagens.find(v => v.id === formData.id_viagem);
