@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import logoFly from '@/assets/logo-fly-turismo.jpg';
+import assinaturaGovBr from '@/assets/assinatura-govbr.png';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -665,17 +666,15 @@ export default function Contratos() {
     yy = addTxt('Januária, Minas Gerais, ______________, de ______________, 202___.', marg, yy);
     yy += 15;
 
-    // Selo gov.br
-    doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-    doc.text('Documento assinado digitalmente', cx, yy, { align: 'center' }); yy += 4;
-    doc.setFontSize(7); doc.setFont('helvetica', 'bold');
-    doc.setTextColor(0, 80, 160);
-    doc.text('gov.br', cx, yy, { align: 'center' });
-    doc.setTextColor(0, 0, 0); yy += 4;
-    doc.setFontSize(7); doc.setFont('helvetica', 'bold');
-    doc.text('MARCELLY BEATRIZ LOPES LUNA', cx, yy, { align: 'center' }); yy += 3;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(6);
-    doc.text('Verifique em https://validar.iti.gov.br', cx, yy, { align: 'center' }); yy += 8;
+    // Selo gov.br - imagem real
+    try {
+      const imgW = 100;
+      const imgH = 25;
+      doc.addImage(assinaturaGovBr, 'PNG', cx - imgW / 2, yy, imgW, imgH);
+      yy += imgH + 5;
+    } catch (e) {
+      yy += 5;
+    }
 
     const lW = 80;
     doc.line(cx - lW / 2, yy, cx + lW / 2, yy); yy += 5;
