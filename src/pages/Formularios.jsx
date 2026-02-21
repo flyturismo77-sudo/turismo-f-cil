@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -186,11 +186,22 @@ export default function Formularios() {
   const { data: viagens = [] } = useQuery({
     queryKey: ['viagens'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('viagens').select('*');
+      const { data, error } = await supabase.from('viagens').select('*').eq('arquivada', false).order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
   });
+
+  // Real-time subscription for formularios_contrato
+  useEffect(() => {
+    const channel = supabase
+      .channel('formularios_contrato_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'formularios_contrato' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['formularios_contrato'] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }) => {
@@ -342,7 +353,7 @@ export default function Formularios() {
 
   const getViagemNome = (id) => {
     const v = viagens.find(v => v.id === id);
-    return v ? v.nome : '—';
+    return v ? v.nome : 'Viagem removida';
   };
 
   // Filtering
