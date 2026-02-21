@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { 
   FileText, Plus, Download, Eye, Search, Trash2, Edit, 
-  Loader2, User, Plane, Calendar, DollarSign, MessageCircle, Link2, CheckCircle2
+  Loader2, User, Plane, Calendar, DollarSign, MessageCircle, Link2, CheckCircle2, UserPlus
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -128,6 +128,86 @@ export default function Contratos() {
       toast({ title: 'Contrato excluído!' });
     },
   });
+
+  const [processingId, setProcessingId] = useState(null);
+
+  const processarMutation = useMutation({
+    mutationFn: async (contrato) => {
+      if (contrato.status !== 'Assinado') throw new Error('O contrato precisa estar assinado.');
+      const viagem = viagens.find(v => v.id === contrato.id_viagem);
+      const valorFinal = (contrato.valor_total || viagem?.valor_1 || 0) - (contrato.desconto || 0);
+
+      const { data: cliente, error: clienteErr } = await supabase
+        .from('clientes')
+        .insert({
+          nome_completo: contrato.nome_completo, cpf: contrato.cpf, sexo: contrato.sexo,
+          data_nascimento: contrato.data_nascimento, telefone: contrato.telefone, email: contrato.email,
+          rua: contrato.rua, numero: contrato.numero, bairro: contrato.bairro, cidade: contrato.cidade,
+          id_viagem: contrato.id_viagem,
+          forma_pagamento: contrato.numero_parcelas > 1 ? 'Parcelado' : 'À Vista',
+          numero_parcelas: contrato.numero_parcelas || 1,
+          possui_crianca_colo: contrato.possui_crianca_colo,
+          nome_crianca_colo: contrato.nome_crianca_colo,
+          idade_crianca_colo: contrato.idade_crianca_colo,
+          status_pagamento: 'Pendente', valor_total_pacote: valorFinal, valor_pago: 0,
+        }).select().single();
+      if (clienteErr) throw clienteErr;
+
+      const passAdicionais = contrato.passageiros?.filter(p => p.nome_completo) || [];
+      let totalPessoas = 1;
+      for (const p of passAdicionais) {
+        const { error: pErr } = await supabase.from('clientes').insert({
+          nome_completo: p.nome_completo, cpf: p.cpf || null, telefone: p.telefone || null,
+          id_viagem: contrato.id_viagem, id_cliente_principal: cliente.id,
+          status_pagamento: 'Vinculado', valor_total_pacote: 0, valor_pago: 0,
+        });
+        if (!pErr) totalPessoas++;
+      }
+
+      const numParcelas = contrato.numero_parcelas || 1;
+      if (numParcelas > 0) {
+        const valorParcela = valorFinal / numParcelas;
+        const diaVenc = contrato.dia_vencimento || 10;
+        const hoje = new Date();
+        const parcelas = Array.from({ length: numParcelas }, (_, i) => {
+          const venc = new Date(hoje.getFullYear(), hoje.getMonth() + i + 1, diaVenc);
+          return {
+            id_cliente: cliente.id, id_viagem: contrato.id_viagem,
+            numero_parcela: i + 1, total_parcelas: numParcelas,
+            valor_parcela: Number(valorParcela.toFixed(2)),
+            data_vencimento: venc.toISOString().split('T')[0],
+            status: 'Pendente', forma_pagamento: contrato.forma_pagamento || 'PIX', intervalo_dias: 30,
+          };
+        });
+        await supabase.from('parcelas').insert(parcelas);
+      }
+
+      if (viagem) {
+        await supabase.from('viagens').update({ vagas_ocupadas: (viagem.vagas_ocupadas || 0) + totalPessoas }).eq('id', viagem.id);
+      }
+
+      await supabase.from('formularios_contrato').update({ status: 'Processado' }).eq('id', contrato.id);
+      return totalPessoas;
+    },
+    onSuccess: (totalPessoas) => {
+      setProcessingId(null);
+      queryClient.invalidateQueries({ queryKey: ['contratos'] });
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+      queryClient.invalidateQueries({ queryKey: ['viagens'] });
+      toast({ title: `✅ Processado! ${totalPessoas} pessoa(s) inserida(s) na viagem.` });
+    },
+    onError: (err) => {
+      setProcessingId(null);
+      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+    },
+  });
+
+  const handleProcessar = (contrato) => {
+    if (contrato.status === 'Processado') { toast({ title: 'Já processado!' }); return; }
+    if (contrato.status !== 'Assinado') { toast({ title: 'Cliente precisa assinar primeiro.', variant: 'destructive' }); return; }
+    setProcessingId(contrato.id);
+    processarMutation.mutate(contrato);
+  };
 
   const resetForm = () => {
     setDialogOpen(false);
@@ -551,6 +631,23 @@ export default function Contratos() {
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>
+                    {/* Processar button for signed contracts */}
+                    {contrato.status === 'Assinado' && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleProcessar(contrato)}
+                        disabled={processingId === contrato.id}
+                        className="gap-2 bg-green-600 hover:bg-green-700 text-white ml-2"
+                      >
+                        {processingId === contrato.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
+                        Processar — Inserir na Viagem
+                      </Button>
+                    )}
+                    {contrato.status === 'Processado' && (
+                      <span className="text-xs text-green-600 font-medium flex items-center gap-1 ml-2">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Inserido na viagem
+                      </span>
+                    )}
                   </div>
                 </div>
               </CardContent>
