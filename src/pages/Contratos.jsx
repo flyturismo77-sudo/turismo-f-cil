@@ -449,6 +449,50 @@ export default function Contratos() {
     y += 4;
     addText('CONTRATANTE', margin, y, { fontStyle: 'bold' });
 
+    // Se o contrato foi assinado eletronicamente, adicionar selo de assinatura digital
+    if (contrato.assinatura_data && contrato.assinatura_nome) {
+      y += 15;
+      y = checkPage(y, 55);
+
+      // Caixa do selo
+      const boxX = margin;
+      const boxW = contentWidth;
+      const boxH = 42;
+
+      doc.setDrawColor(34, 139, 34);
+      doc.setLineWidth(0.8);
+      doc.roundedRect(boxX, y, boxW, boxH, 3, 3);
+
+      // Ícone ✓ verde
+      doc.setFillColor(34, 139, 34);
+      doc.circle(boxX + 8, y + 10, 5, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('✓', boxX + 8, y + 12, { align: 'center' });
+
+      // Título do selo
+      doc.setTextColor(34, 139, 34);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('ASSINADO DIGITALMENTE', boxX + 18, y + 12);
+
+      // Reset cor do texto
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+
+      const dataAssinatura = format(new Date(contrato.assinatura_data), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR });
+      doc.text(`Assinante: ${contrato.assinatura_nome}`, boxX + 6, y + 20);
+      doc.text(`CPF: ${contrato.assinatura_cpf || contrato.cpf || '—'}`, boxX + 6, y + 26);
+      doc.text(`Data/Hora: ${dataAssinatura}`, boxX + 6, y + 32);
+
+      doc.setFontSize(7);
+      doc.setTextColor(120, 120, 120);
+      doc.text('Assinatura eletrônica com validade jurídica nos termos da Lei nº 14.063/2020.', boxX + 6, y + 38);
+      doc.setTextColor(0, 0, 0);
+    }
+
     doc.save(`Contrato_${contrato.nome_completo?.replace(/\s+/g, '_') || 'Viagem'}.pdf`);
     toast({ title: 'PDF gerado com sucesso!' });
   };
