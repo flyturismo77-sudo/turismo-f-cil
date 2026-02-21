@@ -186,7 +186,7 @@ export default function Formularios() {
   const { data: viagens = [] } = useQuery({
     queryKey: ['viagens'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('viagens').select('*').eq('arquivada', false).order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('viagens').select('*').order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
