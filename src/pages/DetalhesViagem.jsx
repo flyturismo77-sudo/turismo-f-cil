@@ -14,7 +14,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { ArrowLeft, MapPin, Calendar, Users, Bus, Loader2, Armchair, UserPlus, Printer, CheckCircle, Search, Trash2, Pencil, Save, FileText, Download, Link2, QrCode, Copy, CheckCheck } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Users, Bus, Loader2, Armchair, UserPlus, Printer, CheckCircle, Search, Trash2, Pencil, Save, FileText, Download, Link2, QrCode, Copy, CheckCheck, DollarSign } from "lucide-react";
+import DespesasViagem from "@/components/viagens/DespesasViagem";
 import { Dialog as QRDialog, DialogContent as QRDialogContent, DialogHeader as QRDialogHeader, DialogTitle as QRDialogTitle } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/lib/supabaseClient";
@@ -1018,11 +1019,16 @@ export default function DetalhesViagem() {
       )}
 
       <Tabs defaultValue="detalhes" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="detalhes">Detalhes e Passageiros</TabsTrigger>
+          <TabsTrigger value="despesas">💰 Despesas</TabsTrigger>
           <TabsTrigger value="documentos">Documentos da Viagem</TabsTrigger>
           <TabsTrigger value="manual">📖 Manual do Sistema</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="despesas">
+          <DespesasViagem viagemId={viagemId} />
+        </TabsContent>
 
         <TabsContent value="detalhes" className="space-y-6">
       <div className="grid md:grid-cols-5 gap-6">
