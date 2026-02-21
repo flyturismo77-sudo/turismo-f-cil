@@ -510,6 +510,8 @@ export default function Contratos() {
                   <div className="flex items-center gap-3 shrink-0">
                     <Badge className={
                       contrato.status === 'Assinado' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 
+                      contrato.status === 'Processado' ? 'bg-green-100 text-green-700 hover:bg-green-100' :
+                      contrato.status === 'Contrato Enviado' ? 'bg-violet-100 text-violet-700 hover:bg-violet-100' :
                       contrato.status === 'Cancelado' ? 'bg-red-100 text-red-700 hover:bg-red-100' : 
                       'bg-amber-100 text-amber-700 hover:bg-amber-100'
                     }>
