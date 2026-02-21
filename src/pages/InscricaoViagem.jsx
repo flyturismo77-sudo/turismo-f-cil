@@ -85,7 +85,7 @@ export default function InscricaoViagem() {
   const { data: viagens = [], isLoading: loadingViagens } = useQuery({
     queryKey: ['viagens-publicas'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('viagens').select('*').eq('status', 'Aberta').order('data_saida', { ascending: true });
+      const { data, error } = await supabase.from('viagens').select('*').eq('arquivada', false).order('data_saida', { ascending: true });
       if (error) throw error;
       return data || [];
     },
