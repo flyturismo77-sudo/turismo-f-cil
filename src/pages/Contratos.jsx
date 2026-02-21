@@ -367,9 +367,11 @@ export default function Contratos() {
     );
     y += 4;
 
-    // Passageiros
+    // Passageiros (até 10)
     const pass = contrato.passageiros || [];
-    for (let i = 0; i < 3; i++) {
+    const totalPass = Math.max(pass.length, 10);
+    for (let i = 0; i < totalPass; i++) {
+      y = checkPage(y, 12);
       const p = pass[i] || {};
       y = addText(`Passageiro ${String(i + 1).padStart(2, '0')}: ${p.nome_completo || '___________________________________'}`, margin, y);
       y += 1;
@@ -453,32 +455,16 @@ export default function Contratos() {
     );
     y += 15;
 
-    // Se assinado eletronicamente — selo gov.br + assinaturas preenchidas
+    // Se assinado eletronicamente — selo gov.br com imagem
     if (contrato.assinatura_data && contrato.assinatura_nome) {
-      // ── Selo de assinatura digital gov.br ──
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Documento assinado digitalmente', centerX, y, { align: 'center' });
-      y += 4;
-
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(0, 80, 160);
-      doc.text('gov.br', centerX, y, { align: 'center' });
-      doc.setTextColor(0, 0, 0);
-      y += 4;
-
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.text((contrato.assinatura_nome || '').toUpperCase(), centerX, y, { align: 'center' });
-      y += 3;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(6);
-      const dataAssinatura = format(new Date(contrato.assinatura_data), "dd/MM/yyyy HH:mm:ss xx", { locale: ptBR });
-      doc.text(`Data: ${dataAssinatura}`, centerX, y, { align: 'center' });
-      y += 3;
-      doc.text('Verifique em https://validar.iti.gov.br', centerX, y, { align: 'center' });
-      y += 8;
+      try {
+        const imgW = 100;
+        const imgH = 25;
+        doc.addImage(assinaturaGovBr, 'PNG', centerX - imgW / 2, y, imgW, imgH);
+        y += imgH + 5;
+      } catch (e) {
+        y += 5;
+      }
 
       // Linha CONTRATADA
       const lineW = 80;
@@ -613,7 +599,8 @@ export default function Contratos() {
     );
     yy += 4;
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 10; i++) {
+      yy = chkPage(yy, 12);
       yy = addTxt(`Passageiro ${String(i + 1).padStart(2, '0')}: ___________________________________`, marg, yy);
       yy += 1;
       yy = addTxt('CPF: ___________________________________', marg, yy);
@@ -1004,7 +991,7 @@ export default function Contratos() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground">Passageiros</h3>
-                {passageiros.length < 3 && (
+                {passageiros.length < 10 && (
                   <Button type="button" variant="outline" size="sm" onClick={() => setPassageiros([...passageiros, { nome_completo: '', cpf: '' }])}>
                     <Plus className="w-3 h-3 mr-1" /> Adicionar
                   </Button>
