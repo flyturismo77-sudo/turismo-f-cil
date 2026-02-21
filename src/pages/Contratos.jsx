@@ -439,22 +439,39 @@ export default function Contratos() {
     );
     y += 15;
 
-    // Signature lines
-    doc.line(margin, y, margin + 75, y);
-    y += 4;
-    addText('CONTRATADA', margin, y, { fontStyle: 'bold' });
-    y += 10;
-
-    doc.line(margin, y, margin + 75, y);
-    y += 4;
-    addText('CONTRATANTE', margin, y, { fontStyle: 'bold' });
-
-    // Se o contrato foi assinado eletronicamente, adicionar selo de assinatura digital
+    // Se assinado eletronicamente, preencher ambas assinaturas automaticamente
     if (contrato.assinatura_data && contrato.assinatura_nome) {
-      y += 15;
+      // ── CONTRATADA (assinatura automática da empresa) ──
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(empresa.nome_empresa || 'FLY TURISMO', margin, y);
+      y += 4;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`CNPJ: 14.121.276/0001-32`, margin, y);
+      y += 3;
+      doc.line(margin, y, margin + 75, y);
+      y += 4;
+      addText('CONTRATADA', margin, y, { fontStyle: 'bold' });
+      y += 12;
+
+      // ── CONTRATANTE (dados da assinatura eletrônica) ──
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(contrato.assinatura_nome, margin, y);
+      y += 4;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`CPF: ${contrato.assinatura_cpf || contrato.cpf || '—'}`, margin, y);
+      y += 3;
+      doc.line(margin, y, margin + 75, y);
+      y += 4;
+      addText('CONTRATANTE', margin, y, { fontStyle: 'bold' });
+
+      // ── Selo de assinatura digital ──
+      y += 12;
       y = checkPage(y, 55);
 
-      // Caixa do selo
       const boxX = margin;
       const boxW = contentWidth;
       const boxH = 42;
@@ -463,7 +480,6 @@ export default function Contratos() {
       doc.setLineWidth(0.8);
       doc.roundedRect(boxX, y, boxW, boxH, 3, 3);
 
-      // Ícone ✓ verde
       doc.setFillColor(34, 139, 34);
       doc.circle(boxX + 8, y + 10, 5, 'F');
       doc.setTextColor(255, 255, 255);
@@ -471,13 +487,11 @@ export default function Contratos() {
       doc.setFont('helvetica', 'bold');
       doc.text('✓', boxX + 8, y + 12, { align: 'center' });
 
-      // Título do selo
       doc.setTextColor(34, 139, 34);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.text('ASSINADO DIGITALMENTE', boxX + 18, y + 12);
 
-      // Reset cor do texto
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
@@ -491,6 +505,16 @@ export default function Contratos() {
       doc.setTextColor(120, 120, 120);
       doc.text('Assinatura eletrônica com validade jurídica nos termos da Lei nº 14.063/2020.', boxX + 6, y + 38);
       doc.setTextColor(0, 0, 0);
+    } else {
+      // Contrato ainda não assinado: linhas em branco para assinatura manual
+      doc.line(margin, y, margin + 75, y);
+      y += 4;
+      addText('CONTRATADA', margin, y, { fontStyle: 'bold' });
+      y += 10;
+
+      doc.line(margin, y, margin + 75, y);
+      y += 4;
+      addText('CONTRATANTE', margin, y, { fontStyle: 'bold' });
     }
 
     doc.save(`Contrato_${contrato.nome_completo?.replace(/\s+/g, '_') || 'Viagem'}.pdf`);
