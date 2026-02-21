@@ -132,7 +132,7 @@ export default function InscricaoViagem() {
 
   const canProceed = () => {
     if (step === 1) return !!formData.id_viagem;
-    if (step === 2) return !!(formData.nome_completo && formData.cpf && formData.rg && formData.sexo && formData.data_nascimento && formData.telefone && formData.email);
+    if (step === 2) return !!(formData.nome_completo && formData.cpf && formData.sexo && formData.data_nascimento && formData.telefone && formData.email);
     if (step === 3) return !!(formData.rua && formData.numero && formData.bairro && formData.cidade);
     if (step === 4) return !!formData.forma_pagamento;
     return true;
@@ -357,8 +357,8 @@ export default function InscricaoViagem() {
                 <Field label="Nome Completo" required className="md:col-span-2">
                   <Input value={formData.nome_completo} onChange={e => update('nome_completo', e.target.value)} placeholder="Como consta no RG/CPF" />
                 </Field>
-                <Field label="RG" required>
-                  <Input value={formData.rg} onChange={e => update('rg', e.target.value)} placeholder="0000000" />
+                <Field label="RG">
+                  <Input value={formData.rg} onChange={e => update('rg', e.target.value)} placeholder="Opcional" />
                 </Field>
                 <Field label="CPF" required>
                   <Input value={formData.cpf} onChange={e => update('cpf', formatCPF(e.target.value))} placeholder="000.000.000-00" />
