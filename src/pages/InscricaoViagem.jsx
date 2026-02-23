@@ -138,7 +138,20 @@ export default function InscricaoViagem() {
     return true;
   };
 
-  const handleSubmit = () => submitMutation.mutate({ ...formData, passageiros: passageiros.filter(p => p.nome_completo), status: 'Pendente' });
+  const handleSubmit = () => {
+    const { complemento, estado, cep, ...rest } = formData;
+    const payload = {
+      ...rest,
+      id_viagem: rest.id_viagem || null,
+      numero_parcelas: rest.numero_parcelas || 1,
+      dia_vencimento: rest.dia_vencimento || 10,
+      desconto: rest.desconto || 0,
+      idade_crianca_colo: rest.idade_crianca_colo || 0,
+      passageiros: passageiros.filter(p => p.nome_completo),
+      status: 'Pendente',
+    };
+    submitMutation.mutate(payload);
+  };
 
   // ── SUCCESS ──────────────────────────────────────────────────
   if (status === 'success') {
