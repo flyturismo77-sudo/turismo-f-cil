@@ -28,6 +28,7 @@ import Relatorios from './pages/Relatorios';
 import WhatsApp from './pages/WhatsApp';
 import Mensagens from './pages/Mensagens';
 import LogsAuditoria from './pages/LogsAuditoria';
+import FacebookAds from './pages/FacebookAds';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +45,7 @@ export const PAGES = {
     "DespesasViagem": DespesasViagem,
     "DetalhesViagem": DetalhesViagem,
     "Equipe": Equipe,
+    "FacebookAds": FacebookAds,
     "Formularios": Formularios,
     "Fornecedores": Fornecedores,
     "GerenciamentoArquivos": GerenciamentoArquivos,
