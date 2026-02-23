@@ -459,6 +459,60 @@ export type Database = {
           },
         ]
       }
+      facebook_ads_performance: {
+        Row: {
+          ad_name: string
+          adset_name: string | null
+          campaign_name: string
+          clicks: number | null
+          cpc: number | null
+          cpm: number | null
+          created_at: string | null
+          ctr: number | null
+          custo_por_resultado: number | null
+          data_referencia: string
+          id: number
+          impressions: number | null
+          reach: number | null
+          resultado: number | null
+          spend: number | null
+        }
+        Insert: {
+          ad_name: string
+          adset_name?: string | null
+          campaign_name: string
+          clicks?: number | null
+          cpc?: number | null
+          cpm?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          custo_por_resultado?: number | null
+          data_referencia: string
+          id?: number
+          impressions?: number | null
+          reach?: number | null
+          resultado?: number | null
+          spend?: number | null
+        }
+        Update: {
+          ad_name?: string
+          adset_name?: string | null
+          campaign_name?: string
+          clicks?: number | null
+          cpc?: number | null
+          cpm?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          custo_por_resultado?: number | null
+          data_referencia?: string
+          id?: number
+          impressions?: number | null
+          reach?: number | null
+          resultado?: number | null
+          spend?: number | null
+        }
+        Relationships: []
+      }
       formularios: {
         Row: {
           ativo: boolean | null

@@ -26,6 +26,7 @@ import {
   CheckSquare,
   TrendingUp,
   Bell,
+  Megaphone,
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import {
@@ -77,6 +78,12 @@ const navSections = [
       { title: "Desp. Viagem", url: createPageUrl("DespesasViagem"), icon: Plane, adminOnly: true },
       { title: "Desp. Pessoal", url: createPageUrl("DespesasPessoal"), icon: UserCheck, adminOnly: true },
       { title: "Desp. Empresa", url: createPageUrl("DespesasEmpresa"), icon: Building2, adminOnly: true },
+    ]
+  },
+  {
+    label: "Marketing",
+    items: [
+      { title: "Facebook Ads", url: createPageUrl("FacebookAds"), icon: Megaphone },
     ]
   },
   {
