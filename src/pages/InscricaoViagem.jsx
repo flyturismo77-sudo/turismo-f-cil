@@ -117,6 +117,13 @@ export default function InscricaoViagem() {
   });
 
   const viagemSelecionada = viagens.find(v => v.id === formData.id_viagem);
+  const isViagemPirapark =
+    !!viagemSelecionada &&
+    (viagemSelecionada.modo_pirapark === true ||
+      String(viagemSelecionada.nome || '').toUpperCase().includes('PIRAPARK') ||
+      String(viagemSelecionada.destino || '').toUpperCase().includes('PIRAPARK'));
+  const idadeMaximaCriancaColo = isViagemPirapark ? 4 : 5;
+
   const update = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
 
   const handleCepBlur = async (cep) => {
@@ -140,6 +147,22 @@ export default function InscricaoViagem() {
 
   const handleSubmit = () => {
     const { complemento, estado, cep, ...rest } = formData;
+
+    if (rest.possui_crianca_colo) {
+      if (!rest.nome_crianca_colo?.trim()) {
+        alert('Informe o nome da criança de colo.');
+        return;
+      }
+
+      const idadeCrianca = Number(rest.idade_crianca_colo || 0);
+      if (idadeCrianca < 0 || idadeCrianca > idadeMaximaCriancaColo) {
+        alert(
+          `Para esta viagem, criança de colo deve ter entre 0 e ${idadeMaximaCriancaColo} anos.`
+        );
+        return;
+      }
+    }
+
     const payload = {
       nome_completo: rest.nome_completo,
       cpf: rest.cpf || null,
@@ -158,9 +181,9 @@ export default function InscricaoViagem() {
       numero_parcelas: rest.numero_parcelas || 1,
       dia_vencimento: rest.dia_vencimento || 10,
       desconto: rest.desconto || 0,
-      possui_crianca_colo: rest.possui_crianca_colo || false,
-      nome_crianca_colo: rest.nome_crianca_colo || null,
-      idade_crianca_colo: rest.idade_crianca_colo || 0,
+      possui_crianca_colo: !!rest.possui_crianca_colo,
+      nome_crianca_colo: rest.possui_crianca_colo ? (rest.nome_crianca_colo || null) : null,
+      idade_crianca_colo: rest.possui_crianca_colo ? Number(rest.idade_crianca_colo || 0) : 0,
       passageiros: passageiros.filter(p => p.nome_completo),
       status: 'Pendente',
     };
@@ -436,19 +459,21 @@ export default function InscricaoViagem() {
                     onChange={e => update('possui_crianca_colo', e.target.checked)}
                     className="w-4 h-4 accent-[hsl(var(--primary))]"
                   />
-                  <div className="flex items-center gap-2">
-                    <Baby className="w-5 h-5 text-primary" />
-                    <span className="font-semibold text-foreground">Vou levar uma criança de colo (0–2 anos)</span>
-                  </div>
-                </label>
-                {formData.possui_crianca_colo && (
-                  <div className="grid md:grid-cols-2 gap-4 mt-4 p-4 bg-primary/5 rounded-xl border border-primary/20">
-                    <Field label="Nome da Criança">
-                      <Input value={formData.nome_crianca_colo} onChange={e => update('nome_crianca_colo', e.target.value)} />
-                    </Field>
-                    <Field label="Idade (meses)">
-                      <Input type="number" min={0} max={24} value={formData.idade_crianca_colo} onChange={e => update('idade_crianca_colo', parseInt(e.target.value) || 0)} />
-                    </Field>
+                    <div className="flex items-center gap-2">
+                      <Baby className="w-5 h-5 text-primary" />
+                      <span className="font-semibold text-foreground">
+                        Vou levar uma criança de colo (0–{idadeMaximaCriancaColo} anos)
+                      </span>
+                    </div>
+                  </label>
+                  {formData.possui_crianca_colo && (
+                    <div className="grid md:grid-cols-2 gap-4 mt-4 p-4 bg-primary/5 rounded-xl border border-primary/20">
+                      <Field label="Nome da Criança">
+                        <Input value={formData.nome_crianca_colo} onChange={e => update('nome_crianca_colo', e.target.value)} />
+                      </Field>
+                      <Field label="Idade (anos)">
+                        <Input type="number" min={0} max={idadeMaximaCriancaColo} value={formData.idade_crianca_colo} onChange={e => update('idade_crianca_colo', parseInt(e.target.value) || 0)} />
+                      </Field>
                   </div>
                 )}
               </div>
