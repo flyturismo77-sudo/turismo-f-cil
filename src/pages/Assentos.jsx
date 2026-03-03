@@ -19,6 +19,7 @@ import { ptBR } from 'date-fns/locale';
 import DoubleDeckLayout from "../components/assentos/DoubleDeckLayout";
 import DDDSTurLayout from "../components/assentos/DDDSTurLayout";
 import JGTurismo44Layout from "../components/assentos/JGTurismo44Layout";
+import LDDecaTurismoLayout from "../components/assentos/LDDecaTurismoLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Assentos() {
@@ -440,6 +441,7 @@ export default function Assentos() {
   const isDoubleDeck = viagemSelecionada?.modelo_onibus === 'VA_TUR';
   const isDDDSTur = viagemSelecionada?.modelo_onibus === 'DD_DS_TUR';
   const isJGTurismo = viagemSelecionada?.modelo_onibus === 'JG_TURISMO_44';
+  const isLDDeca = viagemSelecionada?.modelo_onibus === 'LD48';
 
   const enviarWhatsApp = (cliente) => {
     if (!cliente.telefone) {
@@ -598,7 +600,17 @@ Qualquer dúvida, estamos à disposição!`;
               </div>
             </div>
 
-            {isJGTurismo ? (
+            {isLDDeca ? (
+              <LDDecaTurismoLayout
+                clientePorPoltrona={clientePorPoltrona}
+                searchTerm={searchTerm}
+                onSeatClick={(seatNumber) => {
+                  setSelectedSeat(seatNumber);
+                  setShowDialog(true);
+                }}
+                renderSeatInfo={renderSeatInfo}
+              />
+            ) : isJGTurismo ? (
               <JGTurismo44Layout
                 clientePorPoltrona={clientePorPoltrona}
                 searchTerm={searchTerm}

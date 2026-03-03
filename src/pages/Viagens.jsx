@@ -50,6 +50,12 @@ export default function Viagens() {
           for (let i = 1; i <= totalAssentos; i++) {
             assentos.push({ numero_poltrona: i, id_viagem: viagem.id, andar: i <= 44 ? 'Piso Superior' : 'Piso Inferior', posicao: i % 2 === 1 ? 'Janela' : 'Corredor', status: 'Disponível' });
           }
+        } else if (modelo === 'LD48') {
+          // LD Deca Turismo - seats 1-22, 25-48 (no 23, 24)
+          for (let i = 1; i <= 48; i++) {
+            if (i === 23 || i === 24) continue;
+            assentos.push({ numero_poltrona: i, id_viagem: viagem.id, andar: 'Piso Superior', posicao: i % 2 === 1 ? 'Janela' : 'Corredor', status: 'Disponível' });
+          }
         } else if (modelo === 'JG_TURISMO_44') {
           for (let i = 1; i <= totalAssentos; i++) {
             assentos.push({ numero_poltrona: i, id_viagem: viagem.id, andar: 'Primeiro Andar', posicao: i % 2 === 1 ? 'Janela' : 'Corredor', status: 'Disponível' });
