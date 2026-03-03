@@ -385,16 +385,16 @@ export default function Contratos() {
       y += 4;
     }
 
-    // Passageiros (até 10)
-    const pass = contrato.passageiros || [];
-    const totalPass = Math.max(pass.length, 10);
-    for (let i = 0; i < totalPass; i++) {
-      y = checkPage(y, 12);
-      const p = pass[i] || {};
-      y = addText(`Passageiro ${String(i + 1).padStart(2, '0')}: ${p.nome_completo || '___________________________________'}`, margin, y);
-      y += 1;
-      y = addText(`CPF: ${p.cpf || '___________________________________'}`, margin, y);
-      y += 2;
+    // Passageiros - só mostra os preenchidos
+    const pass = (contrato.passageiros || []).filter(p => p.nome_completo);
+    if (pass.length > 0) {
+      for (let i = 0; i < pass.length; i++) {
+        y = checkPage(y, 12);
+        y = addText(`Passageiro ${String(i + 1).padStart(2, '0')}: ${pass[i].nome_completo}`, margin, y);
+        y += 1;
+        y = addText(`CPF: ${pass[i].cpf || '___________________________________'}`, margin, y);
+        y += 2;
+      }
     }
     y += 2;
 
