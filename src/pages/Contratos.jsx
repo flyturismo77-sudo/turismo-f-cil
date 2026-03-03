@@ -48,6 +48,9 @@ export default function Contratos() {
     dia_vencimento: 10,
     forma_pagamento: 'À Vista',
     status: 'Pendente',
+    possui_crianca_colo: false,
+    nome_crianca_colo: '',
+    idade_crianca_colo: 0,
   });
   const [passageiros, setPassageiros] = useState([
     { nome_completo: '', cpf: '' },
@@ -220,6 +223,7 @@ export default function Contratos() {
       rua: '', numero: '', bairro: '', cidade: '', telefone: '', email: '',
       id_viagem: '', passageiros: [], valor_total: 0, numero_parcelas: 1,
       dia_vencimento: 10, forma_pagamento: 'À Vista', status: 'Pendente',
+      possui_crianca_colo: false, nome_crianca_colo: '', idade_crianca_colo: 0,
     });
     setPassageiros([{ nome_completo: '', cpf: '' }]);
   };
@@ -273,6 +277,9 @@ export default function Contratos() {
       dia_vencimento: contrato.dia_vencimento || 10,
       forma_pagamento: contrato.forma_pagamento || 'À Vista',
       status: contrato.status || 'Pendente',
+      possui_crianca_colo: contrato.possui_crianca_colo || false,
+      nome_crianca_colo: contrato.nome_crianca_colo || '',
+      idade_crianca_colo: contrato.idade_crianca_colo || 0,
     });
     setPassageiros(
       contrato.passageiros?.length > 0 
@@ -997,6 +1004,35 @@ export default function Contratos() {
             </div>
 
             <Separator />
+
+            {/* Criança Não Pagante */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-foreground">Criança Não Pagante</h3>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="crianca_colo_dialog"
+                  checked={formData.possui_crianca_colo}
+                  onChange={(e) => setFormData({...formData, possui_crianca_colo: e.target.checked, nome_crianca_colo: e.target.checked ? formData.nome_crianca_colo : '', idade_crianca_colo: e.target.checked ? formData.idade_crianca_colo : 0})}
+                  className="w-4 h-4"
+                />
+                <Label htmlFor="crianca_colo_dialog" className="cursor-pointer">
+                  Possui criança não pagante?
+                </Label>
+              </div>
+              {formData.possui_crianca_colo && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label>Nome da Criança</Label>
+                    <Input value={formData.nome_crianca_colo} onChange={(e) => setFormData({...formData, nome_crianca_colo: e.target.value})} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Idade da Criança</Label>
+                    <Input type="number" min="0" max="5" value={formData.idade_crianca_colo} onChange={(e) => setFormData({...formData, idade_crianca_colo: parseInt(e.target.value) || 0})} />
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Passageiros */}
             <div className="space-y-3">
