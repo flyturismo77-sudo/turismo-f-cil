@@ -575,15 +575,19 @@ export default function MapaQuartos() {
     const fileName = `Lista-Quartos-${viagemSelecionada.nome.replace(/[^a-z0-9]/gi, '_')}.html`;
     const file = new File([blob], fileName, { type: 'text/html' });
 
-    const { file_url } = await base44.integrations.Core.UploadFile({ file: file });
-    
-    await saveDocumentMutation.mutateAsync({
-      nome: fileName,
-      url: file_url,
-      tipo: 'Lista de Quartos',
-      id_viagem: selectedViagem,
-      tamanho: blob.size
-    });
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: file });
+
+      await saveDocumentMutation.mutateAsync({
+        nome: fileName,
+        url: file_url,
+        tipo: 'Lista de Quartos',
+        id_viagem: selectedViagem,
+      });
+    } catch (error) {
+      console.error('Erro ao salvar lista de quartos:', error);
+      alert('Erro ao salvar documento de quartos. Tente novamente.');
+    }
   };
 
   const handleAdicionarHospede = async (clienteId, quarto) => {

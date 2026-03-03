@@ -367,6 +367,17 @@ export default function Contratos() {
     );
     y += 4;
 
+    // Criança de colo / não pagante
+    if (contrato.possui_crianca_colo) {
+      y = addText(
+        `CRIANÇA NÃO PAGANTE: ${contrato.nome_crianca_colo || '___________________'} — Idade: ${contrato.idade_crianca_colo ?? '___'} ano(s).`,
+        margin,
+        y,
+        { fontStyle: 'bold' }
+      );
+      y += 4;
+    }
+
     // Passageiros (até 10)
     const pass = contrato.passageiros || [];
     const totalPass = Math.max(pass.length, 10);
