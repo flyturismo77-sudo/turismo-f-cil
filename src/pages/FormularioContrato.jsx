@@ -92,16 +92,33 @@ export default function FormularioContrato() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const dataToSend = {
-      ...formData,
+      nome_completo: formData.nome_completo,
+      cpf: formData.cpf || null,
+      rg: formData.rg || null,
+      sexo: formData.sexo || null,
+      data_nascimento: formData.data_nascimento || null,
+      email: formData.email || null,
+      telefone: formData.telefone || null,
+      rua: formData.rua || null,
+      numero: formData.numero || null,
+      bairro: formData.bairro || null,
+      cidade: formData.cidade || null,
       id_viagem: formData.id_viagem || null,
-      passageiros: passageiros.filter(p => p.nome_completo && p.cpf),
+      forma_pagamento: formData.forma_pagamento || 'À Vista',
+      numero_parcelas: formData.numero_parcelas || 1,
       desconto: formData.desconto || 0,
-      idade_crianca_colo: formData.idade_crianca_colo || 0,
+      possui_crianca_colo: formData.possui_crianca_colo || false,
+      nome_crianca_colo: formData.possui_crianca_colo ? (formData.nome_crianca_colo || null) : null,
+      idade_crianca_colo: formData.possui_crianca_colo ? (formData.idade_crianca_colo || 0) : 0,
+      passageiros: passageiros.filter(p => p.nome_completo),
+      status: 'Pendente',
     };
     createMutation.mutate(dataToSend);
   };
 
   const viagemSelecionada = viagens.find(v => v.id === formData.id_viagem);
+  const isViagemPirapark = viagemSelecionada && (viagemSelecionada.modo_pirapark || viagemSelecionada.nome?.toUpperCase().includes('PIRAPARK'));
+  const idadeMaximaCriancaColo = isViagemPirapark ? 4 : 5;
 
   if (error) {
     return (
@@ -381,35 +398,41 @@ export default function FormularioContrato() {
                     </div>
                   </div>
 
-                  <h4 className="font-semibold text-gray-900 mt-6 mb-3">Criança de Colo</h4>
+                  <h4 className="font-semibold text-gray-900 mt-6 mb-3">
+                    Criança Não Pagante {formData.id_viagem ? `(0 a ${idadeMaximaCriancaColo} anos)` : ''}
+                  </h4>
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         id="crianca_colo"
                         checked={formData.possui_crianca_colo}
-                        onChange={(e) => setFormData({...formData, possui_crianca_colo: e.target.checked})}
+                        onChange={(e) => setFormData({...formData, possui_crianca_colo: e.target.checked, nome_crianca_colo: e.target.checked ? formData.nome_crianca_colo : '', idade_crianca_colo: e.target.checked ? formData.idade_crianca_colo : 0})}
                         className="w-4 h-4"
                       />
                       <Label htmlFor="crianca_colo" className="cursor-pointer">
-                        Possui criança de colo?
+                        Possui criança não pagante?
                       </Label>
                     </div>
                     {formData.possui_crianca_colo && (
                       <div className="grid md:grid-cols-2 gap-4 pl-6">
                         <div className="space-y-2">
-                          <Label>Nome da Criança</Label>
+                          <Label>Nome da Criança *</Label>
                           <Input
                             value={formData.nome_crianca_colo}
                             onChange={(e) => setFormData({...formData, nome_crianca_colo: e.target.value})}
+                            required
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Idade da Criança</Label>
+                          <Label>Idade da Criança (0 a {idadeMaximaCriancaColo} anos) *</Label>
                           <Input
                             type="number"
+                            min="0"
+                            max={idadeMaximaCriancaColo}
                             value={formData.idade_crianca_colo}
                             onChange={(e) => setFormData({...formData, idade_crianca_colo: parseInt(e.target.value) || 0})}
+                            required
                           />
                         </div>
                       </div>
