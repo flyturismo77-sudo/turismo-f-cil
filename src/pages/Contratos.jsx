@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import logoFly from '@/assets/logo-fly-turismo.jpg';
 import assinaturaGovBr from '@/assets/assinatura-govbr.png';
+import assinaturaContratada from '@/assets/assinatura-contratada.png';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -486,6 +487,14 @@ export default function Contratos() {
       y += 5;
     }
 
+    // Assinatura da contratada (imagem)
+    try {
+      const sigW = 60;
+      const sigH = 20;
+      doc.addImage(assinaturaContratada, 'PNG', centerX - sigW / 2, y - 5, sigW, sigH);
+      y += sigH;
+    } catch (e) {}
+
     // Linha CONTRATADA
     const lineW = 80;
     doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
@@ -493,6 +502,10 @@ export default function Contratos() {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.text('CONTRATADA', centerX, y, { align: 'center' });
+    y += 4;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Ulisses José de Luna Neto', centerX, y, { align: 'center' });
     y += 20;
 
     // Linha CONTRATANTE
@@ -666,10 +679,20 @@ export default function Contratos() {
       yy += 5;
     }
 
+    // Assinatura da contratada (imagem)
+    try {
+      const sigW = 60;
+      const sigH = 20;
+      doc.addImage(assinaturaContratada, 'PNG', cx - sigW / 2, yy - 5, sigW, sigH);
+      yy += sigH;
+    } catch (e) {}
+
     const lW = 80;
     doc.line(cx - lW / 2, yy, cx + lW / 2, yy); yy += 5;
     doc.setFontSize(11); doc.setFont('helvetica', 'bold');
-    doc.text('CONTRATADA', cx, yy, { align: 'center' }); yy += 20;
+    doc.text('CONTRATADA', cx, yy, { align: 'center' }); yy += 4;
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    doc.text('Ulisses José de Luna Neto', cx, yy, { align: 'center' }); yy += 20;
     doc.line(cx - lW / 2, yy, cx + lW / 2, yy); yy += 5;
     doc.text('CONTRATANTE', cx, yy, { align: 'center' });
 
