@@ -479,8 +479,8 @@ export default function Contratos() {
 
     // Assinatura da contratada (imagem) - maior e centralizada
     try {
-      const sigW = 90;
-      const sigH = 30;
+      const sigW = 140;
+      const sigH = 45;
       doc.addImage(assinaturaContratada, 'PNG', centerX - sigW / 2, y, sigW, sigH);
       y += sigH + 3;
     } catch (e) {
