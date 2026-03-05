@@ -466,56 +466,41 @@ export default function Contratos() {
     doc.text(linhasEnc, margin, y);
     y += linhasEnc.length * 5 + 10;
 
-    // Data — sempre com campos em branco como no documento original
+    // Data — preenchida com a data de criação do contrato
+    const dataContrato = contrato.created_at 
+      ? format(new Date(contrato.created_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+      : format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
     y = addText(
-      'Januária, Minas Gerais, ______________, de ______________, 202___.', 
+      `Januária, Minas Gerais, ${dataContrato}.`, 
       margin, y
     );
     y += 15;
 
-    // Se assinado eletronicamente — selo gov.br com imagem
-    if (contrato.assinatura_data && contrato.assinatura_nome) {
-      try {
-        const imgW = 100;
-        const imgH = 25;
-        doc.addImage(assinaturaGovBr, 'PNG', centerX - imgW / 2, y, imgW, imgH);
-        y += imgH + 5;
-      } catch (e) {
-        y += 5;
-      }
-
-      // Linha CONTRATADA
-      const lineW = 80;
-      doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
+    // Selo gov.br - sempre presente
+    try {
+      const imgW = 100;
+      const imgH = 25;
+      doc.addImage(assinaturaGovBr, 'PNG', centerX - imgW / 2, y, imgW, imgH);
+      y += imgH + 5;
+    } catch (e) {
       y += 5;
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'bold');
-      doc.text('CONTRATADA', centerX, y, { align: 'center' });
-      y += 20;
-
-      // Linha CONTRATANTE
-      doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
-      y += 5;
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'bold');
-      doc.text('CONTRATANTE', centerX, y, { align: 'center' });
-
-    } else {
-      // Contrato não assinado — linhas em branco centralizadas
-      const lineW = 80;
-      doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
-      y += 5;
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'bold');
-      doc.text('CONTRATADA', centerX, y, { align: 'center' });
-      y += 20;
-
-      doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
-      y += 5;
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'bold');
-      doc.text('CONTRATANTE', centerX, y, { align: 'center' });
     }
+
+    // Linha CONTRATADA
+    const lineW = 80;
+    doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
+    y += 5;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('CONTRATADA', centerX, y, { align: 'center' });
+    y += 20;
+
+    // Linha CONTRATANTE
+    doc.line(centerX - lineW / 2, y, centerX + lineW / 2, y);
+    y += 5;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('CONTRATANTE', centerX, y, { align: 'center' });
 
     doc.save(`Contrato_${contrato.nome_completo?.replace(/\s+/g, '_') || 'Viagem'}.pdf`);
     toast({ title: 'PDF gerado com sucesso!' });
@@ -868,76 +853,80 @@ export default function Contratos() {
 
           <div className="space-y-6">
             {/* Step 1 - Select Viagem */}
-            {!editingContrato && (
-              <div className="space-y-4">
-                <h3 className="font-semibold text-foreground flex items-center gap-2">
-                  <Plane className="w-4 h-4" /> 1. Selecione a Viagem
-                </h3>
-                <Select value={selectedViagem} onValueChange={handleSelectViagem}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Escolha uma viagem" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {viagens.map(v => (
-                      <SelectItem key={v.id} value={v.id}>
-                        {v.nome} - {v.destino}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <div className="space-y-4">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <Plane className="w-4 h-4" /> {editingContrato ? 'Viagem' : '1. Selecione a Viagem'}
+              </h3>
+              <Select value={editingContrato ? formData.id_viagem : selectedViagem} onValueChange={(v) => {
+                if (editingContrato) {
+                  setFormData(prev => ({ ...prev, id_viagem: v }));
+                } else {
+                  handleSelectViagem(v);
+                }
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Escolha uma viagem" />
+                </SelectTrigger>
+                <SelectContent>
+                  {viagens.map(v => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.nome} - {v.destino}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                {/* Step 2 - Select Cliente */}
-                {selectedViagem && (
-                  <>
-                    <h3 className="font-semibold text-foreground flex items-center gap-2">
-                      <User className="w-4 h-4" /> 2. Selecione o Cliente (preenche automaticamente)
-                    </h3>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Buscar por nome, CPF ou telefone..."
-                        value={clienteSearch}
-                        onChange={(e) => setClienteSearch(e.target.value)}
-                        className="pl-10 mb-2"
-                      />
-                    </div>
-                    <div className="max-h-48 overflow-y-auto border rounded-lg divide-y">
-                      {clientes
-                        .filter(c => {
-                          if (!clienteSearch) return true;
-                          const term = clienteSearch.toLowerCase();
-                          return (
-                            c.nome_completo?.toLowerCase().includes(term) ||
-                            c.cpf?.includes(term) ||
-                            c.telefone?.includes(term)
-                          );
-                        })
-                        .map(c => (
-                          <button
-                            key={c.id}
-                            type="button"
-                            onClick={() => handleSelectCliente(c.id)}
-                            className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-accent ${
-                              selectedCliente === c.id ? 'bg-primary/10 font-semibold text-primary' : 'text-foreground'
-                            }`}
-                          >
-                            {c.nome_completo} {c.cpf ? `- ${c.cpf}` : ''} {c.telefone ? `- ${c.telefone}` : ''}
-                          </button>
-                        ))
-                      }
-                      {clientes.filter(c => {
+              {/* Step 2 - Select Cliente (only for new contracts) */}
+              {!editingContrato && selectedViagem && (
+                <>
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    <User className="w-4 h-4" /> 2. Selecione o Cliente (preenche automaticamente)
+                  </h3>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Buscar por nome, CPF ou telefone..."
+                      value={clienteSearch}
+                      onChange={(e) => setClienteSearch(e.target.value)}
+                      className="pl-10 mb-2"
+                    />
+                  </div>
+                  <div className="max-h-48 overflow-y-auto border rounded-lg divide-y">
+                    {clientes
+                      .filter(c => {
                         if (!clienteSearch) return true;
                         const term = clienteSearch.toLowerCase();
-                        return c.nome_completo?.toLowerCase().includes(term) || c.cpf?.includes(term) || c.telefone?.includes(term);
-                      }).length === 0 && (
-                        <p className="px-3 py-4 text-sm text-muted-foreground text-center">Nenhum cliente encontrado</p>
-                      )}
-                    </div>
-                  </>
-                )}
-                <Separator />
-              </div>
-            )}
+                        return (
+                          c.nome_completo?.toLowerCase().includes(term) ||
+                          c.cpf?.includes(term) ||
+                          c.telefone?.includes(term)
+                        );
+                      })
+                      .map(c => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => handleSelectCliente(c.id)}
+                          className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-accent ${
+                            selectedCliente === c.id ? 'bg-primary/10 font-semibold text-primary' : 'text-foreground'
+                          }`}
+                        >
+                          {c.nome_completo} {c.cpf ? `- ${c.cpf}` : ''} {c.telefone ? `- ${c.telefone}` : ''}
+                        </button>
+                      ))
+                    }
+                    {clientes.filter(c => {
+                      if (!clienteSearch) return true;
+                      const term = clienteSearch.toLowerCase();
+                      return c.nome_completo?.toLowerCase().includes(term) || c.cpf?.includes(term) || c.telefone?.includes(term);
+                    }).length === 0 && (
+                      <p className="px-3 py-4 text-sm text-muted-foreground text-center">Nenhum cliente encontrado</p>
+                    )}
+                  </div>
+                </>
+              )}
+              <Separator />
+            </div>
 
             {/* Form Fields */}
             <div className="space-y-4">
