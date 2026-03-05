@@ -477,23 +477,15 @@ export default function Contratos() {
     );
     y += 15;
 
-    // Selo gov.br - sempre presente
+    // Assinatura da contratada (imagem) - maior e centralizada
     try {
-      const imgW = 100;
-      const imgH = 25;
-      doc.addImage(assinaturaGovBr, 'PNG', centerX - imgW / 2, y, imgW, imgH);
-      y += imgH + 5;
+      const sigW = 90;
+      const sigH = 30;
+      doc.addImage(assinaturaContratada, 'PNG', centerX - sigW / 2, y, sigW, sigH);
+      y += sigH + 3;
     } catch (e) {
       y += 5;
     }
-
-    // Assinatura da contratada (imagem)
-    try {
-      const sigW = 60;
-      const sigH = 20;
-      doc.addImage(assinaturaContratada, 'PNG', centerX - sigW / 2, y - 5, sigW, sigH);
-      y += sigH;
-    } catch (e) {}
 
     // Linha CONTRATADA
     const lineW = 80;
@@ -669,23 +661,15 @@ export default function Contratos() {
     yy = addTxt('Januária, Minas Gerais, ______________, de ______________, 202___.', marg, yy);
     yy += 15;
 
-    // Selo gov.br - imagem real
+    // Assinatura da contratada (imagem) - maior e centralizada
     try {
-      const imgW = 100;
-      const imgH = 25;
-      doc.addImage(assinaturaGovBr, 'PNG', cx - imgW / 2, yy, imgW, imgH);
-      yy += imgH + 5;
+      const sigW = 90;
+      const sigH = 30;
+      doc.addImage(assinaturaContratada, 'PNG', cx - sigW / 2, yy, sigW, sigH);
+      yy += sigH + 3;
     } catch (e) {
       yy += 5;
     }
-
-    // Assinatura da contratada (imagem)
-    try {
-      const sigW = 60;
-      const sigH = 20;
-      doc.addImage(assinaturaContratada, 'PNG', cx - sigW / 2, yy - 5, sigW, sigH);
-      yy += sigH;
-    } catch (e) {}
 
     const lW = 80;
     doc.line(cx - lW / 2, yy, cx + lW / 2, yy); yy += 5;
