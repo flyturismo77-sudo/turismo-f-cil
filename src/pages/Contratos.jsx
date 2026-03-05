@@ -497,7 +497,7 @@ export default function Contratos() {
     y += 4;
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text('Ulisses José de Luna Neto', centerX, y, { align: 'center' });
+    doc.text('Marcelly Beatriz Lopes Luna', centerX, y, { align: 'center' });
     y += 20;
 
     // Linha CONTRATANTE
@@ -676,7 +676,7 @@ export default function Contratos() {
     doc.setFontSize(11); doc.setFont('helvetica', 'bold');
     doc.text('CONTRATADA', cx, yy, { align: 'center' }); yy += 4;
     doc.setFontSize(9); doc.setFont('helvetica', 'normal');
-    doc.text('Ulisses José de Luna Neto', cx, yy, { align: 'center' }); yy += 20;
+    doc.text('Marcelly Beatriz Lopes Luna', cx, yy, { align: 'center' }); yy += 20;
     doc.line(cx - lW / 2, yy, cx + lW / 2, yy); yy += 5;
     doc.text('CONTRATANTE', cx, yy, { align: 'center' });
 
