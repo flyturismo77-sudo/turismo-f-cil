@@ -441,6 +441,7 @@ export default function Assentos() {
   const seatRows = renderSeatsLayout();
   const isDoubleDeck = viagemSelecionada?.modelo_onibus === 'VA_TUR';
   const isDDDSTur = viagemSelecionada?.modelo_onibus === 'DD_DS_TUR';
+  const isDDJGTur = viagemSelecionada?.modelo_onibus === 'DD_JG_TUR';
   const isJGTurismo = viagemSelecionada?.modelo_onibus === 'JG_TURISMO_44';
   const isLDDeca = viagemSelecionada?.modelo_onibus === 'LD48';
 
@@ -603,6 +604,16 @@ Qualquer dúvida, estamos à disposição!`;
 
             {isLDDeca ? (
               <LDDecaTurismoLayout
+                clientePorPoltrona={clientePorPoltrona}
+                searchTerm={searchTerm}
+                onSeatClick={(seatNumber) => {
+                  setSelectedSeat(seatNumber);
+                  setShowDialog(true);
+                }}
+                renderSeatInfo={renderSeatInfo}
+              />
+            ) : isDDJGTur ? (
+              <DDJGTurismoLayout
                 clientePorPoltrona={clientePorPoltrona}
                 searchTerm={searchTerm}
                 onSeatClick={(seatNumber) => {
