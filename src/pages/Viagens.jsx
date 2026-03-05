@@ -56,6 +56,15 @@ export default function Viagens() {
             if (i === 23 || i === 24) continue;
             assentos.push({ numero_poltrona: i, id_viagem: viagem.id, andar: 'Piso Superior', posicao: i % 2 === 1 ? 'Janela' : 'Corredor', status: 'Disponível' });
           }
+        } else if (modelo === 'DD_JG_TUR') {
+          // DD JG Turismo - 54 seats, two floors
+          // Superior: 1,2,5,9,10,13,14,17,18,21,22,25,26,29,30,33,34,37,38,41,42,43,44
+          // Inferior: 3,4,6,7,8,11,12,15,16,19,20,23,24,27,28,31,32,35,36,39,40,45-54
+          const superior = [1,2,5,9,10,13,14,17,18,21,22,25,26,29,30,33,34,37,38,41,42,43,44];
+          for (let i = 1; i <= 54; i++) {
+            const andar = superior.includes(i) ? 'Piso Superior' : 'Piso Inferior';
+            assentos.push({ numero_poltrona: i, id_viagem: viagem.id, andar, posicao: i % 2 === 1 ? 'Janela' : 'Corredor', status: 'Disponível' });
+          }
         } else if (modelo === 'JG_TURISMO_44') {
           for (let i = 1; i <= totalAssentos; i++) {
             assentos.push({ numero_poltrona: i, id_viagem: viagem.id, andar: 'Primeiro Andar', posicao: i % 2 === 1 ? 'Janela' : 'Corredor', status: 'Disponível' });

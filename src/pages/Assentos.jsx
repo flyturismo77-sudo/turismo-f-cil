@@ -18,6 +18,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DoubleDeckLayout from "../components/assentos/DoubleDeckLayout";
 import DDDSTurLayout from "../components/assentos/DDDSTurLayout";
+import DDJGTurismoLayout from "../components/assentos/DDJGTurismoLayout";
 import JGTurismo44Layout from "../components/assentos/JGTurismo44Layout";
 import LDDecaTurismoLayout from "../components/assentos/LDDecaTurismoLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -105,10 +106,13 @@ export default function Assentos() {
     }
 
     let andar = 'Primeiro Andar';
+    const superiorDDJG = [1,2,5,9,10,13,14,17,18,21,22,25,26,29,30,33,34,37,38,41,42,43,44];
     if (viagemSelecionada?.modelo_onibus === 'VA_TUR') {
       andar = poltrona <= 48 ? 'Piso Superior' : 'Piso Inferior';
     } else if (viagemSelecionada?.modelo_onibus === 'DD_DS_TUR') {
       andar = poltrona <= 44 ? 'Piso Superior' : 'Piso Inferior';
+    } else if (viagemSelecionada?.modelo_onibus === 'DD_JG_TUR') {
+      andar = superiorDDJG.includes(poltrona) ? 'Piso Superior' : 'Piso Inferior';
     }
 
     await updateClienteMutation.mutateAsync({
@@ -440,6 +444,7 @@ export default function Assentos() {
   const seatRows = renderSeatsLayout();
   const isDoubleDeck = viagemSelecionada?.modelo_onibus === 'VA_TUR';
   const isDDDSTur = viagemSelecionada?.modelo_onibus === 'DD_DS_TUR';
+  const isDDJGTur = viagemSelecionada?.modelo_onibus === 'DD_JG_TUR';
   const isJGTurismo = viagemSelecionada?.modelo_onibus === 'JG_TURISMO_44';
   const isLDDeca = viagemSelecionada?.modelo_onibus === 'LD48';
 
@@ -602,6 +607,16 @@ Qualquer dúvida, estamos à disposição!`;
 
             {isLDDeca ? (
               <LDDecaTurismoLayout
+                clientePorPoltrona={clientePorPoltrona}
+                searchTerm={searchTerm}
+                onSeatClick={(seatNumber) => {
+                  setSelectedSeat(seatNumber);
+                  setShowDialog(true);
+                }}
+                renderSeatInfo={renderSeatInfo}
+              />
+            ) : isDDJGTur ? (
+              <DDJGTurismoLayout
                 clientePorPoltrona={clientePorPoltrona}
                 searchTerm={searchTerm}
                 onSeatClick={(seatNumber) => {
