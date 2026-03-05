@@ -106,10 +106,13 @@ export default function Assentos() {
     }
 
     let andar = 'Primeiro Andar';
+    const superiorDDJG = [1,2,5,9,10,13,14,17,18,21,22,25,26,29,30,33,34,37,38,41,42,43,44];
     if (viagemSelecionada?.modelo_onibus === 'VA_TUR') {
       andar = poltrona <= 48 ? 'Piso Superior' : 'Piso Inferior';
     } else if (viagemSelecionada?.modelo_onibus === 'DD_DS_TUR') {
       andar = poltrona <= 44 ? 'Piso Superior' : 'Piso Inferior';
+    } else if (viagemSelecionada?.modelo_onibus === 'DD_JG_TUR') {
+      andar = superiorDDJG.includes(poltrona) ? 'Piso Superior' : 'Piso Inferior';
     }
 
     await updateClienteMutation.mutateAsync({
