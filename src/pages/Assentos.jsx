@@ -18,6 +18,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DoubleDeckLayout from "../components/assentos/DoubleDeckLayout";
 import DDDSTurLayout from "../components/assentos/DDDSTurLayout";
+import DDJGTurismoLayout from "../components/assentos/DDJGTurismoLayout";
 import JGTurismo44Layout from "../components/assentos/JGTurismo44Layout";
 import LDDecaTurismoLayout from "../components/assentos/LDDecaTurismoLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
