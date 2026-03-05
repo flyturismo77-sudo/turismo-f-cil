@@ -9,7 +9,7 @@ export default function DDJGTurismoLayout({
 }) {
   
   const renderSeat = (seatNumber) => {
-    if (!seatNumber) return <div className="w-16 h-16" />;
+    if (!seatNumber) return <div className="w-14 h-14" />;
     
     const cliente = clientePorPoltrona[seatNumber];
     const isOccupied = !!cliente;
@@ -27,17 +27,19 @@ export default function DDJGTurismoLayout({
           onClick={() => onSeatClick(seatNumber)}
           title={isOccupied ? cliente.nome_completo : `Poltrona ${seatNumber}`}
           className={`
-            w-16 h-16 rounded-lg border-2 transition-all duration-200
+            w-14 h-14 rounded-lg border-2 transition-all duration-200
             flex flex-col items-center justify-center p-1
             ${isOccupied 
               ? 'bg-green-100 border-green-500 hover:bg-green-200' 
-              : 'bg-sky-500 border-sky-600 hover:bg-sky-600'
+              : 'bg-gray-200 border-gray-300 hover:bg-gray-300'
             }
             ${!matchesSearch && searchTerm ? 'opacity-30' : ''}
           `}
         >
-          <Armchair className={`w-4 h-4 ${isOccupied ? 'text-green-700' : 'text-white'}`} />
-          <span className={`text-sm font-bold ${isOccupied ? 'text-gray-700' : 'text-white'}`}>{seatNumber}</span>
+          <Armchair className={`w-3.5 h-3.5 ${isOccupied ? 'text-green-700' : 'text-gray-500'}`} />
+          <span className={`text-xs font-bold ${isOccupied ? 'text-green-800' : 'text-gray-600'}`}>
+            {String(seatNumber).padStart(2, '0')}
+          </span>
         </button>
         {isOccupied && (
           <div className="hidden group-hover:block">
@@ -49,174 +51,160 @@ export default function DDJGTurismoLayout({
   };
 
   const renderLabel = (text, className = '') => (
-    <div className={`w-16 h-16 rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 ${className}`}>
+    <div className={`w-14 h-14 rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-400 ${className}`}>
       {text}
     </div>
   );
 
-  const renderEmpty = () => <div className="w-16 h-16" />;
+  const renderLabelWide = (text, cols = 2) => (
+    <div className={`h-14 rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-400`}
+      style={{ width: cols === 2 ? '7.5rem' : '3.5rem' }}>
+      {text}
+    </div>
+  );
 
-  // PISO SUPERIOR layout based on the PDF map
-  // Rows: 01,02 | 05,(gap) | ESCADA | 09,10 | 13,14 | 17,18 | 21,22 | 25,26 | 29,30 | 33,34 | 37,38 | 41,42 | 43,44
-  const pisoSuperiorRows = [
-    [1, 2],
-    [5, null],       // seat 05, gap on right
-    'ESCADA',
-    [9, 10],
-    [13, 14],
-    [17, 18],
-    [21, 22],
-    [25, 26],
-    [29, 30],
-    [33, 34],
-    [37, 38],
-    [41, 42],
-    [43, 44],
-  ];
-
-  // PISO INFERIOR layout based on the PDF map
-  // Front: 04,03 | 06 | FRIGOBAR/WC/PORTA
-  // Then: 07,08 + 46,45 | 12,11 + 47,48 + 50,49 | 16,15 + 51,52 + 54,53
-  // Then: 20,19 | 24,23 | 28,27 | 32,31 | 36,35 | 40,39
-  const pisoInferiorFront = [
-    { left: [4, 3] },
-    { left: [6, null] },
-    'FRIGOBAR_WC',
-  ];
-
-  const pisoInferiorMiddle = [
-    { left: [7, 8], right: [46, 45] },
-    { left: [12, 11], right: [47, 48], extra: [50, 49] },
-    { left: [16, 15], right: [51, 52], extra: [54, 53] },
-  ];
-
-  const pisoInferiorBack = [
-    [20, 19],
-    [24, 23],
-    [28, 27],
-    [32, 31],
-    [36, 35],
-    [40, 39],
-  ];
+  const gap = () => <div className="w-6" />;
+  const empty = () => <div className="w-14 h-14" />;
 
   const occupiedCount = Object.keys(clientePorPoltrona).length;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="text-center text-sm text-gray-500">
         {occupiedCount} de 54 assentos ocupados
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* PISO SUPERIOR */}
-        <div className="bg-gradient-to-b from-blue-50 to-blue-100/50 p-6 rounded-2xl">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* ═══ PISO SUPERIOR ═══ */}
+        <div className="bg-gradient-to-b from-sky-50 to-sky-100/30 p-5 rounded-2xl border border-sky-200">
           <div className="text-center mb-4">
-            <div className="inline-block bg-blue-800 text-white px-6 py-2 rounded-lg font-semibold mb-2">
+            <span className="inline-block bg-sky-600 text-white px-5 py-1.5 rounded-lg font-bold text-sm tracking-wide">
               PISO SUPERIOR
-            </div>
+            </span>
           </div>
 
-          {/* Motorista */}
-          <div className="flex justify-center mb-4">
-            <div className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-              MOT
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center gap-2">
-            {pisoSuperiorRows.map((row, idx) => {
-              if (row === 'ESCADA') {
-                return (
-                  <div key={idx} className="flex gap-2 justify-center">
-                    {renderLabel('ESCADA')}
-                    {renderLabel('ESCADA')}
-                  </div>
-                );
-              }
-              return (
-                <div key={idx} className="flex gap-2 justify-center">
-                  {renderSeat(row[0])}
-                  {row[1] ? renderSeat(row[1]) : renderEmpty()}
+          {/* Bus shape top */}
+          <div className="relative mx-auto" style={{ maxWidth: '340px' }}>
+            <div className="border-2 border-gray-300 rounded-t-[60px] rounded-b-xl p-4 pt-8 bg-white/60">
+              
+              {/* Rows: Left pair | corridor | Right pair */}
+              <div className="flex flex-col gap-2 items-center">
+                {/* Row 1: 01,02 | 04,03 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(1)}{renderSeat(2)}{gap()}{renderSeat(4)}{renderSeat(3)}
                 </div>
-              );
-            })}
+                {/* Row 2: 05,06 | ESCADA */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(5)}{renderSeat(6)}{gap()}{renderLabelWide('ESCADA')}
+                </div>
+                {/* Row 3: 09,10 | FRIGOBAR */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(9)}{renderSeat(10)}{gap()}{renderLabelWide('FRIGOBAR')}
+                </div>
+                {/* Row 4: 13,14 | 07,08 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(13)}{renderSeat(14)}{gap()}{renderSeat(7)}{renderSeat(8)}
+                </div>
+                {/* Row 5: 17,18 | 12,11 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(17)}{renderSeat(18)}{gap()}{renderSeat(12)}{renderSeat(11)}
+                </div>
+                {/* Row 6: 21,22 | 16,15 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(21)}{renderSeat(22)}{gap()}{renderSeat(16)}{renderSeat(15)}
+                </div>
+                {/* Row 7: 25,26 | 20,19 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(25)}{renderSeat(26)}{gap()}{renderSeat(20)}{renderSeat(19)}
+                </div>
+                {/* Row 8: 29,30 | 24,23 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(29)}{renderSeat(30)}{gap()}{renderSeat(24)}{renderSeat(23)}
+                </div>
+                {/* Row 9: 33,34 | 28,27 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(33)}{renderSeat(34)}{gap()}{renderSeat(28)}{renderSeat(27)}
+                </div>
+                {/* Row 10: 37,38 | 32,31 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(37)}{renderSeat(38)}{gap()}{renderSeat(32)}{renderSeat(31)}
+                </div>
+                {/* Row 11: 41,42 | 36,35 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(41)}{renderSeat(42)}{gap()}{renderSeat(36)}{renderSeat(35)}
+                </div>
+                {/* Row 12: 43,44 | 40,39 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(43)}{renderSeat(44)}{gap()}{renderSeat(40)}{renderSeat(39)}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* PISO INFERIOR */}
-        <div className="bg-gradient-to-b from-amber-50 to-amber-100/50 p-6 rounded-2xl">
+        {/* ═══ PISO INFERIOR ═══ */}
+        <div className="bg-gradient-to-b from-amber-50 to-amber-100/30 p-5 rounded-2xl border border-amber-200">
           <div className="text-center mb-4">
-            <div className="inline-block bg-amber-800 text-white px-6 py-2 rounded-lg font-semibold mb-2">
+            <span className="inline-block bg-amber-600 text-white px-5 py-1.5 rounded-lg font-bold text-sm tracking-wide">
               PISO INFERIOR
-            </div>
+            </span>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            {/* Front section */}
-            <div className="flex gap-2 justify-center">
-              {renderSeat(4)}
-              {renderSeat(3)}
-            </div>
-            <div className="flex gap-2 justify-center">
-              {renderSeat(6)}
-              {renderEmpty()}
-            </div>
+          <div className="relative mx-auto" style={{ maxWidth: '340px' }}>
+            <div className="border-2 border-gray-300 rounded-t-[60px] rounded-b-xl p-4 pt-8 bg-white/60">
+              
+              <div className="flex flex-col gap-2 items-center">
+                {/* MOT */}
+                <div className="flex items-center gap-1">
+                  {empty()}{empty()}{gap()}{renderLabel('MOT')}{renderLabel('MOT')}
+                </div>
 
-            {/* Frigobar / WC / Porta */}
-            <div className="flex gap-2 justify-center">
-              {renderLabel('FRIGO')}
-              {renderLabel('WC')}
-              {renderLabel('PORTA')}
-            </div>
+                {/* Large baggage/empty area + ESCADA */}
+                <div className="flex items-center gap-1">
+                  <div className="w-[7.25rem] h-14 rounded-lg border-2 border-dashed border-gray-200 bg-gray-50" />
+                  {gap()}
+                  {empty()}
+                  {renderLabel('ESCADA')}
+                </div>
 
-            {/* Middle section with extra seats */}
-            <div className="flex gap-2 justify-center">
-              {renderSeat(7)}
-              {renderSeat(8)}
-              <div className="w-4" />
-              {renderSeat(46)}
-              {renderSeat(45)}
-            </div>
-            <div className="flex gap-2 justify-center">
-              {renderSeat(12)}
-              {renderSeat(11)}
-              <div className="w-4" />
-              {renderSeat(47)}
-              {renderSeat(48)}
-              <div className="w-4" />
-              {renderSeat(50)}
-              {renderSeat(49)}
-            </div>
-            <div className="flex gap-2 justify-center">
-              {renderSeat(16)}
-              {renderSeat(15)}
-              <div className="w-4" />
-              {renderSeat(51)}
-              {renderSeat(52)}
-              <div className="w-4" />
-              {renderSeat(54)}
-              {renderSeat(53)}
-            </div>
+                {/* WC + PORTA */}
+                <div className="flex items-center gap-1">
+                  {renderLabelWide('WC')}
+                  {gap()}
+                  {empty()}
+                  {renderLabel('PORTA')}
+                </div>
 
-            {/* Back section - 2 columns */}
-            {pisoInferiorBack.map((row, idx) => (
-              <div key={`back-${idx}`} className="flex gap-2 justify-center">
-                {renderSeat(row[0])}
-                {renderSeat(row[1])}
+                {/* FRIGOBAR + 46,45 */}
+                <div className="flex items-center gap-1">
+                  {renderLabelWide('FRIGOBAR')}
+                  {gap()}
+                  {renderSeat(46)}{renderSeat(45)}
+                </div>
+
+                {/* 47,48 | 50,49 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(47)}{renderSeat(48)}{gap()}{renderSeat(50)}{renderSeat(49)}
+                </div>
+
+                {/* 51,52 | 54,53 */}
+                <div className="flex items-center gap-1">
+                  {renderSeat(51)}{renderSeat(52)}{gap()}{renderSeat(54)}{renderSeat(53)}
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Legenda */}
-      <div className="flex flex-wrap gap-4 justify-center text-sm">
+      <div className="flex flex-wrap gap-6 justify-center text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-sky-500 rounded border-2 border-sky-600" />
+          <div className="w-5 h-5 bg-gray-200 rounded border-2 border-gray-300" />
           <span className="text-gray-600">Disponível</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-green-100 rounded border-2 border-green-500" />
+          <div className="w-5 h-5 bg-green-100 rounded border-2 border-green-500" />
           <span className="text-gray-600">Ocupado</span>
         </div>
       </div>
