@@ -479,9 +479,9 @@ export default function Contratos() {
 
     // Assinatura da contratada (imagem) - maior e centralizada
     try {
-      const sigW = 140;
-      const sigH = 45;
-      doc.addImage(assinaturaContratada, 'PNG', centerX - sigW / 2, y, sigW, sigH);
+      const sigW = 70;
+      const sigH = 18;
+      doc.addImage(assinaturaContratada, 'PNG', centerX - sigW / 2, y + 2, sigW, sigH);
       y += sigH + 3;
     } catch (e) {
       y += 5;
@@ -497,7 +497,7 @@ export default function Contratos() {
     y += 4;
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text('Marcelly Beatriz Lopes Luna', centerX, y, { align: 'center' });
+    doc.text('Ulisses José de Luna Neto', centerX, y, { align: 'center' });
     y += 20;
 
     // Linha CONTRATANTE
@@ -663,9 +663,9 @@ export default function Contratos() {
 
     // Assinatura da contratada (imagem) - maior e centralizada
     try {
-      const sigW = 140;
-      const sigH = 45;
-      doc.addImage(assinaturaContratada, 'PNG', cx - sigW / 2, yy, sigW, sigH);
+      const sigW = 70;
+      const sigH = 18;
+      doc.addImage(assinaturaContratada, 'PNG', cx - sigW / 2, yy + 2, sigW, sigH);
       yy += sigH + 3;
     } catch (e) {
       yy += 5;
@@ -676,7 +676,7 @@ export default function Contratos() {
     doc.setFontSize(11); doc.setFont('helvetica', 'bold');
     doc.text('CONTRATADA', cx, yy, { align: 'center' }); yy += 4;
     doc.setFontSize(9); doc.setFont('helvetica', 'normal');
-    doc.text('Marcelly Beatriz Lopes Luna', cx, yy, { align: 'center' }); yy += 20;
+    doc.text('Ulisses José de Luna Neto', cx, yy, { align: 'center' }); yy += 20;
     doc.line(cx - lW / 2, yy, cx + lW / 2, yy); yy += 5;
     doc.text('CONTRATANTE', cx, yy, { align: 'center' });
 
