@@ -479,9 +479,9 @@ export default function Contratos() {
 
     // Assinatura da contratada (imagem) - maior e centralizada
     try {
-      const sigW = 140;
-      const sigH = 45;
-      doc.addImage(assinaturaContratada, 'PNG', centerX - sigW / 2, y, sigW, sigH);
+      const sigW = 70;
+      const sigH = 18;
+      doc.addImage(assinaturaContratada, 'PNG', centerX - sigW / 2, y + 2, sigW, sigH);
       y += sigH + 3;
     } catch (e) {
       y += 5;
@@ -663,9 +663,9 @@ export default function Contratos() {
 
     // Assinatura da contratada (imagem) - maior e centralizada
     try {
-      const sigW = 140;
-      const sigH = 45;
-      doc.addImage(assinaturaContratada, 'PNG', cx - sigW / 2, yy, sigW, sigH);
+      const sigW = 70;
+      const sigH = 18;
+      doc.addImage(assinaturaContratada, 'PNG', cx - sigW / 2, yy + 2, sigW, sigH);
       yy += sigH + 3;
     } catch (e) {
       yy += 5;
