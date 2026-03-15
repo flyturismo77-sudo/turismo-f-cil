@@ -220,36 +220,36 @@ function ChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-50 flex flex-col items-end gap-3">
       {open && (
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="w-80 sm:w-96 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+          className="w-[calc(100vw-2rem)] max-w-sm sm:max-w-md md:w-96 bg-card border border-border rounded-xl md:rounded-2xl shadow-2xl overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src={logoAgencia} alt="" className="w-8 h-8 rounded-full object-contain bg-white/20 p-1" />
+          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-3 md:p-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 md:gap-3">
+              <img src={logoAgencia} alt="" className="w-7 h-7 md:w-8 md:h-8 rounded-full object-contain bg-white/20 p-1" />
               <div>
-                <p className="text-white font-bold text-sm">{BRAND}</p>
-                <p className="text-white/70 text-xs">Online agora</p>
+                <p className="text-white font-bold text-xs md:text-sm">{BRAND}</p>
+                <p className="text-white/70 text-[10px] md:text-xs">Online agora</p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white"><X className="w-5 h-5" /></button>
+            <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white"><X className="w-4 h-4 md:w-5 md:h-5" /></button>
           </div>
-          <div className="h-64 overflow-y-auto p-4 space-y-3 bg-muted/30">
+          <div className="h-56 md:h-64 overflow-y-auto p-3 md:p-4 space-y-2 md:space-y-3 bg-muted/30">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] px-4 py-2 rounded-2xl text-sm ${m.from === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card border border-border text-foreground rounded-bl-md'}`}>
+                <div className={`max-w-[85%] px-3 md:px-4 py-1.5 md:py-2 rounded-xl md:rounded-2xl text-xs md:text-sm ${m.from === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card border border-border text-foreground rounded-bl-md'}`}>
                   {m.text}
                 </div>
               </div>
             ))}
           </div>
-          <form onSubmit={handleSend} className="p-3 border-t border-border flex gap-2">
-            <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Digite sua mensagem..." className="h-10 text-sm" />
-            <Button type="submit" size="icon" className="h-10 w-10 bg-gradient-to-r from-blue-500 to-cyan-500 text-white flex-shrink-0">
-              <Send className="w-4 h-4" />
+          <form onSubmit={handleSend} className="p-2 md:p-3 border-t border-border flex gap-2">
+            <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Digite sua mensagem..." className="h-9 md:h-10 text-xs md:text-sm" />
+            <Button type="submit" size="icon" className="h-9 w-9 md:h-10 md:w-10 bg-gradient-to-r from-blue-500 to-cyan-500 text-white flex-shrink-0">
+              <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
             </Button>
           </form>
         </motion.div>
@@ -258,9 +258,9 @@ function ChatWidget() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(!open)}
-        className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-2xl shadow-blue-500/30 flex items-center justify-center"
+        className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-2xl shadow-blue-500/30 flex items-center justify-center"
       >
-        {open ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
+        {open ? <X className="w-5 h-5 md:w-6 md:h-6" /> : <MessageSquare className="w-5 h-5 md:w-6 md:h-6" />}
       </motion.button>
     </div>
   );
