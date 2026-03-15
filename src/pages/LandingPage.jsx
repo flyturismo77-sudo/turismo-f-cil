@@ -651,7 +651,7 @@ export default function LandingPage() {
               </div>
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur-2xl" />
-                <motion.img whileHover={{ scale: 1.02 }} src={mockupMultidevice} alt="Sistema multi dispositivo" className="relative rounded-2xl shadow-2xl border border-border" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupFinanceiro} alt="Sistema financeiro multi dispositivo" className="relative rounded-2xl shadow-2xl border border-border" />
               </div>
             </div>
           </div>
