@@ -7,6 +7,7 @@ import logoAgencia from '@/assets/logo-agencia-sistema.png';
 import mockupDashboard from '@/assets/mockup-dashboard-3d.jpg';
 import mockupMultidevice from '@/assets/mockup-multidevice.jpg';
 import testimonialBg from '@/assets/testimonial-bg.jpg';
+import demoVideo from '@/assets/demo-video.mp4';
 import {
   Plane, Users, CreditCard, Bus, Calendar, FileText, BarChart3,
   Shield, Clock, CheckCircle2, Star,
