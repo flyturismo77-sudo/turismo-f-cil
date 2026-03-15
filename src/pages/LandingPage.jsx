@@ -183,18 +183,18 @@ function CountdownTimer() {
   }, []);
   const pad = (n) => String(n).padStart(2, '0');
   return (
-    <div className="flex items-center justify-center gap-3">
-      {[
-        { v: pad(time.h), l: 'Horas' },
-        { v: pad(time.m), l: 'Min' },
-        { v: pad(time.s), l: 'Seg' },
-      ].map((t, i) => (
-        <div key={i} className="text-center">
-          <div className="bg-white/20 backdrop-blur rounded-xl px-4 py-3 text-3xl md:text-4xl font-extrabold font-mono tabular-nums">{t.v}</div>
-          <span className="text-xs text-white/60 mt-1 block">{t.l}</span>
-        </div>
-      ))}
-    </div>
+            <div className="flex items-center justify-center gap-2 md:gap-3">
+              {[
+                { v: pad(time.h), l: 'Horas' },
+                { v: pad(time.m), l: 'Min' },
+                { v: pad(time.s), l: 'Seg' },
+              ].map((t, i) => (
+                <div key={i} className="text-center">
+                  <div className="bg-white/20 backdrop-blur rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 text-2xl sm:text-3xl md:text-4xl font-extrabold font-mono tabular-nums">{t.v}</div>
+                  <span className="text-[10px] md:text-xs text-white/60 mt-1 block">{t.l}</span>
+                </div>
+              ))}
+            </div>
   );
 }
 
@@ -220,36 +220,36 @@ function ChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-50 flex flex-col items-end gap-3">
       {open && (
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="w-80 sm:w-96 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+          className="w-[calc(100vw-2rem)] max-w-sm sm:max-w-md md:w-96 bg-card border border-border rounded-xl md:rounded-2xl shadow-2xl overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src={logoAgencia} alt="" className="w-8 h-8 rounded-full object-contain bg-white/20 p-1" />
+          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-3 md:p-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 md:gap-3">
+              <img src={logoAgencia} alt="" className="w-7 h-7 md:w-8 md:h-8 rounded-full object-contain bg-white/20 p-1" />
               <div>
-                <p className="text-white font-bold text-sm">{BRAND}</p>
-                <p className="text-white/70 text-xs">Online agora</p>
+                <p className="text-white font-bold text-xs md:text-sm">{BRAND}</p>
+                <p className="text-white/70 text-[10px] md:text-xs">Online agora</p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white"><X className="w-5 h-5" /></button>
+            <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white"><X className="w-4 h-4 md:w-5 md:h-5" /></button>
           </div>
-          <div className="h-64 overflow-y-auto p-4 space-y-3 bg-muted/30">
+          <div className="h-56 md:h-64 overflow-y-auto p-3 md:p-4 space-y-2 md:space-y-3 bg-muted/30">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] px-4 py-2 rounded-2xl text-sm ${m.from === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card border border-border text-foreground rounded-bl-md'}`}>
+                <div className={`max-w-[85%] px-3 md:px-4 py-1.5 md:py-2 rounded-xl md:rounded-2xl text-xs md:text-sm ${m.from === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-card border border-border text-foreground rounded-bl-md'}`}>
                   {m.text}
                 </div>
               </div>
             ))}
           </div>
-          <form onSubmit={handleSend} className="p-3 border-t border-border flex gap-2">
-            <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Digite sua mensagem..." className="h-10 text-sm" />
-            <Button type="submit" size="icon" className="h-10 w-10 bg-gradient-to-r from-blue-500 to-cyan-500 text-white flex-shrink-0">
-              <Send className="w-4 h-4" />
+          <form onSubmit={handleSend} className="p-2 md:p-3 border-t border-border flex gap-2">
+            <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Digite sua mensagem..." className="h-9 md:h-10 text-xs md:text-sm" />
+            <Button type="submit" size="icon" className="h-9 w-9 md:h-10 md:w-10 bg-gradient-to-r from-blue-500 to-cyan-500 text-white flex-shrink-0">
+              <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
             </Button>
           </form>
         </motion.div>
@@ -258,9 +258,9 @@ function ChatWidget() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(!open)}
-        className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-2xl shadow-blue-500/30 flex items-center justify-center"
+        className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-2xl shadow-blue-500/30 flex items-center justify-center"
       >
-        {open ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
+        {open ? <X className="w-5 h-5 md:w-6 md:h-6" /> : <MessageSquare className="w-5 h-5 md:w-6 md:h-6" />}
       </motion.button>
     </div>
   );
@@ -333,62 +333,62 @@ export default function LandingPage() {
       <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-slate-900 to-cyan-950" />
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 25% 50%, hsl(200 80% 60%) 0%, transparent 50%), radial-gradient(circle at 75% 50%, hsl(180 80% 50%) 0%, transparent 50%)' }} />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-28 w-full">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
-                <Flame className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm font-medium text-emerald-400">+200 agências já testaram gratuitamente</span>
+              <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 md:mb-6">
+                <Flame className="w-3 h-3 md:w-4 md:h-4 text-emerald-400 flex-shrink-0" />
+                <span className="text-xs md:text-sm font-medium text-emerald-400">+200 agências já testaram</span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-white">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 md:mb-6 text-white">
                 Sua agência no{' '}
                 <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">piloto automático</span>
               </h1>
-              <p className="text-lg md:text-xl text-blue-100/80 mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-blue-100/80 mb-6 md:mb-8 leading-relaxed">
                 Viagens, clientes, assentos, quartos, financeiro, contratos, WhatsApp e muito mais —
                 <strong className="text-white"> tudo em um só lugar</strong>. Pare de usar planilhas e comece a crescer.
               </p>
-              <div className="flex flex-wrap items-center gap-6 mb-8">
-                {['100% na nuvem', 'Sem cartão de crédito', 'Demo personalizada', 'Suporte dedicado'].map((text, i) => (
+              <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:items-center md:gap-4 lg:gap-6 mb-6 md:mb-8">
+                {['100% na nuvem', 'Sem cartão', 'Demo grátis', 'Suporte dedicado'].map((text, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-cyan-400" />
-                    <span className="text-sm text-blue-200/80">{text}</span>
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0" />
+                    <span className="text-xs md:text-sm text-blue-200/80">{text}</span>
                   </div>
                 ))}
               </div>
-              <div className="lg:hidden mb-8">
-                <img src={mockupDashboard} alt={`Dashboard ${BRAND}`} className="rounded-2xl shadow-2xl border border-white/10" />
+              <div className="lg:hidden mb-6 md:mb-8">
+                <img src={mockupDashboard} alt={`Dashboard ${BRAND}`} className="rounded-xl md:rounded-2xl shadow-2xl border border-white/10 w-full" />
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} id="agendar">
-              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 rounded-2xl blur-3xl" />
-              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-3">
+            <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} id="agendar" className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 rounded-2xl blur-3xl hidden lg:block" />
+              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl md:rounded-2xl p-5 md:p-8">
+                <div className="text-center mb-4 md:mb-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-2 md:mb-3">
                     <Gift className="w-3 h-3" /> TESTE GRATUITO
                   </div>
-                  <h3 className="text-2xl font-extrabold text-white mb-2">Agende sua demonstração</h3>
-                  <p className="text-blue-200/70 text-sm">Veja o sistema ao vivo, sem compromisso</p>
+                  <h3 className="text-xl md:text-2xl font-extrabold text-white mb-1 md:mb-2">Agende sua demonstração</h3>
+                  <p className="text-blue-200/70 text-xs md:text-sm">Veja o sistema ao vivo, sem compromisso</p>
                 </div>
                 <LeadForm variant="hero" />
               </div>
             </motion.div>
           </div>
         </div>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-blue-300/60 text-xs animate-bounce">
+        <div className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 items-center gap-2 text-blue-300/60 text-xs animate-bounce">
           <ChevronDown className="w-4 h-4" /> Role para descobrir mais
         </div>
       </section>
 
       {/* Social Proof Bar */}
-      <section className="py-6 bg-gradient-to-r from-blue-500 to-cyan-500">
+      <section className="py-5 md:py-6 bg-gradient-to-r from-blue-500 to-cyan-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 text-white">
-            {[{ value: '18+', label: 'Módulos' }, { value: '200+', label: 'Agências Testaram' }, { value: '99.9%', label: 'Uptime' }, { value: '5★', label: 'Nota dos Clientes' }].map((stat, i) => (
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-6 sm:gap-8 md:gap-16 text-white">
+            {[{ value: '18+', label: 'Módulos' }, { value: '200+', label: 'Testaram' }, { value: '99.9%', label: 'Uptime' }, { value: '5★', label: 'Nota' }].map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="text-2xl md:text-3xl font-extrabold">{stat.value}</div>
-                <div className="text-white/80 text-xs font-medium">{stat.label}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-extrabold">{stat.value}</div>
+                <div className="text-white/80 text-[10px] sm:text-xs font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -397,17 +397,17 @@ export default function LandingPage() {
 
       {/* Video Demo Section */}
       <FadeIn>
-        <section className="py-20">
+        <section className="py-12 md:py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-                <Play className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Veja na Prática</span>
+            <div className="text-center mb-6 md:mb-10">
+              <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 border border-primary/20 mb-3 md:mb-4">
+                <Play className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+                <span className="text-xs md:text-sm font-medium text-primary">Veja na Prática</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Conheça o sistema em 60 segundos</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Assista uma prévia do que o {BRAND} pode fazer pela sua agência</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3 md:mb-4 px-4">Conheça o sistema em 60 segundos</h2>
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">Assista uma prévia do que o {BRAND} pode fazer pela sua agência</p>
             </div>
-            <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl bg-muted aspect-video">
+            <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border shadow-2xl bg-muted aspect-video">
               <video
                 src={demoVideo}
                 autoPlay
@@ -431,7 +431,7 @@ export default function LandingPage() {
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Não é só uma apresentação — é uma consultoria personalizada</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {[
                 { icon: Monitor, title: 'Demo Ao Vivo', desc: 'Sistema funcionando com dados reais de viagens e clientes', color: 'from-blue-500 to-cyan-500' },
                 { icon: Handshake, title: 'Consultoria Grátis', desc: 'Analisamos seu fluxo e mostramos como otimizar', color: 'from-amber-500 to-orange-500' },
@@ -440,12 +440,12 @@ export default function LandingPage() {
               ].map((item, i) => (
                 <FadeIn key={i} delay={i * 0.1}>
                   <Card className="border-border text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
-                    <CardContent className="p-6">
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                        <item.icon className="w-7 h-7 text-white" />
+                    <CardContent className="p-5 md:p-6">
+                      <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-lg`}>
+                        <item.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                      <h3 className="text-base md:text-lg font-bold mb-1 md:mb-2">{item.title}</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground">{item.desc}</p>
                     </CardContent>
                   </Card>
                 </FadeIn>
@@ -463,7 +463,7 @@ export default function LandingPage() {
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Você ainda gerencia sua agência assim?</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Se você se identificou, o {BRAND} é para você.</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {[
                 { emoji: '📋', pain: 'Planilhas infinitas do Excel', solution: 'Dashboard inteligente centralizado' },
                 { emoji: '😰', pain: 'Medo de perder dados', solution: 'Banco de dados seguro na nuvem' },
@@ -475,14 +475,14 @@ export default function LandingPage() {
                 <FadeIn key={i} delay={i * 0.08}>
                   <Card className="border-border overflow-hidden group hover:shadow-xl transition-all duration-300 h-full">
                     <CardContent className="p-0">
-                      <div className="p-5 bg-destructive/5 border-b border-border">
-                        <div className="text-2xl mb-2">{item.emoji}</div>
-                        <p className="font-semibold text-destructive/80 line-through decoration-2">{item.pain}</p>
+                      <div className="p-4 md:p-5 bg-destructive/5 border-b border-border">
+                        <div className="text-xl md:text-2xl mb-1 md:mb-2">{item.emoji}</div>
+                        <p className="font-semibold text-sm md:text-base text-destructive/80 line-through decoration-2">{item.pain}</p>
                       </div>
-                      <div className="p-5">
+                      <div className="p-4 md:p-5">
                         <div className="flex items-start gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                          <p className="font-medium text-foreground">{item.solution}</p>
+                          <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                          <p className="font-medium text-sm md:text-base text-foreground">{item.solution}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -566,16 +566,16 @@ export default function LandingPage() {
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Construída ouvindo agências reais. Nada genérico.</p>
             </div>
           </FadeIn>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {features.map((f, i) => (
               <FadeIn key={i} delay={i * 0.05}>
                 <Card className="group border-border hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
-                  <CardContent className="p-6">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
-                      <f.icon className="w-6 h-6 text-white" />
+                  <CardContent className="p-5 md:p-6">
+                    <div className={`w-11 h-11 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-3 md:mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
+                      <f.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold mb-2 text-foreground">{f.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
+                    <h3 className="text-base md:text-lg font-bold mb-1.5 md:mb-2 text-foreground">{f.title}</h3>
+                    <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">{f.desc}</p>
                   </CardContent>
                 </Card>
               </FadeIn>
@@ -596,13 +596,13 @@ export default function LandingPage() {
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">+18 módulos 100% integrados</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Todos conversam entre si. Cadastre uma viagem e tudo fica conectado.</p>
             </div>
-            <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-9 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3 md:gap-4">
               {modules.map((m, i) => (
-                <motion.div key={i} whileHover={{ y: -4 }} className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all group cursor-default">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 flex items-center justify-center group-hover:from-blue-500 group-hover:to-cyan-500 transition-all">
-                    <m.icon className="w-5 h-5 text-primary group-hover:text-white transition-colors" />
+                <motion.div key={i} whileHover={{ y: -4 }} className="flex flex-col items-center gap-1.5 md:gap-2 p-3 md:p-4 rounded-lg md:rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all group cursor-default">
+                  <div className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 flex items-center justify-center group-hover:from-blue-500 group-hover:to-cyan-500 transition-all flex-shrink-0">
+                    <m.icon className="w-4 h-4 md:w-5 md:h-5 text-primary group-hover:text-white transition-colors" />
                   </div>
-                  <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight">{m.name}</span>
+                  <span className="text-[10px] md:text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight">{m.name}</span>
                 </motion.div>
               ))}
             </div>
@@ -649,11 +649,11 @@ export default function LandingPage() {
                   </Button>
                 </a>
               </div>
-              <div className="relative space-y-6">
-                <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur-2xl" />
-                <motion.img whileHover={{ scale: 1.02 }} src={mockupDashboard} alt="Dashboard do sistema" className="relative rounded-2xl shadow-2xl border border-border" />
-                <motion.img whileHover={{ scale: 1.02 }} src={mockupAssentos} alt="Mapa de assentos" className="relative rounded-2xl shadow-2xl border border-border" />
-                <motion.img whileHover={{ scale: 1.02 }} src={mockupFinanceiro} alt="Financeiro multi dispositivo" className="relative rounded-2xl shadow-2xl border border-border" />
+              <div className="relative space-y-4 md:space-y-6">
+                <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur-2xl hidden lg:block" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupDashboard} alt="Dashboard do sistema" className="relative rounded-xl md:rounded-2xl shadow-2xl border border-border w-full" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupAssentos} alt="Mapa de assentos" className="relative rounded-xl md:rounded-2xl shadow-2xl border border-border w-full" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupFinanceiro} alt="Financeiro multi dispositivo" className="relative rounded-xl md:rounded-2xl shadow-2xl border border-border w-full" />
               </div>
             </div>
           </div>
@@ -773,20 +773,20 @@ export default function LandingPage() {
               </div>
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">O que dizem nossos clientes</h2>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {testimonials.map((t, i) => (
                 <FadeIn key={i} delay={i * 0.1}>
                   <Card className="border-border hover:shadow-xl transition-all h-full">
-                    <CardContent className="p-6">
-                      <Quote className="w-8 h-8 text-cyan-500/30 mb-4" />
-                      <p className="text-foreground mb-4 leading-relaxed text-sm">"{t.text}"</p>
-                      <div className="flex items-center gap-1 mb-3">
+                    <CardContent className="p-5 md:p-6">
+                      <Quote className="w-7 h-7 md:w-8 md:h-8 text-cyan-500/30 mb-3 md:mb-4" />
+                      <p className="text-foreground mb-3 md:mb-4 leading-relaxed text-xs md:text-sm">"{t.text}"</p>
+                      <div className="flex items-center gap-1 mb-2 md:mb-3">
                         {Array(t.stars).fill(0).map((_, j) => (
-                          <Star key={j} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          <Star key={j} className="w-3.5 h-3.5 md:w-4 md:h-4 fill-amber-400 text-amber-400" />
                         ))}
                       </div>
-                      <p className="font-bold text-foreground text-sm">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.role}</p>
+                      <p className="font-bold text-foreground text-xs md:text-sm">{t.name}</p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">{t.role}</p>
                     </CardContent>
                   </Card>
                 </FadeIn>
@@ -798,9 +798,9 @@ export default function LandingPage() {
 
       {/* Trust */}
       <FadeIn>
-        <section className="py-20">
+        <section className="py-12 md:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {[
                 { icon: Lock, title: 'Dados Seguros', desc: 'Criptografia e backup na nuvem AWS' },
                 { icon: TabletSmartphone, title: '100% Responsivo', desc: 'Celular, tablet e desktop' },
@@ -808,12 +808,12 @@ export default function LandingPage() {
                 { icon: HeadphonesIcon, title: 'Suporte Humano', desc: 'WhatsApp e e-mail reais' },
               ].map((item, i) => (
                 <Card key={i} className="border-border text-center hover:shadow-lg transition-all">
-                  <CardContent className="p-6">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                      <item.icon className="w-7 h-7 text-white" />
+                  <CardContent className="p-5 md:p-6">
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-lg">
+                      <item.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold mb-1">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    <h3 className="text-base md:text-lg font-bold mb-1">{item.title}</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground">{item.desc}</p>
                   </CardContent>
                 </Card>
               ))}
