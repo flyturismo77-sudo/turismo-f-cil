@@ -431,7 +431,7 @@ export default function LandingPage() {
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Não é só uma apresentação — é uma consultoria personalizada</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {[
                 { icon: Monitor, title: 'Demo Ao Vivo', desc: 'Sistema funcionando com dados reais de viagens e clientes', color: 'from-blue-500 to-cyan-500' },
                 { icon: Handshake, title: 'Consultoria Grátis', desc: 'Analisamos seu fluxo e mostramos como otimizar', color: 'from-amber-500 to-orange-500' },
@@ -440,12 +440,12 @@ export default function LandingPage() {
               ].map((item, i) => (
                 <FadeIn key={i} delay={i * 0.1}>
                   <Card className="border-border text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
-                    <CardContent className="p-6">
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                        <item.icon className="w-7 h-7 text-white" />
+                    <CardContent className="p-5 md:p-6">
+                      <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-lg`}>
+                        <item.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                      <h3 className="text-base md:text-lg font-bold mb-1 md:mb-2">{item.title}</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground">{item.desc}</p>
                     </CardContent>
                   </Card>
                 </FadeIn>
