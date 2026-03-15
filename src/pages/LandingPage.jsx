@@ -596,13 +596,13 @@ export default function LandingPage() {
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">+18 módulos 100% integrados</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Todos conversam entre si. Cadastre uma viagem e tudo fica conectado.</p>
             </div>
-            <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-9 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3 md:gap-4">
               {modules.map((m, i) => (
-                <motion.div key={i} whileHover={{ y: -4 }} className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all group cursor-default">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 flex items-center justify-center group-hover:from-blue-500 group-hover:to-cyan-500 transition-all">
-                    <m.icon className="w-5 h-5 text-primary group-hover:text-white transition-colors" />
+                <motion.div key={i} whileHover={{ y: -4 }} className="flex flex-col items-center gap-1.5 md:gap-2 p-3 md:p-4 rounded-lg md:rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all group cursor-default">
+                  <div className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 flex items-center justify-center group-hover:from-blue-500 group-hover:to-cyan-500 transition-all flex-shrink-0">
+                    <m.icon className="w-4 h-4 md:w-5 md:h-5 text-primary group-hover:text-white transition-colors" />
                   </div>
-                  <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight">{m.name}</span>
+                  <span className="text-[10px] md:text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight">{m.name}</span>
                 </motion.div>
               ))}
             </div>
