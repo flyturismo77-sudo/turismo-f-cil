@@ -382,13 +382,13 @@ export default function LandingPage() {
       </section>
 
       {/* Social Proof Bar */}
-      <section className="py-6 bg-gradient-to-r from-blue-500 to-cyan-500">
+      <section className="py-5 md:py-6 bg-gradient-to-r from-blue-500 to-cyan-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 text-white">
-            {[{ value: '18+', label: 'Módulos' }, { value: '200+', label: 'Agências Testaram' }, { value: '99.9%', label: 'Uptime' }, { value: '5★', label: 'Nota dos Clientes' }].map((stat, i) => (
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-6 sm:gap-8 md:gap-16 text-white">
+            {[{ value: '18+', label: 'Módulos' }, { value: '200+', label: 'Testaram' }, { value: '99.9%', label: 'Uptime' }, { value: '5★', label: 'Nota' }].map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="text-2xl md:text-3xl font-extrabold">{stat.value}</div>
-                <div className="text-white/80 text-xs font-medium">{stat.label}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-extrabold">{stat.value}</div>
+                <div className="text-white/80 text-[10px] sm:text-xs font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
