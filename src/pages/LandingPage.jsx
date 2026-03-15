@@ -463,7 +463,7 @@ export default function LandingPage() {
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Você ainda gerencia sua agência assim?</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Se você se identificou, o {BRAND} é para você.</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {[
                 { emoji: '📋', pain: 'Planilhas infinitas do Excel', solution: 'Dashboard inteligente centralizado' },
                 { emoji: '😰', pain: 'Medo de perder dados', solution: 'Banco de dados seguro na nuvem' },
@@ -475,14 +475,14 @@ export default function LandingPage() {
                 <FadeIn key={i} delay={i * 0.08}>
                   <Card className="border-border overflow-hidden group hover:shadow-xl transition-all duration-300 h-full">
                     <CardContent className="p-0">
-                      <div className="p-5 bg-destructive/5 border-b border-border">
-                        <div className="text-2xl mb-2">{item.emoji}</div>
-                        <p className="font-semibold text-destructive/80 line-through decoration-2">{item.pain}</p>
+                      <div className="p-4 md:p-5 bg-destructive/5 border-b border-border">
+                        <div className="text-xl md:text-2xl mb-1 md:mb-2">{item.emoji}</div>
+                        <p className="font-semibold text-sm md:text-base text-destructive/80 line-through decoration-2">{item.pain}</p>
                       </div>
-                      <div className="p-5">
+                      <div className="p-4 md:p-5">
                         <div className="flex items-start gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                          <p className="font-medium text-foreground">{item.solution}</p>
+                          <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                          <p className="font-medium text-sm md:text-base text-foreground">{item.solution}</p>
                         </div>
                       </div>
                     </CardContent>
