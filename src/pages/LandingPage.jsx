@@ -7,6 +7,7 @@ import logoAgencia from '@/assets/logo-agencia-sistema.png';
 import mockupDashboard from '@/assets/mockup-dashboard-3d.jpg';
 import mockupMultidevice from '@/assets/mockup-multidevice.jpg';
 import testimonialBg from '@/assets/testimonial-bg.jpg';
+import demoVideo from '@/assets/demo-video.mp4';
 import {
   Plane, Users, CreditCard, Bus, Calendar, FileText, BarChart3,
   Shield, Clock, CheckCircle2, Star,
@@ -405,20 +406,15 @@ export default function LandingPage() {
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Conheça o sistema em 60 segundos</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Assista uma prévia do que o {BRAND} pode fazer pela sua agência</p>
             </div>
-            <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl bg-muted aspect-video group cursor-pointer"
-              onClick={() => window.open(WHATSAPP_LINK, '_blank')}
-            >
-              <img src={mockupDashboard} alt="Demo do sistema" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/50 transition-colors">
-                <motion.div whileHover={{ scale: 1.1 }} className="w-20 h-20 rounded-full bg-white/90 flex items-center justify-center shadow-2xl">
-                  <Play className="w-8 h-8 text-blue-600 ml-1" />
-                </motion.div>
-              </div>
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <p className="text-white text-sm font-medium bg-black/30 backdrop-blur rounded-lg px-4 py-2">
-                  Clique para solicitar um vídeo de demonstração personalizado
-                </p>
-              </div>
+            <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl bg-muted aspect-video">
+              <video
+                src={demoVideo}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </section>
