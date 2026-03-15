@@ -333,50 +333,50 @@ export default function LandingPage() {
       <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-slate-900 to-cyan-950" />
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 25% 50%, hsl(200 80% 60%) 0%, transparent 50%), radial-gradient(circle at 75% 50%, hsl(180 80% 50%) 0%, transparent 50%)' }} />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-28 w-full">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
-                <Flame className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm font-medium text-emerald-400">+200 agências já testaram gratuitamente</span>
+              <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 md:mb-6">
+                <Flame className="w-3 h-3 md:w-4 md:h-4 text-emerald-400 flex-shrink-0" />
+                <span className="text-xs md:text-sm font-medium text-emerald-400">+200 agências já testaram</span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-white">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 md:mb-6 text-white">
                 Sua agência no{' '}
                 <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">piloto automático</span>
               </h1>
-              <p className="text-lg md:text-xl text-blue-100/80 mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-blue-100/80 mb-6 md:mb-8 leading-relaxed">
                 Viagens, clientes, assentos, quartos, financeiro, contratos, WhatsApp e muito mais —
                 <strong className="text-white"> tudo em um só lugar</strong>. Pare de usar planilhas e comece a crescer.
               </p>
-              <div className="flex flex-wrap items-center gap-6 mb-8">
-                {['100% na nuvem', 'Sem cartão de crédito', 'Demo personalizada', 'Suporte dedicado'].map((text, i) => (
+              <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:items-center md:gap-4 lg:gap-6 mb-6 md:mb-8">
+                {['100% na nuvem', 'Sem cartão', 'Demo grátis', 'Suporte dedicado'].map((text, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-cyan-400" />
-                    <span className="text-sm text-blue-200/80">{text}</span>
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0" />
+                    <span className="text-xs md:text-sm text-blue-200/80">{text}</span>
                   </div>
                 ))}
               </div>
-              <div className="lg:hidden mb-8">
-                <img src={mockupDashboard} alt={`Dashboard ${BRAND}`} className="rounded-2xl shadow-2xl border border-white/10" />
+              <div className="lg:hidden mb-6 md:mb-8">
+                <img src={mockupDashboard} alt={`Dashboard ${BRAND}`} className="rounded-xl md:rounded-2xl shadow-2xl border border-white/10 w-full" />
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} id="agendar">
-              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 rounded-2xl blur-3xl" />
-              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-3">
+            <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} id="agendar" className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 rounded-2xl blur-3xl hidden lg:block" />
+              <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl md:rounded-2xl p-5 md:p-8">
+                <div className="text-center mb-4 md:mb-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-2 md:mb-3">
                     <Gift className="w-3 h-3" /> TESTE GRATUITO
                   </div>
-                  <h3 className="text-2xl font-extrabold text-white mb-2">Agende sua demonstração</h3>
-                  <p className="text-blue-200/70 text-sm">Veja o sistema ao vivo, sem compromisso</p>
+                  <h3 className="text-xl md:text-2xl font-extrabold text-white mb-1 md:mb-2">Agende sua demonstração</h3>
+                  <p className="text-blue-200/70 text-xs md:text-sm">Veja o sistema ao vivo, sem compromisso</p>
                 </div>
                 <LeadForm variant="hero" />
               </div>
             </motion.div>
           </div>
         </div>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-blue-300/60 text-xs animate-bounce">
+        <div className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 items-center gap-2 text-blue-300/60 text-xs animate-bounce">
           <ChevronDown className="w-4 h-4" /> Role para descobrir mais
         </div>
       </section>
