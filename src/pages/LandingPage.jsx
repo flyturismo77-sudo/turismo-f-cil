@@ -649,11 +649,11 @@ export default function LandingPage() {
                   </Button>
                 </a>
               </div>
-              <div className="relative space-y-6">
-                <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur-2xl" />
-                <motion.img whileHover={{ scale: 1.02 }} src={mockupDashboard} alt="Dashboard do sistema" className="relative rounded-2xl shadow-2xl border border-border" />
-                <motion.img whileHover={{ scale: 1.02 }} src={mockupAssentos} alt="Mapa de assentos" className="relative rounded-2xl shadow-2xl border border-border" />
-                <motion.img whileHover={{ scale: 1.02 }} src={mockupFinanceiro} alt="Financeiro multi dispositivo" className="relative rounded-2xl shadow-2xl border border-border" />
+              <div className="relative space-y-4 md:space-y-6">
+                <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur-2xl hidden lg:block" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupDashboard} alt="Dashboard do sistema" className="relative rounded-xl md:rounded-2xl shadow-2xl border border-border w-full" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupAssentos} alt="Mapa de assentos" className="relative rounded-xl md:rounded-2xl shadow-2xl border border-border w-full" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupFinanceiro} alt="Financeiro multi dispositivo" className="relative rounded-xl md:rounded-2xl shadow-2xl border border-border w-full" />
               </div>
             </div>
           </div>
