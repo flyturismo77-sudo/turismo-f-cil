@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import logoAgencia from '@/assets/logo-agencia-sistema.png';
-import mockupDashboard from '@/assets/mockup-dashboard-3d.jpg';
-import mockupMultidevice from '@/assets/mockup-multidevice.jpg';
+import mockupDashboard from '@/assets/mockup-dashboard-pt.jpg';
+import mockupAssentos from '@/assets/mockup-assentos-pt.jpg';
+import mockupFinanceiro from '@/assets/mockup-financeiro-pt.jpg';
 import testimonialBg from '@/assets/testimonial-bg.jpg';
 import demoVideo from '@/assets/demo-video.mp4';
 import {
