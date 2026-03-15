@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import logoAgencia from '@/assets/logo-agencia-sistema.png';
-import mockupDashboard from '@/assets/mockup-dashboard-3d.jpg';
-import mockupMultidevice from '@/assets/mockup-multidevice.jpg';
+import mockupDashboard from '@/assets/mockup-dashboard-pt.jpg';
+import mockupAssentos from '@/assets/mockup-assentos-pt.jpg';
+import mockupFinanceiro from '@/assets/mockup-financeiro-pt.jpg';
 import testimonialBg from '@/assets/testimonial-bg.jpg';
 import demoVideo from '@/assets/demo-video.mp4';
 import {
@@ -648,9 +649,11 @@ export default function LandingPage() {
                   </Button>
                 </a>
               </div>
-              <div className="relative">
+              <div className="relative space-y-6">
                 <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur-2xl" />
-                <motion.img whileHover={{ scale: 1.02 }} src={mockupMultidevice} alt="Sistema multi dispositivo" className="relative rounded-2xl shadow-2xl border border-border" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupDashboard} alt="Dashboard do sistema" className="relative rounded-2xl shadow-2xl border border-border" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupAssentos} alt="Mapa de assentos" className="relative rounded-2xl shadow-2xl border border-border" />
+                <motion.img whileHover={{ scale: 1.02 }} src={mockupFinanceiro} alt="Financeiro multi dispositivo" className="relative rounded-2xl shadow-2xl border border-border" />
               </div>
             </div>
           </div>
