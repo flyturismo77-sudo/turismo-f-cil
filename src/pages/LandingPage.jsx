@@ -397,17 +397,17 @@ export default function LandingPage() {
 
       {/* Video Demo Section */}
       <FadeIn>
-        <section className="py-20">
+        <section className="py-12 md:py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-                <Play className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Veja na Prática</span>
+            <div className="text-center mb-6 md:mb-10">
+              <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 border border-primary/20 mb-3 md:mb-4">
+                <Play className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+                <span className="text-xs md:text-sm font-medium text-primary">Veja na Prática</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Conheça o sistema em 60 segundos</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Assista uma prévia do que o {BRAND} pode fazer pela sua agência</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3 md:mb-4 px-4">Conheça o sistema em 60 segundos</h2>
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">Assista uma prévia do que o {BRAND} pode fazer pela sua agência</p>
             </div>
-            <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl bg-muted aspect-video">
+            <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border shadow-2xl bg-muted aspect-video">
               <video
                 src={demoVideo}
                 autoPlay
