@@ -798,9 +798,9 @@ export default function LandingPage() {
 
       {/* Trust */}
       <FadeIn>
-        <section className="py-20">
+        <section className="py-12 md:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {[
                 { icon: Lock, title: 'Dados Seguros', desc: 'Criptografia e backup na nuvem AWS' },
                 { icon: TabletSmartphone, title: '100% Responsivo', desc: 'Celular, tablet e desktop' },
@@ -808,12 +808,12 @@ export default function LandingPage() {
                 { icon: HeadphonesIcon, title: 'Suporte Humano', desc: 'WhatsApp e e-mail reais' },
               ].map((item, i) => (
                 <Card key={i} className="border-border text-center hover:shadow-lg transition-all">
-                  <CardContent className="p-6">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                      <item.icon className="w-7 h-7 text-white" />
+                  <CardContent className="p-5 md:p-6">
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-lg">
+                      <item.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold mb-1">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    <h3 className="text-base md:text-lg font-bold mb-1">{item.title}</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground">{item.desc}</p>
                   </CardContent>
                 </Card>
               ))}
