@@ -566,16 +566,16 @@ export default function LandingPage() {
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Construída ouvindo agências reais. Nada genérico.</p>
             </div>
           </FadeIn>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {features.map((f, i) => (
               <FadeIn key={i} delay={i * 0.05}>
                 <Card className="group border-border hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
-                  <CardContent className="p-6">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
-                      <f.icon className="w-6 h-6 text-white" />
+                  <CardContent className="p-5 md:p-6">
+                    <div className={`w-11 h-11 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-3 md:mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
+                      <f.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold mb-2 text-foreground">{f.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
+                    <h3 className="text-base md:text-lg font-bold mb-1.5 md:mb-2 text-foreground">{f.title}</h3>
+                    <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">{f.desc}</p>
                   </CardContent>
                 </Card>
               </FadeIn>
