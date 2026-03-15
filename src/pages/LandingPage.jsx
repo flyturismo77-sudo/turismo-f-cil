@@ -773,20 +773,20 @@ export default function LandingPage() {
               </div>
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">O que dizem nossos clientes</h2>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {testimonials.map((t, i) => (
                 <FadeIn key={i} delay={i * 0.1}>
                   <Card className="border-border hover:shadow-xl transition-all h-full">
-                    <CardContent className="p-6">
-                      <Quote className="w-8 h-8 text-cyan-500/30 mb-4" />
-                      <p className="text-foreground mb-4 leading-relaxed text-sm">"{t.text}"</p>
-                      <div className="flex items-center gap-1 mb-3">
+                    <CardContent className="p-5 md:p-6">
+                      <Quote className="w-7 h-7 md:w-8 md:h-8 text-cyan-500/30 mb-3 md:mb-4" />
+                      <p className="text-foreground mb-3 md:mb-4 leading-relaxed text-xs md:text-sm">"{t.text}"</p>
+                      <div className="flex items-center gap-1 mb-2 md:mb-3">
                         {Array(t.stars).fill(0).map((_, j) => (
-                          <Star key={j} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          <Star key={j} className="w-3.5 h-3.5 md:w-4 md:h-4 fill-amber-400 text-amber-400" />
                         ))}
                       </div>
-                      <p className="font-bold text-foreground text-sm">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.role}</p>
+                      <p className="font-bold text-foreground text-xs md:text-sm">{t.name}</p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">{t.role}</p>
                     </CardContent>
                   </Card>
                 </FadeIn>
