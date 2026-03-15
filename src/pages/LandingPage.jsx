@@ -183,18 +183,18 @@ function CountdownTimer() {
   }, []);
   const pad = (n) => String(n).padStart(2, '0');
   return (
-    <div className="flex items-center justify-center gap-3">
-      {[
-        { v: pad(time.h), l: 'Horas' },
-        { v: pad(time.m), l: 'Min' },
-        { v: pad(time.s), l: 'Seg' },
-      ].map((t, i) => (
-        <div key={i} className="text-center">
-          <div className="bg-white/20 backdrop-blur rounded-xl px-4 py-3 text-3xl md:text-4xl font-extrabold font-mono tabular-nums">{t.v}</div>
-          <span className="text-xs text-white/60 mt-1 block">{t.l}</span>
-        </div>
-      ))}
-    </div>
+            <div className="flex items-center justify-center gap-2 md:gap-3">
+              {[
+                { v: pad(time.h), l: 'Horas' },
+                { v: pad(time.m), l: 'Min' },
+                { v: pad(time.s), l: 'Seg' },
+              ].map((t, i) => (
+                <div key={i} className="text-center">
+                  <div className="bg-white/20 backdrop-blur rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 text-2xl sm:text-3xl md:text-4xl font-extrabold font-mono tabular-nums">{t.v}</div>
+                  <span className="text-[10px] md:text-xs text-white/60 mt-1 block">{t.l}</span>
+                </div>
+              ))}
+            </div>
   );
 }
 
