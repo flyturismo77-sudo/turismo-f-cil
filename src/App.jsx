@@ -70,6 +70,7 @@ const AppRoutes = () => {
       <Route path="/Contato" element={<Contato />} />
       <Route path="/AssinaturaContrato" element={<AssinaturaContrato />} />
       <Route path="/PortalCliente" element={<PortalCliente />} />
+      <Route path="/LandingPage" element={<LandingPage />} />
       
       <Route path="/" element={
         <ProtectedRoute>
