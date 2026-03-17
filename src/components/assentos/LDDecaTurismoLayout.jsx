@@ -56,21 +56,22 @@ export default function LDDecaTurismoLayout({
   };
 
   // Rows: [leftSeat1, leftSeat2, rightSeat1, rightSeat2]
-  const seatRows = [
+  const seatRowsBlock1 = [
     [1, 2, 4, 3],
     [5, 6, 8, 7],
     [9, 10, 12, 11],
     [13, 14, 16, 15],
     [17, 18, 20, 19],
+    [21, 22, 24, 23],
   ];
 
-  const seatRowsAfterFrigobar = [
+  const seatRowsBlock2 = [
     [25, 26, 28, 27],
     [29, 30, 32, 31],
     [33, 34, 36, 35],
     [37, 38, 40, 39],
-    [41, 42, 46, 45],
-    [43, 44, 48, 47],
+    [41, 42, 44, 43],
+    [45, 46, 48, 47],
   ];
 
   const renderRow = (left1, left2, right1, right2) => (
@@ -104,28 +105,22 @@ export default function LDDecaTurismoLayout({
           </div>
 
           <div className="space-y-2">
-            {/* First block: seats 1-22 */}
-            {seatRows.map(([l1, l2, r1, r2]) => renderRow(l1, l2, r1, r2))}
+            {/* First block: seats 1-24 */}
+            {seatRowsBlock1.map(([l1, l2, r1, r2]) => renderRow(l1, l2, r1, r2))}
 
-            {/* Row with 21-22 and Frigobar/Escada */}
+            {/* Frigobar / Escada divider */}
             <div className="flex gap-3 justify-center items-center">
-              <div className="flex gap-1">
-                {renderSeat(21)}
-                {renderSeat(22)}
+              <div className="w-[120px] bg-cyan-100 border-2 border-cyan-400 rounded-lg py-1 text-center">
+                <p className="text-[9px] font-bold text-cyan-900">🧊 Frigobar</p>
               </div>
               <div className="w-6" />
-              <div className="flex flex-col gap-1">
-                <div className="w-[120px] bg-cyan-100 border-2 border-cyan-400 rounded-lg py-1 text-center">
-                  <p className="text-[9px] font-bold text-cyan-900">🧊 Frigobar</p>
-                </div>
-                <div className="w-[120px] bg-purple-100 border-2 border-purple-400 rounded-lg py-1 text-center">
-                  <p className="text-[9px] font-bold text-purple-900">🪜 Escada</p>
-                </div>
+              <div className="w-[120px] bg-purple-100 border-2 border-purple-400 rounded-lg py-1 text-center">
+                <p className="text-[9px] font-bold text-purple-900">🪜 Escada</p>
               </div>
             </div>
 
             {/* Second block: seats 25-48 */}
-            {seatRowsAfterFrigobar.map(([l1, l2, r1, r2]) => renderRow(l1, l2, r1, r2))}
+            {seatRowsBlock2.map(([l1, l2, r1, r2]) => renderRow(l1, l2, r1, r2))}
           </div>
 
           {/* Frigobar bottom */}
