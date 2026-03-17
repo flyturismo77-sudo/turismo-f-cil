@@ -291,6 +291,7 @@ export default function DetalhesViagem() {
   };
 
 
+  const resetForm = () => {
     const isPirapark = viagem?.modo_pirapark;
     const valorPadrao = isPirapark ? 429.90 : (viagem?.valor_1 || 0);
     
