@@ -1019,8 +1019,9 @@ export default function DetalhesViagem() {
       )}
 
       <Tabs defaultValue="detalhes" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="detalhes">Detalhes e Passageiros</TabsTrigger>
+          <TabsTrigger value="lista-financeira">💲 Lista Financeira</TabsTrigger>
           <TabsTrigger value="despesas">💰 Despesas</TabsTrigger>
           <TabsTrigger value="documentos">Documentos da Viagem</TabsTrigger>
           <TabsTrigger value="manual">📖 Manual do Sistema</TabsTrigger>
@@ -1360,7 +1361,92 @@ export default function DetalhesViagem() {
       </TabsContent>
 
 
-      <TabsContent value="documentos">
+      <TabsContent value="lista-financeira">
+        <Card className="shadow-lg">
+          <CardHeader className="border-b border-border">
+            <CardTitle className="text-xl text-foreground flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-emerald-500" />
+              Lista Financeira dos Passageiros ({clientes.length})
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Resumo de Nome, CPF e Valor Pago de cada passageiro desta viagem.
+            </p>
+          </CardHeader>
+          <CardContent className="p-0">
+            {clientes.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground/40" />
+                <p>Nenhum passageiro cadastrado nesta viagem.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/50">
+                      <th className="text-left p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nº</th>
+                      <th className="text-left p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nome Completo</th>
+                      <th className="text-left p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">CPF</th>
+                      <th className="text-right p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Valor do Pacote</th>
+                      <th className="text-right p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Valor Pago</th>
+                      <th className="text-right p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Saldo</th>
+                      <th className="text-center p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...clientes].sort((a, b) => (a.nome_completo || '').localeCompare(b.nome_completo || '')).map((cliente, index) => {
+                      const valorPacote = cliente.valor_total_pacote || 0;
+                      const valorPago = cliente.valor_pago || 0;
+                      const saldo = valorPacote - valorPago;
+                      return (
+                        <tr key={cliente.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                          <td className="p-3 text-sm text-muted-foreground font-medium">{index + 1}</td>
+                          <td className="p-3 text-sm font-semibold text-foreground">{cliente.nome_completo}</td>
+                          <td className="p-3 text-sm text-muted-foreground">{cliente.cpf || '-'}</td>
+                          <td className="p-3 text-sm text-right text-foreground">
+                            R$ {valorPacote.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </td>
+                          <td className="p-3 text-sm text-right font-semibold text-emerald-600 dark:text-emerald-400">
+                            R$ {valorPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </td>
+                          <td className={`p-3 text-sm text-right font-semibold ${saldo > 0 ? 'text-red-500' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            R$ {saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </td>
+                          <td className="p-3 text-center">
+                            <Badge className={
+                              cliente.status_pagamento === 'Pago' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400' :
+                              cliente.status_pagamento === 'Parcial' ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400' :
+                              'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400'
+                            }>
+                              {cliente.status_pagamento || 'Pendente'}
+                            </Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-muted/50 border-t-2 border-border">
+                      <td colSpan={3} className="p-3 text-sm font-bold text-foreground">TOTAIS</td>
+                      <td className="p-3 text-sm text-right font-bold text-foreground">
+                        R$ {clientes.reduce((sum, c) => sum + (c.valor_total_pacote || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="p-3 text-sm text-right font-bold text-emerald-600 dark:text-emerald-400">
+                        R$ {clientes.reduce((sum, c) => sum + (c.valor_pago || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="p-3 text-sm text-right font-bold text-red-500">
+                        R$ {clientes.reduce((sum, c) => sum + ((c.valor_total_pacote || 0) - (c.valor_pago || 0)), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+
         <Card className="shadow-lg border-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
