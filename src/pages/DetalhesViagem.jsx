@@ -40,6 +40,9 @@ export default function DetalhesViagem() {
   const [searchTerm, setSearchTerm] = useState("");
   // Removed showMapaAssentos and selectedPoltrona states
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showPagamentoForm, setShowPagamentoForm] = useState(false);
+  const [pagamentoCliente, setPagamentoCliente] = useState(null);
+  const [pagamentoData, setPagamentoData] = useState({ valor: 0, forma_pagamento: 'PIX', data_pagamento: '', observacoes: '' });
   const [formData, setFormData] = useState({
     nome_completo: '',
     cpf: '',
@@ -181,7 +184,113 @@ export default function DetalhesViagem() {
     },
   });
 
-  const resetForm = () => {
+  const registrarPagamentoMutation = useMutation({
+    mutationFn: async () => {
+      if (!pagamentoCliente || !pagamentoData.valor) return;
+      const novoValorPago = (pagamentoCliente.valor_pago || 0) + parseFloat(pagamentoData.valor);
+      const valorPacote = pagamentoCliente.valor_total_pacote || 0;
+      const novoStatus = novoValorPago >= valorPacote ? 'Pago' : novoValorPago > 0 ? 'Parcial' : 'Pendente';
+      
+      await base44.entities.Cliente.update(pagamentoCliente.id, {
+        valor_pago: novoValorPago,
+        status_pagamento: novoStatus
+      });
+
+      await supabase.from('pagamentos').insert({
+        id_cliente: pagamentoCliente.id,
+        valor: parseFloat(pagamentoData.valor),
+        forma_pagamento: pagamentoData.forma_pagamento,
+        data_pagamento: pagamentoData.data_pagamento || new Date().toISOString().split('T')[0],
+        observacoes: pagamentoData.observacoes || null
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['clientes-viagem']);
+      setShowPagamentoForm(false);
+      setPagamentoCliente(null);
+      setPagamentoData({ valor: 0, forma_pagamento: 'PIX', data_pagamento: '', observacoes: '' });
+      toast({ title: '✅ Pagamento registrado com sucesso!' });
+    },
+    onError: (err) => {
+      console.error('Erro ao registrar pagamento:', err);
+      toast({ title: '❌ Erro ao registrar pagamento', variant: 'destructive' });
+    }
+  });
+
+  const imprimirListaFinanceira = () => {
+    if (!viagem || clientes.length === 0) return;
+    const sorted = [...clientes].sort((a, b) => (a.nome_completo || '').localeCompare(b.nome_completo || ''));
+    const totalPacote = clientes.reduce((s, c) => s + (c.valor_total_pacote || 0), 0);
+    const totalPago = clientes.reduce((s, c) => s + (c.valor_pago || 0), 0);
+    const totalSaldo = totalPacote - totalPago;
+    const hoje = format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+
+    let html = `<!DOCTYPE html><html><head><title>Lista Financeira - ${viagem.nome}</title>
+    <style>
+      @page { size: A4 landscape; margin: 10mm; }
+      body { font-family: 'Segoe UI', sans-serif; font-size: 11px; color: #333; }
+      .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #10b981; padding-bottom: 8px; }
+      .header h2 { margin: 0; color: #065f46; }
+      .header p { margin: 4px 0 0; color: #6b7280; font-size: 11px; }
+      table { width: 100%; border-collapse: collapse; }
+      th { background: #10b981; color: white; padding: 8px; text-align: left; font-size: 10px; text-transform: uppercase; }
+      td { border-bottom: 1px solid #e5e7eb; padding: 7px 8px; }
+      tr:nth-child(even) { background: #f9fafb; }
+      .text-right { text-align: right; }
+      .text-center { text-align: center; }
+      .total-row { background: #ecfdf5; font-weight: bold; }
+      .badge { padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 600; }
+      .pago { background: #dcfce7; color: #166534; }
+      .parcial { background: #fef9c3; color: #854d0e; }
+      .pendente { background: #fee2e2; color: #991b1b; }
+      .saldo-positivo { color: #dc2626; }
+      .saldo-zero { color: #16a34a; }
+      @media print { .no-print { display: none !important; } }
+    </style></head><body>
+    <div class="header">
+      <h2>💲 LISTA FINANCEIRA — ${viagem.nome}</h2>
+      <p>${viagem.destino} | Emitido em: ${hoje} | Total de Passageiros: ${clientes.length}</p>
+    </div>
+    <table><thead><tr>
+      <th>Nº</th><th>Nome Completo</th><th>CPF</th>
+      <th class="text-right">Valor Pacote</th><th class="text-right">Valor Pago</th>
+      <th class="text-right">Saldo</th><th class="text-center">Status</th>
+    </tr></thead><tbody>`;
+
+    sorted.forEach((c, i) => {
+      const vp = c.valor_total_pacote || 0;
+      const pg = c.valor_pago || 0;
+      const saldo = vp - pg;
+      const status = c.status_pagamento || 'Pendente';
+      const badgeClass = status === 'Pago' ? 'pago' : status === 'Parcial' ? 'parcial' : 'pendente';
+      html += `<tr>
+        <td>${i + 1}</td>
+        <td><strong>${(c.nome_completo || '').toUpperCase()}</strong></td>
+        <td>${c.cpf || '-'}</td>
+        <td class="text-right">R$ ${vp.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+        <td class="text-right">R$ ${pg.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+        <td class="text-right ${saldo > 0 ? 'saldo-positivo' : 'saldo-zero'}">R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+        <td class="text-center"><span class="badge ${badgeClass}">${status}</span></td>
+      </tr>`;
+    });
+
+    html += `</tbody><tfoot><tr class="total-row">
+      <td colspan="3"><strong>TOTAIS</strong></td>
+      <td class="text-right">R$ ${totalPacote.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+      <td class="text-right">R$ ${totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+      <td class="text-right ${totalSaldo > 0 ? 'saldo-positivo' : 'saldo-zero'}">R$ ${totalSaldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+      <td></td>
+    </tr></tfoot></table>
+    <div class="no-print" style="text-align:center;margin-top:20px;">
+      <button onclick="window.print()" style="padding:10px 24px;background:#10b981;color:white;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;">🖨️ IMPRIMIR</button>
+    </div></body></html>`;
+
+    const w = window.open('', '_blank');
+    w.document.write(html);
+    w.document.close();
+  };
+
+
     const isPirapark = viagem?.modo_pirapark;
     const valorPadrao = isPirapark ? 429.90 : (viagem?.valor_1 || 0);
     
@@ -1364,13 +1473,23 @@ export default function DetalhesViagem() {
       <TabsContent value="lista-financeira">
         <Card className="shadow-lg">
           <CardHeader className="border-b border-border">
-            <CardTitle className="text-xl text-foreground flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-emerald-500" />
-              Lista Financeira dos Passageiros ({clientes.length})
-            </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              Resumo de Nome, CPF e Valor Pago de cada passageiro desta viagem.
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl text-foreground flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-emerald-500" />
+                  Lista Financeira dos Passageiros ({clientes.length})
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Resumo de Nome, CPF e Valor Pago de cada passageiro desta viagem.
+                </p>
+              </div>
+              {clientes.length > 0 && (
+                <Button onClick={imprimirListaFinanceira} variant="outline" className="gap-2">
+                  <Printer className="w-4 h-4" />
+                  Imprimir Lista
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             {clientes.length === 0 ? (
@@ -1390,6 +1509,7 @@ export default function DetalhesViagem() {
                       <th className="text-right p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Valor Pago</th>
                       <th className="text-right p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Saldo</th>
                       <th className="text-center p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                      <th className="text-center p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1420,6 +1540,21 @@ export default function DetalhesViagem() {
                               {cliente.status_pagamento || 'Pendente'}
                             </Badge>
                           </td>
+                          <td className="p-3 text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-emerald-600 hover:text-emerald-500 hover:bg-emerald-500/10 h-8 px-2 gap-1"
+                              onClick={() => {
+                                setPagamentoCliente(cliente);
+                                setPagamentoData({ valor: 0, forma_pagamento: 'PIX', data_pagamento: new Date().toISOString().split('T')[0], observacoes: '' });
+                                setShowPagamentoForm(true);
+                              }}
+                            >
+                              <DollarSign className="w-3.5 h-3.5" />
+                              Pagar
+                            </Button>
+                          </td>
                         </tr>
                       );
                     })}
@@ -1436,7 +1571,7 @@ export default function DetalhesViagem() {
                       <td className="p-3 text-sm text-right font-bold text-red-500">
                         R$ {clientes.reduce((sum, c) => sum + ((c.valor_total_pacote || 0) - (c.valor_pago || 0)), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td></td>
+                      <td colSpan={2}></td>
                     </tr>
                   </tfoot>
                 </table>
@@ -1852,7 +1987,86 @@ export default function DetalhesViagem() {
         </DialogContent>
       </Dialog>
 
-      {/* Removed Dialog for showMapaAssentos */}
+      {/* Modal Registrar Pagamento */}
+      <Dialog open={showPagamentoForm} onOpenChange={setShowPagamentoForm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-emerald-500" />
+              Registrar Pagamento
+            </DialogTitle>
+          </DialogHeader>
+          {pagamentoCliente && (
+            <div className="space-y-4">
+              <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                <p className="font-semibold text-foreground">{pagamentoCliente.nome_completo}</p>
+                <p className="text-sm text-muted-foreground">CPF: {pagamentoCliente.cpf || '-'}</p>
+                <div className="flex gap-4 text-sm mt-2">
+                  <span>Pacote: <strong>R$ {(pagamentoCliente.valor_total_pacote || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></span>
+                  <span>Pago: <strong className="text-emerald-600">R$ {(pagamentoCliente.valor_pago || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></span>
+                  <span>Saldo: <strong className="text-red-500">R$ {((pagamentoCliente.valor_total_pacote || 0) - (pagamentoCliente.valor_pago || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Valor do Pagamento (R$) *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={pagamentoData.valor}
+                  onChange={(e) => setPagamentoData({ ...pagamentoData, valor: e.target.value })}
+                  placeholder="0,00"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Forma de Pagamento</Label>
+                <Select value={pagamentoData.forma_pagamento} onValueChange={(v) => setPagamentoData({ ...pagamentoData, forma_pagamento: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PIX">PIX</SelectItem>
+                    <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="Cartão Crédito">Cartão Crédito</SelectItem>
+                    <SelectItem value="Cartão Débito">Cartão Débito</SelectItem>
+                    <SelectItem value="Transferência">Transferência</SelectItem>
+                    <SelectItem value="Boleto">Boleto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Data do Pagamento</Label>
+                <Input
+                  type="date"
+                  value={pagamentoData.data_pagamento}
+                  onChange={(e) => setPagamentoData({ ...pagamentoData, data_pagamento: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Observações</Label>
+                <Input
+                  value={pagamentoData.observacoes}
+                  onChange={(e) => setPagamentoData({ ...pagamentoData, observacoes: e.target.value })}
+                  placeholder="Observações opcionais..."
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPagamentoForm(false)}>Cancelar</Button>
+            <Button
+              onClick={() => registrarPagamentoMutation.mutate()}
+              disabled={registrarPagamentoMutation.isPending || !pagamentoData.valor}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {registrarPagamentoMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Confirmar Pagamento
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
