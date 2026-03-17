@@ -1987,7 +1987,86 @@ export default function DetalhesViagem() {
         </DialogContent>
       </Dialog>
 
-      {/* Removed Dialog for showMapaAssentos */}
+      {/* Modal Registrar Pagamento */}
+      <Dialog open={showPagamentoForm} onOpenChange={setShowPagamentoForm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-emerald-500" />
+              Registrar Pagamento
+            </DialogTitle>
+          </DialogHeader>
+          {pagamentoCliente && (
+            <div className="space-y-4">
+              <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                <p className="font-semibold text-foreground">{pagamentoCliente.nome_completo}</p>
+                <p className="text-sm text-muted-foreground">CPF: {pagamentoCliente.cpf || '-'}</p>
+                <div className="flex gap-4 text-sm mt-2">
+                  <span>Pacote: <strong>R$ {(pagamentoCliente.valor_total_pacote || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></span>
+                  <span>Pago: <strong className="text-emerald-600">R$ {(pagamentoCliente.valor_pago || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></span>
+                  <span>Saldo: <strong className="text-red-500">R$ {((pagamentoCliente.valor_total_pacote || 0) - (pagamentoCliente.valor_pago || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Valor do Pagamento (R$) *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={pagamentoData.valor}
+                  onChange={(e) => setPagamentoData({ ...pagamentoData, valor: e.target.value })}
+                  placeholder="0,00"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Forma de Pagamento</Label>
+                <Select value={pagamentoData.forma_pagamento} onValueChange={(v) => setPagamentoData({ ...pagamentoData, forma_pagamento: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PIX">PIX</SelectItem>
+                    <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="Cartão Crédito">Cartão Crédito</SelectItem>
+                    <SelectItem value="Cartão Débito">Cartão Débito</SelectItem>
+                    <SelectItem value="Transferência">Transferência</SelectItem>
+                    <SelectItem value="Boleto">Boleto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Data do Pagamento</Label>
+                <Input
+                  type="date"
+                  value={pagamentoData.data_pagamento}
+                  onChange={(e) => setPagamentoData({ ...pagamentoData, data_pagamento: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Observações</Label>
+                <Input
+                  value={pagamentoData.observacoes}
+                  onChange={(e) => setPagamentoData({ ...pagamentoData, observacoes: e.target.value })}
+                  placeholder="Observações opcionais..."
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPagamentoForm(false)}>Cancelar</Button>
+            <Button
+              onClick={() => registrarPagamentoMutation.mutate()}
+              disabled={registrarPagamentoMutation.isPending || !pagamentoData.valor}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {registrarPagamentoMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Confirmar Pagamento
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
