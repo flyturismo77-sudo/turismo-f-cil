@@ -1447,6 +1447,7 @@ export default function DetalhesViagem() {
       </TabsContent>
 
 
+      <TabsContent value="documentos">
         <Card className="shadow-lg border-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
