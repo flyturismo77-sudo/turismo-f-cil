@@ -1473,13 +1473,23 @@ export default function DetalhesViagem() {
       <TabsContent value="lista-financeira">
         <Card className="shadow-lg">
           <CardHeader className="border-b border-border">
-            <CardTitle className="text-xl text-foreground flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-emerald-500" />
-              Lista Financeira dos Passageiros ({clientes.length})
-            </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              Resumo de Nome, CPF e Valor Pago de cada passageiro desta viagem.
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl text-foreground flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-emerald-500" />
+                  Lista Financeira dos Passageiros ({clientes.length})
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Resumo de Nome, CPF e Valor Pago de cada passageiro desta viagem.
+                </p>
+              </div>
+              {clientes.length > 0 && (
+                <Button onClick={imprimirListaFinanceira} variant="outline" className="gap-2">
+                  <Printer className="w-4 h-4" />
+                  Imprimir Lista
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             {clientes.length === 0 ? (
@@ -1499,6 +1509,7 @@ export default function DetalhesViagem() {
                       <th className="text-right p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Valor Pago</th>
                       <th className="text-right p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Saldo</th>
                       <th className="text-center p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                      <th className="text-center p-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1529,6 +1540,21 @@ export default function DetalhesViagem() {
                               {cliente.status_pagamento || 'Pendente'}
                             </Badge>
                           </td>
+                          <td className="p-3 text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-emerald-600 hover:text-emerald-500 hover:bg-emerald-500/10 h-8 px-2 gap-1"
+                              onClick={() => {
+                                setPagamentoCliente(cliente);
+                                setPagamentoData({ valor: 0, forma_pagamento: 'PIX', data_pagamento: new Date().toISOString().split('T')[0], observacoes: '' });
+                                setShowPagamentoForm(true);
+                              }}
+                            >
+                              <DollarSign className="w-3.5 h-3.5" />
+                              Pagar
+                            </Button>
+                          </td>
                         </tr>
                       );
                     })}
@@ -1545,7 +1571,7 @@ export default function DetalhesViagem() {
                       <td className="p-3 text-sm text-right font-bold text-red-500">
                         R$ {clientes.reduce((sum, c) => sum + ((c.valor_total_pacote || 0) - (c.valor_pago || 0)), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </td>
-                      <td></td>
+                      <td colSpan={2}></td>
                     </tr>
                   </tfoot>
                 </table>
