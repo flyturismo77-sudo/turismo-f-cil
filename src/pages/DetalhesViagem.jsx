@@ -1019,8 +1019,9 @@ export default function DetalhesViagem() {
       )}
 
       <Tabs defaultValue="detalhes" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="detalhes">Detalhes e Passageiros</TabsTrigger>
+          <TabsTrigger value="lista-financeira">💲 Lista Financeira</TabsTrigger>
           <TabsTrigger value="despesas">💰 Despesas</TabsTrigger>
           <TabsTrigger value="documentos">Documentos da Viagem</TabsTrigger>
           <TabsTrigger value="manual">📖 Manual do Sistema</TabsTrigger>
