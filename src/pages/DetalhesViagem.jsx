@@ -40,6 +40,9 @@ export default function DetalhesViagem() {
   const [searchTerm, setSearchTerm] = useState("");
   // Removed showMapaAssentos and selectedPoltrona states
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showPagamentoForm, setShowPagamentoForm] = useState(false);
+  const [pagamentoCliente, setPagamentoCliente] = useState(null);
+  const [pagamentoData, setPagamentoData] = useState({ valor: 0, forma_pagamento: 'PIX', data_pagamento: '', observacoes: '' });
   const [formData, setFormData] = useState({
     nome_completo: '',
     cpf: '',
